@@ -41,11 +41,17 @@ public class TweetService {
         return tweet.getAuthor().getUsername().equals(req.getUserPrincipal().getName());
     }
 
-    public void save(Tweet tweet) {
+    public TweetService save(Tweet tweet) {
         tweetRepository.save(tweet);
+        return this;
     }
-    public void delete(Tweet tweet) {
+    public TweetService saveAndFlush(Tweet tweet) {
+        tweetRepository.saveAndFlush(tweet);
+        return this;
+    }
+    public TweetService delete(Tweet tweet) {
         tweetRepository.delete(tweet);
+        return this;
     }
     
     public Page<Tweet> findPage(Pageable page){

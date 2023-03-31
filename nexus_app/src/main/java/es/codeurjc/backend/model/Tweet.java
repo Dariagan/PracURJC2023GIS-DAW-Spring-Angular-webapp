@@ -15,10 +15,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.codeurjc.backend.service.TweetService;
 
-//Completely programmed by group 13 A
+// Programmed by group 13-A
 @Entity(name = "Tweet")
-public class Tweet implements Comparable<Tweet>{
-    
+public class Tweet implements Comparable<Tweet>
+{    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -109,6 +109,7 @@ public class Tweet implements Comparable<Tweet>{
         this.text = text;
         this.media = media;
         this.tags = tags;
+        //this.likes.add(author);
     }
 
     public long getId() {return id;}
@@ -124,22 +125,19 @@ public class Tweet implements Comparable<Tweet>{
     public Set<User> getReporters() {
         return reporters;
     }
-    public void report(User reporter, TweetService tweetService) {
+    public void report(User reporter) {
         reporters.add(reporter);
-        tweetService.save(this);
     }
 
     public String getText() {return text;}
     public void setText(String text) {this.text = text;}
     
     public Set<User> getLikes() {return likes;}
-    public void switchLike(User user, TweetService tweetService) {
+    public void switchLike(User user) {
         assert(user != null);
         if (!likes.contains(user))
             likes.add(user);
         else likes.remove(user);
-
-        tweetService.save(this);
     }
 
     public Set<Tweet> getShares() {return shares;}
@@ -152,6 +150,7 @@ public class Tweet implements Comparable<Tweet>{
 
     public List<Tweet> getChildren() {return children;}
     public void reply(Tweet tweet, TweetService tweetService) {
+        assert tweet != this;
         children.add(tweet);
         tweetService.save(this);
         tweetService.save(tweet);

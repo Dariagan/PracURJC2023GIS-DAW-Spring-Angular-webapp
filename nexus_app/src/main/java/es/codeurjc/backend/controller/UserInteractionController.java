@@ -13,7 +13,7 @@ import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
-// Programmed exclusively by group 13 A
+// All methods/functionality programmed entirely by group 13 A
 @Controller
 public class UserInteractionController {
 
@@ -32,7 +32,9 @@ public class UserInteractionController {
             
             if (UserService.urlUserExistsAndNotSelfAction(users)){
             
-                users.getRight().switchFollow(users.getLeft(), userService);
+                users.getRight().switchFollow(users.getLeft());
+
+                userService.save(users.getLeft()).save(users.getRight());
 
                 return UserService.redirectToReferer(req);
             } else 

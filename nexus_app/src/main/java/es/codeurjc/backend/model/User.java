@@ -23,8 +23,8 @@ import es.codeurjc.backend.service.UserService;
 
 import org.springframework.lang.Nullable;
 
-//class initially defined by group 13 B in a basic manner, 
-//vastly refactored, reprogrammed, given all functionality by group 13 A
+// Class initially defined by group 13 B in a basic manner, 
+// refactored, reprogrammed, given all functionality by group 13 A
 @Entity(name = "UserTable")
 public class User {
 
@@ -145,10 +145,6 @@ public class User {
         this.profilePicture = profilePicture;
     }
 
-    /*
-    public long getId() {return id;}
-    public void setId(long id) {this.id = id;}*/
-
     public String getName() {return name;}
     public void setName(String name) {this.name = name; }
 
@@ -164,8 +160,14 @@ public class User {
     public String getDescription() {return description;}
     public void setDescription(String description) {this.description = description;}
 
-    public void ban() {this.banned = true;}
-    public void unban() {this.banned = false;}
+    public void ban() {
+        this.banned = true;
+        roles.remove("USER");
+    }
+    public void unban() {
+        this.banned = false;
+        roles.add("USER");
+    }
     public boolean isBanned() {return banned;}
 
     public Blob getProfilePicture() {return profilePicture;}
@@ -176,7 +178,6 @@ public class User {
     }
 
     public List<Tweet> getTweets() {return tweets;}
-    public void setTweets(List<Tweet> tweets) {this.tweets = tweets;}
   
     public Set<String> getRoles() {return this.roles;}
 
@@ -188,13 +189,11 @@ public class User {
         return userService.getFollowers(this);
     }
     public Set<User> getFollowing() {return following;}
-    public void switchFollow(User user, UserService userService) {
+    public void switchFollow(User user) {
         assert user != null && !user.equals(this);
         if (!following.contains(user))
             following.add(user);
         else following.remove(user);
-
-        userService.save(this);
     }
 
     public Set<User> getBlockedUsers() {return blockedUsers;}
@@ -204,6 +203,7 @@ public class User {
     public LocalDateTime getSignUpDate() {return signUpDate;}
     public Set<Tweet> getReportedTweets() {return reportedTweets;} 
 
+    public String toString(){return username;}
 
     //DON'T USE, ONLY FOR DATABASE 
     public User() {}

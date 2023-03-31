@@ -29,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
     
     
-    // Access configurated by group 13 A
+    // Access completely configured by group 13 A
     @Override
     protected void configure(HttpSecurity http) throws Exception {
     	

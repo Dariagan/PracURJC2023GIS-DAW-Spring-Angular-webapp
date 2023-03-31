@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-// Entire controller programmed by group 13 A
+// All methods/functionality programmed entirely by group 13-A
 @Controller
 public class FeedController {
     

@@ -21,7 +21,7 @@ import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
-//Whole controller programmed by group 13 A
+// All methods/functionality programmed entirely by group 13 A
 @Controller
 public class TweetInteractionController {
     
@@ -32,9 +32,8 @@ public class TweetInteractionController {
     UserService userService;
     
     @RequestMapping("/tweet/{id}/like")
-    public String handleLike(
-        HttpServletRequest req, @PathVariable String id
-    ) {
+    public String handleLike(HttpServletRequest req, @PathVariable String id) 
+    {
         Optional<User> userOpt = userService.getUserBy(req);
         Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
@@ -42,7 +41,8 @@ public class TweetInteractionController {
             if (tweetOpt.isPresent()) {
 
                 Tweet tweet = tweetOpt.get();
-                tweet.switchLike(userOpt.get(), tweetService);
+                tweet.switchLike(userOpt.get());
+                tweetService.save(tweet);
             }
             return UserService.redirectToReferer(req);
         }
@@ -50,8 +50,8 @@ public class TweetInteractionController {
     }
 
     @RequestMapping("/tweet/{id}/report")
-    public String reportTweet(
-        Model model, HttpServletRequest req, @PathVariable Long id) {
+    public String reportTweet(Model model, HttpServletRequest req, @PathVariable Long id) 
+    {
         Optional<User> reportingUserOpt = userService.getUserBy(req);
         Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
@@ -59,7 +59,8 @@ public class TweetInteractionController {
             if (tweetOpt.isPresent()) {
 
                 Tweet tweet = tweetOpt.get();
-                tweet.report(reportingUserOpt.get(), tweetService);           
+                tweet.report(reportingUserOpt.get());     
+                tweetService.save(tweet);      
             }
             return UserService.redirectToReferer(req);
         }
@@ -67,16 +68,15 @@ public class TweetInteractionController {
     }
 
     @RequestMapping("/tweet/{id}/delete")
-    public String deleteTweet(@PathVariable Long id, HttpServletRequest req) {
-
+    public String deleteTweet(@PathVariable Long id, HttpServletRequest req) 
+    {
         Optional<User> deletingUserOpt = userService.getUserBy(req);
         Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
         if (tweetOpt.isPresent() && 
         (TweetService.isOwnTweet(tweetOpt.get(), req) ||
         UserService.isAdmin(deletingUserOpt) || 
-        TweetService.readIfPostShouldGetdeleted(id))) 
-        {
+        TweetService.readIfPostShouldGetdeleted(id))) {
             tweetService.delete(tweetOpt.get());
           
             return "redirect:" + req.getHeader("referer");
@@ -85,8 +85,8 @@ public class TweetInteractionController {
     }
 
     @GetMapping("/tweet/{id}/media")
-	public ResponseEntity<Resource> downloadImage(@PathVariable Long id) {
-
+	public ResponseEntity<Resource> downloadImage(@PathVariable Long id) 
+    {
 		Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
         Optional<Blob> mediaOpt = Optional.ofNullable(tweetOpt.get().getMedia());

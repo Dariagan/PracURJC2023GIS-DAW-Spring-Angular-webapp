@@ -31,10 +31,10 @@ public class DataBaseController {
     @Autowired
 	private PasswordEncoder passwordEncoder;
    
-    //Method body programmed by group 13 A
+    //Method body programmed by group 13-A
     @PostConstruct
-    public void init() {
-
+    public void init() 
+    {
         User.Builder builder = new User.Builder();
         Tweet.Builder tweetBuilder = new Tweet.Builder();
 
@@ -49,39 +49,47 @@ public class DataBaseController {
         User userA = builder.build();
         User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
         User userC = builder.setUsername("c").setEmail("c@c.com").build();
+        User userD = builder.setUsername("d").setEmail("d@e.com").build();
+        User userE = builder.setUsername("e").setEmail("e@e.com").build();
         
-        userService.save(userA)
-        .save(userB)
-        .save(userC);
+        userService.save(userA).save(userB).save(userC).save(userD).save(userE);
+        userRepository.flush();
 
-
-        userA.switchFollow(userB, userService);
+        userA.switchFollow(userB);
         
         // Building tweets
         tweetBuilder
             .setAuthor(userA)
-            .setText("less mean comment")
-            .addTag("cars").addTag("sports").addTag("pets");
+            .setText("I like fat cats")
+            .addTag("chonkers").addTag("cats").addTag("pets");
         
         Tweet tweet1 = tweetBuilder.build();
 
-        tweet1.switchLike(userB, tweetService);
+        
+        tweet1.switchLike(userB);
+        tweet1.report(userB);
+   
+        tweetService.save(tweet1);
+
         //-------------------------------------
-        tweetBuilder.setAuthor(userB).setText("mean comment");
+        tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
         
         Tweet tweet2 = tweetBuilder.build();
+        Tweet tweet3 = tweetBuilder.build();
 
-        tweet2.report(userA, tweetService);
-        tweetRepository.flush();
-        tweet2.report(userC, tweetService);
-        tweetRepository.flush();
+        tweet2.report(userA);
+
+        tweet2.report(userC);
       
+        tweet2.switchLike(userD);
         
-        tweet1.report(userB, tweetService);
+        tweet2.switchLike(userE);
+        tweet3.switchLike(userD);
+        tweet3.switchLike(userE);
+
+        tweetService.save(tweet2).save(tweet3);
 
         tweetBuilder.setAuthor(userB);
-
-
 
         for (int i = 0; i < 20; i++){
 
