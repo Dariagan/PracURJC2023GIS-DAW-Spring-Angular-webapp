@@ -13,6 +13,7 @@ import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
+// Programmed exclusively by group 13 A
 @Controller
 public class UserInteractionController {
 

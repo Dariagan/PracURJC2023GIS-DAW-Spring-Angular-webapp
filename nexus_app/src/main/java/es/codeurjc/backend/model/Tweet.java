@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.codeurjc.backend.service.TweetService;
 
+//Completely programmed by group 13 A
 @Entity(name = "Tweet")
 public class Tweet implements Comparable<Tweet>{
     
@@ -115,9 +116,7 @@ public class Tweet implements Comparable<Tweet>{
 
     public User getAuthor() {return author;}
     public String getUserName() {return author.getUsername();}
-    public void setNullAuthor() {
-        this.author = null;
-    }
+    public void setNullAuthor() {this.author = null;}
     public boolean authorIsNull() {return this.author == null;}
 
     public LocalDateTime getDate() {return date;}
@@ -129,7 +128,6 @@ public class Tweet implements Comparable<Tweet>{
         reporters.add(reporter);
         tweetService.save(this);
     }
-
 
     public String getText() {return text;}
     public void setText(String text) {this.text = text;}

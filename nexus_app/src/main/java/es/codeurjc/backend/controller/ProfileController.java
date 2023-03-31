@@ -31,7 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
-
+// Whole controller programmed by group 13 A
 @Controller
 public class ProfileController {
     

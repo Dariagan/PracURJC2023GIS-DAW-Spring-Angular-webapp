@@ -16,6 +16,7 @@ import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 import es.codeurjc.backend.service.TweetService;
 
+
 @RestController
 public class DataBaseController {
 
@@ -30,6 +31,7 @@ public class DataBaseController {
     @Autowired
 	private PasswordEncoder passwordEncoder;
    
+    //Method body programmed by group 13 A
     @PostConstruct
     public void init() {
 

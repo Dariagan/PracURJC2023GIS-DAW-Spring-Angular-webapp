@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+//Class initially defined by group 13 B, vastly refactored by group 13 A
 @Entity
 public class Message {
 

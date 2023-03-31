@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import java.sql.Blob;
 import java.util.Optional;
 
+//Whole class programmed by group 13 A
 public class ResourcesBuilder {
 
     public static ResponseEntity.BodyBuilder getImgResponseHeader() {

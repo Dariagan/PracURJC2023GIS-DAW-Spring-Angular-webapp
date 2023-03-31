@@ -21,6 +21,7 @@ import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
+//Whole controller programmed by group 13 A
 @Controller
 public class TweetInteractionController {
     

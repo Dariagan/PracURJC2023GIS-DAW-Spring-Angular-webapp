@@ -23,7 +23,8 @@ import es.codeurjc.backend.service.UserService;
 
 import org.springframework.lang.Nullable;
 
-
+//class initially defined by group 13 B in a basic manner, 
+//vastly refactored, reprogrammed, given all functionality by group 13 A
 @Entity(name = "UserTable")
 public class User {
 

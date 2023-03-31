@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 
+// Programmed by group 13 A
 @Service
 public class TweetService {
 

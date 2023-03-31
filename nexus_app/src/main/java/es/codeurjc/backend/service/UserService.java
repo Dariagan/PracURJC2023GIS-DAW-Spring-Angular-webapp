@@ -18,6 +18,7 @@ import es.codeurjc.backend.model.User;
 
 import es.codeurjc.backend.repository.UserRepository;
 
+// Whole service programmed by group 13 A
 @Service
 public final class UserService {
 
