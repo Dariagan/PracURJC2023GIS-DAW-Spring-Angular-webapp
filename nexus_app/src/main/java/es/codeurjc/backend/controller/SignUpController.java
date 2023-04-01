@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
-//Whole controller programmed by group 13 A
+// Entire controller programmed by group 13 A
 @Controller
 public class SignUpController {
 

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-// Entire controller programmed by group 13 A
+// All methods/functionality programmed entirely by group 13-A
 @Controller
 public class FeedController {
     
@@ -35,15 +35,15 @@ public class FeedController {
     private UserService userService;
 
     @RequestMapping("/feed")
-    public String showFeed(Model model, HttpServletRequest request){
-
+    public String showFeed(Model model, HttpServletRequest request)
+    {
         Optional<User> loggedUser = userService.getUserBy(request);
 
         List<Tweet> tweetsToDisplay;
 
-        if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0){
+        if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0)
             tweetsToDisplay = tweetRepository.findFollowedUsersTweets(loggedUser.get(), PageRequest.of(0, 10));
-        } else
+        else
             tweetsToDisplay = tweetRepository.findTop10ByOrderByDateDesc();
         
         updateFeedModel(model, loggedUser, tweetsToDisplay);
@@ -52,8 +52,8 @@ public class FeedController {
     }
 
     @GetMapping("/feed/search")
-    public String searchBytags(Model model, HttpServletRequest req, @RequestParam String tags) {
-
+    public String searchBytags(Model model, HttpServletRequest req, @RequestParam String tags) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
 
         Set<String> inputTags = Set.of(tags.split("\\s+"));
@@ -66,18 +66,20 @@ public class FeedController {
     }
 
     @RequestMapping("/feed/moderator")
-    public String showModFeed(Model model, HttpServletRequest req) {
+    public String showModFeed(Model model, HttpServletRequest req) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
-        if (loggedUser.isPresent() && loggedUser.get().isAdmin()){
+        if (loggedUser.isPresent() && loggedUser.get().isAdmin())
+        {
             updateFeedModel(model, loggedUser, tweetService.queryTweetsToModerate());
             return "feed";
-        } else
-            return "error";
+        } 
+        else return "error";
     }
 
     @RequestMapping("/tomyprofile")
-    public String redirectToProfile(final Model model, HttpServletRequest req) {
-
+    public String redirectToProfile(final Model model, HttpServletRequest req) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
 
         if (loggedUser.isPresent())
@@ -86,8 +88,10 @@ public class FeedController {
             return "error";
     }
 
-    private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) {
-        model.addAttribute("loggedUser", loggedUser.get());
+    private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) 
+    {
+        if (loggedUser.isPresent())
+            model.addAttribute("loggedUser", loggedUser.get());
         model.addAttribute("authenticated", loggedUser.isPresent());
         model.addAttribute("inLogin", false);
         model.addAttribute("tweets", displayedTweets); 

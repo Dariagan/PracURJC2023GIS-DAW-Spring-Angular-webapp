@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import ch.qos.logback.core.joran.conditional.ElseAction;
 import es.codeurjc.backend.model.User;
 
 import es.codeurjc.backend.repository.UserRepository;
@@ -31,9 +30,7 @@ public final class UserService {
             .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
     }
 
-    public OptTwo<User> getUserBy(
-        String username, HttpServletRequest request
-    ) {
+    public OptTwo<User> getUserBy(String username, HttpServletRequest request) {
         return OptTwo.of(getUserBy(username), getUserBy(request));
     }
 

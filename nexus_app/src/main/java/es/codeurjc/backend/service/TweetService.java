@@ -13,14 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 
 // Programmed by group 13 A
@@ -41,11 +36,17 @@ public class TweetService {
         return tweet.getAuthor().getUsername().equals(req.getUserPrincipal().getName());
     }
 
-    public void save(Tweet tweet) {
+    public TweetService save(Tweet tweet) {
         tweetRepository.save(tweet);
+        return this;
     }
-    public void delete(Tweet tweet) {
+    public TweetService saveAndFlush(Tweet tweet) {
+        tweetRepository.saveAndFlush(tweet);
+        return this;
+    }
+    public TweetService delete(Tweet tweet) {
         tweetRepository.delete(tweet);
+        return this;
     }
     
     public Page<Tweet> findPage(Pageable page){
@@ -60,7 +61,8 @@ public class TweetService {
         return tweetRepository.findAll();
     }
 
-    public static boolean readIfPostShouldGetdeleted(Long id) {
+    public static boolean readIfPostShouldGetdeleted(Long id) 
+    {
         final String modEndpoint = "https://mod-microservice.vercel.app/postShouldGetDeleted/";
 
         RestTemplate api = new RestTemplate();
@@ -74,7 +76,6 @@ public class TweetService {
     public List<Tweet> queryTweetsToModerate() {
         return tweetRepository.findMostReportedTweets();
     }
-
 
     public List<Tweet> getTweetsByUser(User user){
         return tweetRepository.findAllByAuthor(user);

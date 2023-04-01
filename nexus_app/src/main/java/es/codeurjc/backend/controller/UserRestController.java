@@ -151,8 +151,8 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/tweets")
-    public ResponseEntity<List<Tweet>> getUserTweets(HttpServletRequest request) {
-
+    public ResponseEntity<List<Tweet>> getUserTweets(HttpServletRequest request) 
+    {
         Optional<User> userOpt = userService.getUserBy(request);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
@@ -165,7 +165,6 @@ public class UserRestController {
             return ResponseEntity.notFound().build();
     }
 
-    //Followers of current user
     @Operation(summary = "Get User followers")
     @ApiResponses(value = {
         @ApiResponse(
@@ -188,8 +187,8 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/followers")
-    public ResponseEntity<Set<User>> getUserFollowers(HttpServletRequest request) {
-          
+    public ResponseEntity<Set<User>> getUserFollowers(HttpServletRequest request)
+    {
         Optional<User> userOpt = userService.getUserBy(request);
 
         if (userOpt.isPresent()) 
@@ -198,7 +197,7 @@ public class UserRestController {
             return ResponseEntity.notFound().build();
     }
 
-    //list of following of the current user
+
     @Operation(summary = "Get User following list")
     @ApiResponses(value = {
         @ApiResponse(
@@ -221,8 +220,8 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/following")
-    public ResponseEntity<Set<User>> getUserFollowing(HttpServletRequest request) {
-        
+    public ResponseEntity<Set<User>> getUserFollowing(HttpServletRequest request) 
+    {
         Optional<User> userOpt = userService.getUserBy(request);
 
         if (userOpt.isPresent()) {
@@ -253,8 +252,8 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/image")
-    public ResponseEntity<Object> downloadImage(HttpServletRequest request) throws SQLException {
-        
+    public ResponseEntity<Object> downloadImage(HttpServletRequest request) throws SQLException 
+    {
         Optional<User> userOpt = userService.getUserBy(request);
 
         if (userOpt.isPresent() && userOpt.get().hasProfilePicture()) {
@@ -270,7 +269,8 @@ public class UserRestController {
 
     //POST new user
     @Operation(summary = "Post new user")
-    @ApiResponses(value = {
+    @ApiResponses(value = 
+    {
         @ApiResponse(
             responseCode = "201",
             description = "Created",
@@ -287,8 +287,8 @@ public class UserRestController {
     })
     @PostMapping("/users/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-
+    public ResponseEntity<User> createUser(@RequestBody User user) 
+    {
         //Only for creating non-admins
         if (!user.isAdmin()) {
             userService.save(user);
@@ -323,7 +323,8 @@ public class UserRestController {
         )
     })
     @PostMapping("/me/image")
-    public ResponseEntity<Object> uploadImage(HttpServletRequest request, @RequestParam MultipartFile imageFile) throws IOException {
+    public ResponseEntity<Object> uploadImage(HttpServletRequest request, @RequestParam MultipartFile imageFile) throws IOException
+    {
         Optional<User> userOpt = userService.getUserBy(request);
 
         if (userOpt.isPresent()) {
