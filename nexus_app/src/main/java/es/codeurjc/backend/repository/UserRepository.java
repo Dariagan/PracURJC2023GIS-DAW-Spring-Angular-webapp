@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import es.codeurjc.backend.model.User;
 
-//Programmed by group 13 A
+// Programmed by group 13 A
 @Component
 public interface UserRepository extends JpaRepository<User, String>{
 

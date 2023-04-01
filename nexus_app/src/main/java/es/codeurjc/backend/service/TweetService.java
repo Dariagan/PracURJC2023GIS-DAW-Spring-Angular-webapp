@@ -66,7 +66,8 @@ public class TweetService {
         return tweetRepository.findAll();
     }
 
-    public static boolean readIfPostShouldGetdeleted(Long id) {
+    public static boolean readIfPostShouldGetdeleted(Long id) 
+    {
         final String modEndpoint = "https://mod-microservice.vercel.app/postShouldGetDeleted/";
 
         RestTemplate api = new RestTemplate();

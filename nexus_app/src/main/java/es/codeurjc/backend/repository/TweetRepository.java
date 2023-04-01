@@ -34,7 +34,7 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
 
     // Advanced query made by group 13-A
     @Query("SELECT t FROM Tweet t JOIN t.likes r GROUP BY t.id ORDER BY COUNT(r) DESC")
-    List<Tweet> findMostLikedTweets();
+    List<Tweet> findMostLikedTweets(Pageable pageable);
     
     // Advanced query made by group 13-A
     @Query("SELECT t FROM Tweet t WHERE EXISTS (SELECT tag FROM t.tags tag WHERE tag IN :tags)")

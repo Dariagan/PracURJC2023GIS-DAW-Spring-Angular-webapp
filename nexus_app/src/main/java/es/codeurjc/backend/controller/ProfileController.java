@@ -46,10 +46,10 @@ public class ProfileController {
 
     private boolean following;
 
+
     @RequestMapping("/u/{username}")
-    public String showProfile(
-        Model model, @PathVariable String username, HttpServletRequest req
-    ){
+    public String redirect(Model model, @PathVariable String username, HttpServletRequest req)
+    {
         OptTwo<User> users = userService.getUserBy(username, req);
 
         // If URL-user exists
@@ -71,8 +71,8 @@ public class ProfileController {
     }
 
     @GetMapping("/u/{username}/profilepicture")
-	public ResponseEntity<Resource> downloadImage(@PathVariable String username) {
-
+	public ResponseEntity<Resource> downloadImage(@PathVariable String username) 
+    {
 		Optional<User> user = userService.getUserBy(username);
         if (user.isEmpty()) return getAnonImage();
 
@@ -84,29 +84,30 @@ public class ProfileController {
             .getOrElse(getAnonImage());
 	}
 
-    private ResponseEntity<Resource> getAnonImage() {
+    private ResponseEntity<Resource> getAnonImage() 
+    {
         Resource img = new ClassPathResource("static/images/anonpfp.jpg");
         return ResourcesBuilder.buildImgResponseOrNotFound(img);
     }
 
     @GetMapping("/u/{username}/write")
-    public String startWritingTweet(@PathVariable String username, Model model) {
-        
-        if (UserService.isOwnResource(username, loggedUser)) {
-
+    public String startWritingTweet(@PathVariable String username, Model model) 
+    {
+        if (UserService.isOwnResource(username, loggedUser)) 
+        {
             model.addAttribute("posting", true);
             modelProfile(model, true);
             return "profile";
-        } else 
-            return "error";
+        } 
+        else return "error";
     }
 
     @PostMapping("/u/{username}/posttweet")
     public String startWritingTweet(Model model, @PathVariable String username, 
-    @RequestParam String text, @RequestParam MultipartFile image) {
-        
-        if (UserService.isOwnResource(username, loggedUser)) {
-
+    @RequestParam String text, @RequestParam MultipartFile image) 
+    {
+        if (UserService.isOwnResource(username, loggedUser)) 
+        {
             Tweet.Builder builder = 
             new Tweet.Builder()
                 .setAuthor(loggedUser.get())
@@ -125,17 +126,17 @@ public class ProfileController {
             tweetRepository.save(builder.build());
             userService.save(profileUser);
             return "redirect:/u/" + username;
-        } else 
-            return "error";
+        } 
+        else return "error";
     }
 
     @PostMapping("/u/{username}/profilepicture/update")
-    public String uploadProfilePicture(
-        @RequestParam MultipartFile image, @PathVariable String username
-    ) {     
-        if (UserService.isOwnResource(username, loggedUser)) {
-
-            if (!image.isEmpty()) {
+    public String uploadProfilePicture(@RequestParam MultipartFile image, @PathVariable String username)
+    {     
+        if (UserService.isOwnResource(username, loggedUser))
+        {
+            if (!image.isEmpty()) 
+            {
                 Try.run(() -> profileUser.setProfilePicture(
                     BlobProxy.generateProxy(image.getInputStream(), image.getSize()),
                     userService
@@ -143,23 +144,24 @@ public class ProfileController {
                 userService.save(profileUser);
             }
             return "redirect:/u/" + loggedUser.get().getUsername();
-        } else
-            return "error";
+        } 
+        else return "error";
     }
 
     @RequestMapping("/u/{username}/profilepicture/remove")
-    public String removeProfilePicture(@PathVariable String username) {
-        
-        if (UserService.isOwnResource(username, loggedUser)) {
+    public String removeProfilePicture(@PathVariable String username) 
+    {
+        if (UserService.isOwnResource(username, loggedUser)) 
+        {
             profileUser.setProfilePicture(null, userService);
             return "profile";
-        } else
-            return "error";
+        } 
+        else return "error";
     }
 
-    private void modelProfile (Model model, boolean ownProfile) {
+    private void modelProfile (Model model, boolean ownProfile) 
+    {
         Collections.sort(profileUser.getTweets(), Collections.reverseOrder());
-
         model.addAttribute("profileUser", profileUser);
         model.addAttribute("followerCount", profileUser.getFollowers(userService).size());
         model.addAttribute("ownProfile", ownProfile);

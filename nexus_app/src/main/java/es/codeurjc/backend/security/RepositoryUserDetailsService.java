@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
+// Teacher's
 @Service
 public final class RepositoryUserDetailsService implements UserDetailsService {
 

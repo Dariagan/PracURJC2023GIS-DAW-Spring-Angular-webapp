@@ -16,27 +16,29 @@ import java.util.Optional;
 
 //Programmed by group 13-A
 @Controller
-public class LoginController {
-
+public class LoginController 
+{
     @Autowired 
     private UserService userService;
    
     @RequestMapping("/login")
-    public String login(Model model){
-
+    public String login(Model model)
+    {
         model.addAttribute("inLogin", true);
 
         return "loginpage";
     }
 
     @RequestMapping("/loginfail")
-    public String loginerror(Model model){
+    public String loginerror(Model model)
+    {
         model.addAttribute("fail", "Failed login");
         return "loginpage";
     }
 
     @RequestMapping("/loginsuccess")
-    public String login(HttpServletRequest req, HttpSession session){
+    public String login(HttpServletRequest req, HttpSession session)
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
         if (loggedUser.isEmpty()) return "redirect:/loginfail";
         return "redirect:/feed";

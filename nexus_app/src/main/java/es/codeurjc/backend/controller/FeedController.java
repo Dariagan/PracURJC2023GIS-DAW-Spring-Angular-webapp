@@ -35,8 +35,8 @@ public class FeedController {
     private UserService userService;
 
     @RequestMapping("/feed")
-    public String showFeed(Model model, HttpServletRequest request){
-
+    public String showFeed(Model model, HttpServletRequest request)
+    {
         Optional<User> loggedUser = userService.getUserBy(request);
 
         List<Tweet> tweetsToDisplay;
@@ -52,8 +52,8 @@ public class FeedController {
     }
 
     @GetMapping("/feed/search")
-    public String searchBytags(Model model, HttpServletRequest req, @RequestParam String tags) {
-
+    public String searchBytags(Model model, HttpServletRequest req, @RequestParam String tags) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
 
         Set<String> inputTags = Set.of(tags.split("\\s+"));
@@ -66,18 +66,20 @@ public class FeedController {
     }
 
     @RequestMapping("/feed/moderator")
-    public String showModFeed(Model model, HttpServletRequest req) {
+    public String showModFeed(Model model, HttpServletRequest req) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
-        if (loggedUser.isPresent() && loggedUser.get().isAdmin()){
+        if (loggedUser.isPresent() && loggedUser.get().isAdmin())
+        {
             updateFeedModel(model, loggedUser, tweetService.queryTweetsToModerate());
             return "feed";
-        } else
-            return "error";
+        } 
+        else return "error";
     }
 
     @RequestMapping("/tomyprofile")
-    public String redirectToProfile(final Model model, HttpServletRequest req) {
-
+    public String redirectToProfile(final Model model, HttpServletRequest req) 
+    {
         Optional<User> loggedUser = userService.getUserBy(req);
 
         if (loggedUser.isPresent())
@@ -86,7 +88,8 @@ public class FeedController {
             return "error";
     }
 
-    private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) {
+    private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) 
+    {
         model.addAttribute("loggedUser", loggedUser.get());
         model.addAttribute("authenticated", loggedUser.isPresent());
         model.addAttribute("inLogin", false);

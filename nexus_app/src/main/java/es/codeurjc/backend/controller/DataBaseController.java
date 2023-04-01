@@ -75,7 +75,7 @@ public class DataBaseController {
         tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
         
         Tweet tweet2 = tweetBuilder.build();
-        Tweet tweet3 = tweetBuilder.build();
+        Tweet tweet3 = tweetBuilder.setAuthor(userC).setText("test tweet").build();
 
         tweet2.report(userA);
 
@@ -91,8 +91,8 @@ public class DataBaseController {
 
         tweetBuilder.setAuthor(userB);
 
-        for (int i = 0; i < 20; i++){
-
+        for (int i = 0; i < 20; i++)
+        {
             tweetRepository.save(tweetBuilder.setText("tweet " + i).build());
             if (i == 6)
                 tweetBuilder.clearTags().addTag("sports").setAuthor(userC);

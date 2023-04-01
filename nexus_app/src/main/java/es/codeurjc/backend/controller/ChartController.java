@@ -2,6 +2,7 @@ package es.codeurjc.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
@@ -20,33 +21,37 @@ import es.codeurjc.backend.repository.TweetRepository;
 
 // group 13-A
 @Controller
-public class ChartController {
-
+public class ChartController 
+{
     @Autowired TweetRepository tweetRepository;
     
     @RequestMapping("/barchart")
     public String showChart(Model model, HttpServletRequest request)
     {
-        List<Tweet> topTweets = new ArrayList<>(tweetRepository.findMostLikedTweets());
+        List<Tweet> topTweets = new ArrayList<>(
+            tweetRepository.findMostLikedTweets(PageRequest.of(0, 5)));
 
         List<String> displayedTexts = new ArrayList<>();
 
         List<Integer> displayedNumbers = new ArrayList<>();
 
-        for (Tweet tweet: topTweets){
+        for (Tweet tweet: topTweets)
+        {
             displayedTexts.add(
-            String.format("“%s”\\nby user: %s", 
-            
-            tweet.getText(),  tweet.getAuthor())
+            String.format("“%s”\\nby user: %s", tweet.getText(),  tweet.getAuthor())
             );
             displayedNumbers.add(tweet.getLikes().size());
         }
 
-        String leftSideNumbersJsonList = new Gson().toJson(displayedNumbers);
-        String bottomTextsJsonList = new Gson().toJson(displayedTexts);
+        Gson gson = new Gson();
+
+        String leftSideNumbersJsonList = gson.toJson(displayedNumbers);
+        String bottomTextsJsonList = gson.toJson(displayedTexts);
+        String chartDescriptionJson = gson.toJson("Top 5 most liked tweets");
 
         model.addAttribute("bottomTextsJsonList", bottomTextsJsonList);
         model.addAttribute("leftSideNumbersJsonList", leftSideNumbersJsonList);
+        model.addAttribute("chartDescription", chartDescriptionJson);
 
         return "chartpage";
     }
