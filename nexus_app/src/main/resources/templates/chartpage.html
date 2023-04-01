@@ -67,7 +67,7 @@
   <script>
     var xValues = JSON.parse('{{{bottomTextsJsonList}}}');
     var yValues = JSON.parse('{{{leftSideNumbersJsonList}}}');
-    var chartDescription = JSON.parse('{{{chartDescription}}}');
+    var chartDescription = '{{chartDescription}}';
     var barColors = ["red", "green","blue","orange","brown"];
 
     new Chart("myChart", {
@@ -102,7 +102,7 @@
             },
             scaleLabel: { 
             display: true,
-            labelString: 'likes',
+            labelString: '{{{yAxisLabel}}}',
             fontColor: 'white',
             fontFamily: 'Ubuntu'
           }

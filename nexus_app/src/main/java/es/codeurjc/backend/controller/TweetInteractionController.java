@@ -37,9 +37,10 @@ public class TweetInteractionController {
         Optional<User> userOpt = userService.getUserBy(req);
         Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
-        if (userOpt.isPresent()) {
-            if (tweetOpt.isPresent()) {
-
+        if (userOpt.isPresent()) 
+        {
+            if (tweetOpt.isPresent()) 
+            {
                 Tweet tweet = tweetOpt.get();
                 tweet.switchLike(userOpt.get());
                 tweetService.save(tweet);
@@ -55,12 +56,18 @@ public class TweetInteractionController {
         Optional<User> reportingUserOpt = userService.getUserBy(req);
         Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
 
-        if (reportingUserOpt.isPresent()) {
-            if (tweetOpt.isPresent()) {
-
+        if (reportingUserOpt.isPresent())
+        {
+            if (tweetOpt.isPresent()) 
+            {
                 Tweet tweet = tweetOpt.get();
-                tweet.report(reportingUserOpt.get());     
-                tweetService.save(tweet);      
+
+                if (TweetService.readIfPostShouldGetdeleted(id))
+                    tweetService.delete(tweet);
+                else {
+                    tweet.report(reportingUserOpt.get());     
+                    tweetService.save(tweet);      
+                }
             }
             return UserService.redirectToReferer(req);
         }
@@ -76,12 +83,12 @@ public class TweetInteractionController {
         if (tweetOpt.isPresent() && 
         (TweetService.isOwnTweet(tweetOpt.get(), req) ||
         UserService.isAdmin(deletingUserOpt) || 
-        TweetService.readIfPostShouldGetdeleted(id))) {
+        TweetService.readIfPostShouldGetdeleted(id))) 
+        {
             tweetService.delete(tweetOpt.get());
-          
             return "redirect:" + req.getHeader("referer");
-        } else
-            return "error";
+        } 
+        else return "error";
     }
 
     @GetMapping("/tweet/{id}/media")

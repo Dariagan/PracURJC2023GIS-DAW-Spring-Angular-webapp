@@ -1,7 +1,6 @@
 package es.codeurjc.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 
@@ -45,13 +44,17 @@ public class ChartController
 
         Gson gson = new Gson();
 
-        String leftSideNumbersJsonList = gson.toJson(displayedNumbers);
-        String bottomTextsJsonList = gson.toJson(displayedTexts);
-        String chartDescriptionJson = gson.toJson("Top 5 most liked tweets");
+        String leftSideNumbersJsonList, bottomTextsJsonList, chartDescription, yAxisLabel;
+
+        leftSideNumbersJsonList = gson.toJson(displayedNumbers);
+        bottomTextsJsonList = gson.toJson(displayedTexts);
+        chartDescription = "Top 5 most liked tweets";
+        yAxisLabel = "Likes";
 
         model.addAttribute("bottomTextsJsonList", bottomTextsJsonList);
         model.addAttribute("leftSideNumbersJsonList", leftSideNumbersJsonList);
-        model.addAttribute("chartDescription", chartDescriptionJson);
+        model.addAttribute("chartDescription", chartDescription);
+        model.addAttribute("yAxisLabel", yAxisLabel);
 
         return "chartpage";
     }

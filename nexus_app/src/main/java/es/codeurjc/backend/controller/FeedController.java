@@ -41,9 +41,9 @@ public class FeedController {
 
         List<Tweet> tweetsToDisplay;
 
-        if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0){
+        if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0)
             tweetsToDisplay = tweetRepository.findFollowedUsersTweets(loggedUser.get(), PageRequest.of(0, 10));
-        } else
+        else
             tweetsToDisplay = tweetRepository.findTop10ByOrderByDateDesc();
         
         updateFeedModel(model, loggedUser, tweetsToDisplay);
@@ -90,7 +90,8 @@ public class FeedController {
 
     private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) 
     {
-        model.addAttribute("loggedUser", loggedUser.get());
+        if (loggedUser.isPresent())
+            model.addAttribute("loggedUser", loggedUser.get());
         model.addAttribute("authenticated", loggedUser.isPresent());
         model.addAttribute("inLogin", false);
         model.addAttribute("tweets", displayedTweets); 

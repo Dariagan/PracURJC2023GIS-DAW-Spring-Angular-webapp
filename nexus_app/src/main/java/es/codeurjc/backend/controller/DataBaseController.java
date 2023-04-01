@@ -49,7 +49,7 @@ public class DataBaseController {
         User userA = builder.build();
         User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
         User userC = builder.setUsername("c").setEmail("c@c.com").build();
-        User userD = builder.setUsername("d").setEmail("d@e.com").build();
+        User userD = builder.setUsername("d").setEmail("d@d.com").build();
         User userE = builder.setUsername("e").setEmail("e@e.com").build();
         
         userService.save(userA).save(userB).save(userC).save(userD).save(userE);
@@ -75,7 +75,7 @@ public class DataBaseController {
         tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
         
         Tweet tweet2 = tweetBuilder.build();
-        Tweet tweet3 = tweetBuilder.setAuthor(userC).setText("test tweet").build();
+        Tweet tweet3 = tweetBuilder.setAuthor(userC).setText("amogus").clearTags().build();
 
         tweet2.report(userA);
 
