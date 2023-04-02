@@ -1,11 +1,14 @@
 package es.codeurjc.backend.model;
 
+import java.io.IOException;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
@@ -19,6 +22,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 
 import org.springframework.lang.Nullable;
@@ -27,47 +31,54 @@ import org.springframework.lang.Nullable;
 // refactored, reprogrammed, given all functionality by group 13 A
 @Entity(name = "UserTable")
 public class User {
-
-    public interface Alt {}
     
+    public interface UsernameView {}
+    public interface BasicView extends UsernameView{}
+    public interface TweetsView {}
+    public interface FollowingView extends UsernameView{}
+
+    public interface FullView extends User.BasicView, User.TweetsView, Tweet.BasicView {}
+    
+    @JsonView(UsernameView.class)
     @Id
     private String username;
+    @JsonView(BasicView.class)
+    private String name;
+    @JsonView(BasicView.class)
+    private String email;
+    @JsonView(BasicView.class)
+    private String description = "";
 
-    private String name, email, description = "";
-
+    @JsonView(BasicView.class)
     private LocalDateTime signUpDate = LocalDateTime.now();
 
     @JsonIgnore
     private String encodedPassword;
 
-    @JsonIgnore
+    @JsonView(BasicView.class)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles = new HashSet<>();
     
-    @JsonIgnore
+    @JsonView(BasicView.class)
     private boolean banned = false;
 
     @Nullable
     @Lob
     @JsonIgnore
-    private Blob profilePicture;
+    private Blob profilePicture = null;
 
-    @JsonView(Alt.class)
+    @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
     private List<Tweet> tweets = new ArrayList<Tweet>();
 
-    @JsonIgnore
-    @OneToMany
-    private Set<Tweet> reportedTweets = new HashSet<Tweet>();
-
-    @JsonIgnore
+    @JsonView(FollowingView.class)
     @Nullable
-    @ManyToMany(fetch = FetchType.EAGER, cascade={CascadeType.ALL})
+    @ManyToMany
     private Set<User> following = new HashSet<User>();
 
     @JsonIgnore
     @Nullable
-    @OneToMany
+    @ManyToMany
     private Set<User> blockedUsers = new HashSet<>();  
 
     public static class Builder {
@@ -128,12 +139,12 @@ public class User {
     private User(User.Builder builder){
         this(
             builder.username, builder.email, builder.encodedPassword, builder.name,
-            builder.description, builder.admin, builder.banned, null
+            builder.description, builder.admin, builder.banned
         );
     }
     private User(
         String username, String email, String encodedPassword, String name,
-        String description, boolean admin, boolean banned, Blob profilePicture
+        String description, boolean admin, boolean banned
     ) {   
         this.username = username;
         this.email = email;
@@ -142,7 +153,7 @@ public class User {
         this.description = description;
         this.roles.add("USER");
         if (admin) this.roles.add("ADMIN");
-        this.profilePicture = profilePicture;
+        this.profilePicture = null;
     }
 
     public String getName() {return name;}
@@ -172,9 +183,9 @@ public class User {
 
     public Blob getProfilePicture() {return profilePicture;}
     public boolean hasProfilePicture() {return profilePicture != null;}
-    public void setProfilePicture(Blob profilePicture, UserService userService) {
+    public void setProfilePicture(Blob profilePicture, UserRepository userRepository) {
         this.profilePicture = profilePicture;
-        userService.save(this);
+        userRepository.save(this);
     }
 
     public List<Tweet> getTweets() {return tweets;}
@@ -201,9 +212,8 @@ public class User {
     public void unblock(User user){blockedUsers.remove(user);};
 
     public LocalDateTime getSignUpDate() {return signUpDate;}
-    public Set<Tweet> getReportedTweets() {return reportedTweets;} 
 
-    public String toString(){return username;}
+    public String toString() {return username;}
 
     //DON'T USE, ONLY FOR DATABASE 
     public User() {}

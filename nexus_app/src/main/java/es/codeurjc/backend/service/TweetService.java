@@ -18,55 +18,30 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-// Programmed by group 13 A
+// Programmed entirely by group 13 A
 @Service
-public class TweetService {
+public class TweetService{
 
     @Autowired
     private TweetRepository tweetRepository;
 
-    public Optional<Tweet> getTweetById(String id) {
-        return getTweetById(Long.parseLong(id));
-    }
-    public Optional<Tweet> getTweetById(Long id) {
-        return tweetRepository.findById(id);
-    }
-
     public static boolean isOwnTweet(Tweet tweet, HttpServletRequest req) {
         return tweet.getAuthor().getUsername().equals(req.getUserPrincipal().getName());
     }
-
-    public TweetService save(Tweet tweet) {
-        tweetRepository.save(tweet);
-        return this;
-    }
-    public TweetService saveAndFlush(Tweet tweet) {
-        tweetRepository.saveAndFlush(tweet);
-        return this;
-    }
-    public TweetService delete(Tweet tweet) {
-        tweetRepository.delete(tweet);
-        return this;
-    }
-    
-    public Page<Tweet> findPage(Pageable page){
-        return tweetRepository.findAll(page);
+    public static boolean isAllowedToDelete(Tweet tweet, User user) {
+        return tweet.getAuthor().equals(user) || user.isAdmin();
     }
 
-    public Page<Tweet> getPageOfTweets(int page){
-        return tweetRepository.findAll(PageRequest.of(page,5));
+    public Page<Tweet> getPage(Pageable pageable){
+        return tweetRepository.findAll(pageable);
     }
 
-    public List<Tweet> findAll(){
-        return tweetRepository.findAll();
-    }
-
-    public static boolean readIfPostShouldGetdeleted(Long id) 
+    public static boolean readIfPostShouldGetdeleted(long id) 
     {
-        final String modEndpoint = "https://mod-microservice.vercel.app/postShouldGetDeleted/";
+        final String MOD_ENDPOINT = "https://mod-microservice.vercel.app/postShouldGetDeleted/";
 
         RestTemplate api = new RestTemplate();
-        String jsonStr = api.getForEntity(modEndpoint + id.toString(), String.class).getBody();
+        String jsonStr = api.getForEntity(MOD_ENDPOINT + id, String.class).getBody();
         return Try
         .of(() -> new ObjectMapper().readTree(jsonStr))
         .map(json -> json.get("response").asBoolean())
@@ -74,11 +49,12 @@ public class TweetService {
     }
 
     public List<Tweet> queryTweetsToModerate() {
-        return tweetRepository.findMostReportedTweets();
+        return tweetRepository.findMostReportedTweets(Pageable.ofSize(10));
     }
 
     public List<Tweet> getTweetsByUser(User user){
         return tweetRepository.findAllByAuthor(user);
     }
+
     
 }

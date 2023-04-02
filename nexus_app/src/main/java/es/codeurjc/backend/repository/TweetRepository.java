@@ -22,15 +22,22 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     
     // Advanced query made by group 13-A
     @Query("SELECT t FROM UserTable u JOIN u.following f JOIN f.tweets t WHERE u = :user ORDER BY t.date DESC")
-    List<Tweet> findFollowedUsersTweets(User user, Pageable pageable);
-    
-    List<Tweet> findTop10ByOrderByDateDesc();
+    Page<Tweet> findFollowedUsersTweets(User user, Pageable pageable);
+
+
     Page<Tweet> findAllByOrderByDateDesc(Pageable pageable);
+
+    Page<Tweet> findAll(Pageable pageable);
+
     List<Tweet> findAllByAuthor(User author);
+
+    // 13-A
+    @Query("SELECT t FROM Tweet t WHERE t.author.username = :username")
+    List<Tweet> findAllByUsername(String username);
 
     // Advanced query made by group 13-A
     @Query("SELECT t FROM Tweet t JOIN t.reporters r GROUP BY t.id ORDER BY COUNT(r) DESC")
-    List<Tweet> findMostReportedTweets();
+    List<Tweet> findMostReportedTweets(Pageable pageable);
 
     // Advanced query made by group 13-A
     @Query("SELECT t FROM Tweet t JOIN t.likes r GROUP BY t.id ORDER BY COUNT(r) DESC")

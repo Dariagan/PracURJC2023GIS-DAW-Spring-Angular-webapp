@@ -7,6 +7,7 @@ import es.codeurjc.backend.repository.TweetRepository;
 
 import es.codeurjc.backend.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,8 @@ import java.util.Set;
 // All methods/functionality programmed entirely by group 13-A
 @Controller
 public class FeedController {
+
+    // TODO FIX API CALL FOR TWEETS PAGINATION
     
     @Autowired
     private TweetRepository tweetRepository;
@@ -39,14 +42,14 @@ public class FeedController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        List<Tweet> tweetsToDisplay;
+        Page<Tweet> tweetsToDisplay;
 
         if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0)
             tweetsToDisplay = tweetRepository.findFollowedUsersTweets(loggedUser.get(), PageRequest.of(0, 10));
         else
-            tweetsToDisplay = tweetRepository.findTop10ByOrderByDateDesc();
+            tweetsToDisplay = tweetRepository.findAllByOrderByDateDesc(PageRequest.of(0, 10));
         
-        updateFeedModel(model, loggedUser, tweetsToDisplay);
+        updateFeedModel(model, loggedUser, tweetsToDisplay.getContent());
 
         return "feed";
     }
@@ -96,22 +99,4 @@ public class FeedController {
         model.addAttribute("inLogin", false);
         model.addAttribute("tweets", displayedTweets); 
     }
-
-    /*
-    // FIXME if a tweet has N likes it will query all the N likes, in this sense
-    // the model for Tweet should store the likes count. Same applies to replies.
-    @GetMapping("/api/tweets")
-    public ResponseEntity<Page<Tweet>> getTweets(
-        @RequestParam("page") int page, @RequestParam("size") int size
-    ) {
-        if (size > 10) return ResponseEntity.badRequest().build();
-
-        Page<Tweet> tweetsPage = tweetRepository
-            .findAllByOrderByDateDesc(PageRequest.of(page, size));
-
-        return ResponseEntity
-            .ok()
-            .header("X-Total-Count", String.valueOf(tweetsPage.getTotalElements()))
-            .body(tweetsPage);
-    }*/
 }

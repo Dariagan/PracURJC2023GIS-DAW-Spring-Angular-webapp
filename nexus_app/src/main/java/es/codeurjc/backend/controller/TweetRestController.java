@@ -24,15 +24,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
+
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
-
+import es.codeurjc.backend.utilities.Sorter;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
@@ -46,9 +49,40 @@ public class TweetRestController {
     private UserService userService;
 
     @Autowired
-    private TweetService tweetService;
+    private TweetRepository tweetRepository;
+
+    @Operation(summary = "Get tweet by id")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Found the tweet",
+            content = {@Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Tweet.class)
+                )}
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid id supplied",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "not found",
+            content = @Content
+        )
+    })
+    @JsonView(Tweet.FullView.class)
+    @GetMapping("/{id}")
+    public ResponseEntity<Tweet> getTweetById(@PathVariable long id) {
+        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
+        if (tweetOpt.isPresent()) 
+            return new ResponseEntity<>(tweetOpt.get(), HttpStatus.OK);
+        else 
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
     
-    @Operation(summary = "Get tweets by user id")
+    @Operation(summary = "Get tweets by username")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
@@ -100,21 +134,24 @@ public class TweetRestController {
             content = @Content
         )
     })
-    @JsonView(User.Alt.class)
+    @JsonView(User.BasicView.class)
     @GetMapping("/me")
     public ResponseEntity<List<Tweet>> getTweetsOfCurrentUser(HttpServletRequest request) {
         
         Optional<User> userOpt = userService.getUserBy(request);
+
+        if (userOpt.isPresent())
+            tweetRepository.findFirst10ByAuthor(userOpt.get());
+
         List<Tweet> tweets = userOpt.get().getTweets();
         return new ResponseEntity<>(tweets, HttpStatus.OK);
     }
-
-    //All Tweets
-    @Operation(summary = "Get all tweets")
+    
+    @Operation(summary = "Get paged tweets from a Pageable")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Found recepies",
+            description = "Found",
             content = {@Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = Tweet.class)
@@ -125,46 +162,18 @@ public class TweetRestController {
             description = "Not found",
             content = @Content
         )
-    })
+    }) 
+    @JsonView(Tweet.FullView.class)
     @GetMapping("")
-    public ResponseEntity<List<Tweet>> getTweets(@RequestParam int page) {
-        Page<Tweet> pagedTweets= tweetService.getPageOfTweets(page);
-        List<Tweet> listedTweets = pagedTweets.toList();
-       return new ResponseEntity<>(listedTweets, HttpStatus.OK);
+    public Page<Tweet> getAll(
+        @RequestParam(value = "page", defaultValue = "0") int page ,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
+        @RequestParam(value = "direction", defaultValue = "desc") String direction
+        ) {   
+        return tweetRepository.findAll(PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction)));
     }
 
-    //Find specific tweet
-    @Operation(summary = "Get tweet by id")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Found the tweet",
-            content = {@Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Tweet.class)
-                )}
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            description = "Invalid id supplied",
-            content = @Content
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "not found",
-            content = @Content
-        )
-    })
-    @GetMapping("/{id}")
-    public ResponseEntity<Tweet> getTweetById(@PathVariable String id) {
-        Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
-        if (tweetOpt.isPresent()) 
-            return new ResponseEntity<>(tweetOpt.get(), HttpStatus.OK);
-        else 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
-    //Find specific tweet
     @Operation(summary = "Get likes of a tweet by id")
     @ApiResponses(value = {
         @ApiResponse(
@@ -186,16 +195,16 @@ public class TweetRestController {
             content = @Content
         )
     })
+    @JsonView(User.UsernameView.class)
     @GetMapping("/{id}/likes")
-    public ResponseEntity<Set<User>> getLikesByTweetId(@PathVariable String id) {
-        Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
-        if (tweetOpt.isPresent()) {
-            Tweet tweet = tweetOpt.get();
-            //this is not going to work with current configuration of JsonIgnores
-            Set<User> users = tweet.getLikes();
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        } else 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Set<User>> getLikesByTweetId(@PathVariable long id) 
+    {
+        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
+        if (tweetOpt.isPresent()) 
+        {
+            return new ResponseEntity<>(tweetOpt.get().getLikes(), HttpStatus.OK);
+        } 
+        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     //POST new tweet
@@ -217,13 +226,16 @@ public class TweetRestController {
     })
     @PostMapping("/")
     //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Tweet> postTweet(@RequestBody Tweet tweet) {
-        try{
-            tweetService.save(tweet);
+    public ResponseEntity<Tweet> postTweet(@RequestBody Tweet tweet) 
+    {
+        try {
+            tweetRepository.save(tweet);
             URI location = fromCurrentRequest().path("/{id}")
                 .buildAndExpand(tweet.getId()).toUri();
             return ResponseEntity.created(location).body(tweet);
-        }catch (EmptyResultDataAccessException e) {
+        }
+        catch (EmptyResultDataAccessException e) 
+        {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -231,34 +243,44 @@ public class TweetRestController {
     @Operation(summary = "Delete tweet")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200",
-                    description = "Deleted",
-                    content = {@Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Tweet.class)
-                    )}
+                responseCode = "200",
+                description = "Deleted",
+                content = {@Content(
+                        mediaType = "application/json",
+                        schema = @Schema(implementation = Tweet.class)
+                )}
             ),
             @ApiResponse(
-                    responseCode = "403",
-                    description = "Forbidden",
-                    content = @Content
+                responseCode = "403",
+                description = "Forbidden",
+                content = @Content
             ),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "Invalid ids supplied",
-                    content = @Content
-            )
+                responseCode = "400",
+                description = "Invalid id supplied",
+                content = @Content
+            ),
+            @ApiResponse(
+                responseCode = "404",
+                description = "Not found",
+                content = @Content
+        )
     })
-    @DeleteMapping("")
-    public ResponseEntity<Tweet> deleteTweet(@RequestParam long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Tweet> deleteTweet(@RequestParam long id, HttpServletRequest request) 
+    {
+        Optional <User> userOpt = userService.getUserBy(request);
+        Optional <Tweet> tweetOpt = tweetRepository.findById(id);
 
-        Optional <Tweet> tweetOpt = tweetService.getTweetById(id);
-        if(tweetOpt.isPresent()) {
-            tweetService.delete(tweetOpt.get());
-            return new ResponseEntity<>(null,HttpStatus.OK);
-        } else
-            return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
-
+        if(userOpt.isPresent() && TweetService.isAllowedToDelete(tweetOpt.get(), userOpt.get())) 
+        {
+            if (tweetOpt.isPresent())
+            {
+                tweetRepository.delete(tweetOpt.get());
+                return new ResponseEntity<>(null,HttpStatus.OK);
+            }
+            else return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+        } 
+        else return new ResponseEntity<>(null,HttpStatus.UNAUTHORIZED);
     }
-
 }

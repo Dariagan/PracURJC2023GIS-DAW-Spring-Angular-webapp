@@ -12,27 +12,38 @@ import javax.persistence.*;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 
-import es.codeurjc.backend.service.TweetService;
+import es.codeurjc.backend.repository.TweetRepository;
+
 
 // Programmed by group 13-A
 @Entity(name = "Tweet")
 public class Tweet implements Comparable<Tweet>
 {    
+    public interface AuthorView extends User.BasicView{}
+    public interface BasicView {}
+    public interface LikesView extends User.UsernameView{}
+    public interface ReportersView extends User.UsernameView{}
+    public interface FullView extends Tweet.AuthorView, Tweet.BasicView, Tweet.LikesView, Tweet.ReportersView {}
+
+    @JsonView(BasicView.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonView(AuthorView.class)
     @ManyToOne
     private User author;
 
-    //@Temporal(TemporalType.TIMESTAMP)
+    @JsonView(BasicView.class)
     private LocalDateTime date;
 
-    @JsonIgnore
+    @JsonView(ReportersView.class)
     @ManyToMany
     private Set<User> reporters = new HashSet<>();
 
+    @JsonView(BasicView.class)
     @Column(columnDefinition = "TEXT")
     private String text;
 
@@ -41,11 +52,11 @@ public class Tweet implements Comparable<Tweet>
     @JsonIgnore
     private Blob media;
 
-    @JsonIgnore
+    @JsonView(BasicView.class)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> tags = new HashSet<String>();
 
-    @JsonIgnore
+    @JsonView(LikesView.class)
     @Nullable
     @ManyToMany
     private Set<User> likes  = new HashSet<>();
@@ -149,11 +160,11 @@ public class Tweet implements Comparable<Tweet>
     }
 
     public List<Tweet> getChildren() {return children;}
-    public void reply(Tweet tweet, TweetService tweetService) {
+    public void reply(Tweet tweet, TweetRepository tweetRepository) {
         assert tweet != this;
         children.add(tweet);
-        tweetService.save(this);
-        tweetService.save(tweet);
+        tweetRepository.save(this);
+        tweetRepository.save(tweet);
     }
 
     public Blob getMedia() {return media;}

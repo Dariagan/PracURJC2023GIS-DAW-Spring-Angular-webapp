@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
@@ -20,7 +21,7 @@ public class UserInteractionController {
     @Autowired
     UserService userService;
     @Autowired
-    TweetService tweetService;
+    TweetRepository tweetRepository;
 
     @RequestMapping("/u/{username}/follow")
     public String handleFollow(
@@ -28,7 +29,7 @@ public class UserInteractionController {
     ) {
         OptTwo<User> users = userService.getUserBy(username, req);
         
-        if (UserService.visitorAuthenticated(users)){
+        if (UserService.isVisitorAuthenticated(users)){
             
             if (UserService.urlUserExistsAndNotSelfAction(users)){
             
@@ -49,7 +50,7 @@ public class UserInteractionController {
     ) {
         OptTwo<User> users = userService.getUserBy(username, req);
         
-        if (UserService.visitorAuthenticated(users) &&
+        if (UserService.isVisitorAuthenticated(users) &&
             UserService.urlUserExistsAndNotSelfAction(users)) {
             
             User bannedUser = users.getLeft();
@@ -73,15 +74,15 @@ public class UserInteractionController {
     ) {
         OptTwo<User> users = userService.getUserBy(username, req);
         
-        if (UserService.visitorAuthenticated(users) &&
+        if (UserService.isVisitorAuthenticated(users) &&
             UserService.urlUserExists(users) &&
-            (users.getRight().isAdmin() || UserService.isSelfAction(users))) {
+            (UserService.isVisitorAdmin(users)|| UserService.isSelfAction(users))) {
 
             User deletedUser = users.getLeft();
 
             for (Tweet tweet: deletedUser.getTweets()){
                 tweet.setNullAuthor();
-                tweetService.save(tweet);
+                tweetRepository.save(tweet);
             }
 
             //TODO add prompt asking whether you want to delete your account

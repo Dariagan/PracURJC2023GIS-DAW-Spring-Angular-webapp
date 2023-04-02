@@ -1,7 +1,5 @@
 package es.codeurjc.backend.controller;
 
-import java.util.stream.IntStream;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +22,7 @@ public class DataBaseController {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private TweetService tweetService;
+
     @Autowired
     private TweetRepository tweetRepository;
     @Autowired
@@ -56,6 +53,7 @@ public class DataBaseController {
         userRepository.flush();
 
         userA.switchFollow(userB);
+        userService.save(userA);
         
         // Building tweets
         tweetBuilder
@@ -69,7 +67,7 @@ public class DataBaseController {
         tweet1.switchLike(userB);
         tweet1.report(userB);
    
-        tweetService.save(tweet1);
+        tweetRepository.save(tweet1);
 
         //-------------------------------------
         tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
@@ -87,7 +85,8 @@ public class DataBaseController {
         tweet3.switchLike(userD);
         tweet3.switchLike(userE);
 
-        tweetService.save(tweet2).save(tweet3);
+        tweetRepository.save(tweet2);
+        tweetRepository.save(tweet3);
 
         tweetBuilder.setAuthor(userB);
 

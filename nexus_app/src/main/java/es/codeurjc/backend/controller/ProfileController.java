@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.repository.TweetRepository;
+import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -37,6 +38,9 @@ public class ProfileController {
     
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private TweetRepository tweetRepository;
@@ -135,14 +139,15 @@ public class ProfileController {
     {     
         if (UserService.isOwnResource(username, loggedUser))
         {
+            //FIXME GET USERS FROM DB, NOT FROM CLASS
             if (!image.isEmpty()) 
             {
                 Try.run(() -> profileUser.setProfilePicture(
                     BlobProxy.generateProxy(image.getInputStream(), image.getSize()),
-                    userService
+                    userRepository
                 ));
-                userService.save(profileUser);
             }
+           
             return "redirect:/u/" + loggedUser.get().getUsername();
         } 
         else return "error";
@@ -153,7 +158,8 @@ public class ProfileController {
     {
         if (UserService.isOwnResource(username, loggedUser)) 
         {
-            profileUser.setProfilePicture(null, userService);
+            profileUser.setProfilePicture(null, userRepository);
+            
             return "profile";
         } 
         else return "error";
