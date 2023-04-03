@@ -25,8 +25,6 @@ import java.util.Set;
 // All methods/functionality programmed entirely by group 13-A
 @Controller
 public class FeedController {
-
-    // TODO FIX API CALL FOR TWEETS PAGINATION
     
     @Autowired
     private TweetRepository tweetRepository;

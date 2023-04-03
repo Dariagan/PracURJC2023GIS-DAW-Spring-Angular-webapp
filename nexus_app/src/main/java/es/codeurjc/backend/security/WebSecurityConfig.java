@@ -33,11 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
     
     @Override
     protected void configure(HttpSecurity http) throws Exception 
-    {
-    	http.authorizeRequests().antMatchers(HttpMethod.DELETE, "**").denyAll();
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "**").denyAll();
-        http.authorizeRequests().antMatchers(HttpMethod.PUT, "**").denyAll();
-
+    {   
     	// Public pages
         http.authorizeRequests().antMatchers("/").permitAll();
         http.authorizeRequests().antMatchers("/signup").permitAll();
@@ -51,22 +47,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http.authorizeRequests().antMatchers("/u/*/profilepicture/*").authenticated();
         http.authorizeRequests().antMatchers("/u/*/write").authenticated();
         http.authorizeRequests().antMatchers("/u/*/posttweet").authenticated();
-        http.authorizeRequests().antMatchers("/logout").permitAll();
-        
 
+        http.authorizeRequests().antMatchers("/logout").permitAll();
+    
         http.authorizeRequests().antMatchers("/moderate").hasAnyRole("ADMIN");
         http.authorizeRequests().antMatchers("/tweet/*/delete").authenticated();
         http.authorizeRequests().antMatchers("/u/*/delete").hasAnyRole("ADMIN");
         http.authorizeRequests().antMatchers("/u/*/ban").hasAnyRole("ADMIN");
 
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll();
-
-        
-
-        // api authorizationsthenticated();
-    
-       
-
 
         // Login form
         http.formLogin().loginPage("/login");
@@ -84,18 +73,3 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter
         http.headers().frameOptions().disable();
     }
 }
-
-
-/* //TODO 
-protected void configure(HttpSecurity http) throws Exception {
-    // Public pages
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/").permitAll();
-    http.authorizeRequests().antMatchers(HttpMethod.POST, "/").authenticated();
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/signup").permitAll();
-    http.authorizeRequests().antMatchers(HttpMethod.POST, "/signup").authenticated();
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/login").permitAll();
-    http.authorizeRequests().antMatchers(HttpMethod.POST, "/login").authenticated();
-    http.authorizeRequests().antMatchers(HttpMethod.GET, "/loginfail").permitAll();
-    http.authorizeRequests().antMatchers(HttpMethod.POST, "/loginfail").authenticated();
-} 
- */

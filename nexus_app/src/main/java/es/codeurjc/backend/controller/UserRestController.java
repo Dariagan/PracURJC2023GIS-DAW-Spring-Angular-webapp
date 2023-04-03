@@ -113,7 +113,6 @@ public class UserRestController {
         return userRepository.findAll(PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction)));
     }
 
-    //Logged user
     @Operation(summary = "Get logged user")
     @ApiResponses(value = {
         @ApiResponse(

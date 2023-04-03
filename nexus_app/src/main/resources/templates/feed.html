@@ -224,11 +224,10 @@
         tweetComponentTemplate = data;
       })
 
-      //TODO FIX API CALL
       const url = `/api/tweets?page=${page}&size=${5}`
       $.get(url, (tweets, status) => {
-        for (var i = 0; i < tweets.content.length; i++) {
-          var post = Mustache.render(tweetComponentTemplate, tweets.content[i])
+        for (var i = 0; i < tweets.length; i++) {
+          var post = Mustache.render(tweetComponentTemplate, tweets[i])
           $("#posts-container").append(post);
         }
       })

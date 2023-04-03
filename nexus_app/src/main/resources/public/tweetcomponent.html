@@ -1,3 +1,4 @@
+<!-- Made by group 13 A -->
 <link href="/profileuser/profileuser.css" rel="stylesheet" />
 <div class="profileanon-twit">
   <div class="profileanon-op1">
@@ -48,7 +49,6 @@
 		alt="IconsaxLinearmessageI135"
 		class="profileanon-iconsax-linearmessage1"
 	  />	
-
 	  {{#loggedUser.isAdmin}}
 
 	  {{#reporters.isEmpty}}
@@ -73,8 +73,8 @@
 		/>
 	  </a>
 	  {{/reporters.isEmpty}}
+	  
 	  {{/loggedUser.isAdmin}}
-
 	  {{^loggedUser.isAdmin}}
 	  <a style="margin-left: 15px" href="/tweet/{{id}}/report">
 	    <span  class="profileanon-text020">report</span>  

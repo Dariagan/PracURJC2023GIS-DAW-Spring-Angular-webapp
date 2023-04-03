@@ -41,9 +41,13 @@ public class RestSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
   
+        /*
         http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/**").authenticated();
         http.authorizeRequests().antMatchers(HttpMethod.DELETE, "/api/**").authenticated();
         http.authorizeRequests().antMatchers(HttpMethod.PUT, "/api/**").authenticated();
+        */
+
+        http.antMatcher("/api/**");
 
         http.authorizeRequests().anyRequest().permitAll();
 
@@ -63,5 +67,4 @@ public class RestSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
-
 }

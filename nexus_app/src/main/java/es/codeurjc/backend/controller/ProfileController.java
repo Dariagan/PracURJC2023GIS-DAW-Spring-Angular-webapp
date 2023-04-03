@@ -117,7 +117,6 @@ public class ProfileController {
                 .setAuthor(loggedUser.get())
                 .setText(text);
 
-            //FIXME refactor
             if (image.isEmpty())
                 builder.setMedia(null);   
             else

@@ -28,7 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import com.fasterxml.jackson.annotation.JsonView;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
@@ -165,13 +165,19 @@ public class TweetRestController {
     }) 
     @JsonView(Tweet.FullView.class)
     @GetMapping("")
-    public Page<Tweet> getAll(
+    public ResponseEntity<List<Tweet>> getAll(
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction
-        ) {   
-        return tweetRepository.findAll(PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction)));
+        ) 
+    {   
+        return new ResponseEntity<>(
+            tweetRepository
+            .findAll(PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction)))
+            .getContent(), 
+            HttpStatus.OK
+            );
     }
 
     @Operation(summary = "Get likes of a tweet by id")
