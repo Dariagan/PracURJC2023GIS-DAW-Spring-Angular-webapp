@@ -21,12 +21,13 @@ public final class RepositoryUserDetailsService implements UserDetailsService {
 	private UserService userService;
 
 	@Override
-	public UserDetails loadUserByUsername(String username) {
-
+	public UserDetails loadUserByUsername(String username) 
+	{
 		User user = userService.getUserByUsernameForced(username);
 
 		List<GrantedAuthority> roles = new ArrayList<>();
-		for (String role : user.getRoles()) {
+		for (String role : user.getRoles()) 
+		{
 			roles.add(new SimpleGrantedAuthority("ROLE_" + role));
 		}
 

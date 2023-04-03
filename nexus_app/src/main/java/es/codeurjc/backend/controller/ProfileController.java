@@ -50,7 +50,6 @@ public class ProfileController {
 
     private boolean following;
 
-
     @RequestMapping("/u/{username}")
     public String redirect(Model model, @PathVariable String username, HttpServletRequest req)
     {
@@ -138,7 +137,6 @@ public class ProfileController {
     {     
         if (UserService.isOwnResource(username, loggedUser))
         {
-            //FIXME GET USERS FROM DB, NOT FROM CLASS
             if (!image.isEmpty()) 
             {
                 Try.run(() -> profileUser.setProfilePicture(
@@ -158,7 +156,6 @@ public class ProfileController {
         if (UserService.isOwnResource(username, loggedUser)) 
         {
             profileUser.setProfilePicture(null, userRepository);
-            
             return "profile";
         } 
         else return "error";

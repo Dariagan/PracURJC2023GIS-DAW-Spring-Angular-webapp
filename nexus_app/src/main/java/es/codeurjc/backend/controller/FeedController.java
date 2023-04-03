@@ -9,6 +9,7 @@ import es.codeurjc.backend.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
+import es.codeurjc.backend.utilities.Sorter;
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -44,9 +47,10 @@ public class FeedController {
 
         if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0)
             tweetsToDisplay = tweetRepository.findFollowedUsersTweets(loggedUser.get(), PageRequest.of(0, 10));
-        else
-            tweetsToDisplay = tweetRepository.findAllByOrderByDateDesc(PageRequest.of(0, 10));
-        
+        else {
+            Sort sort = Sort.by("date").descending();
+            tweetsToDisplay = tweetRepository.findAll(PageRequest.of(0, 10, sort));
+        }
         updateFeedModel(model, loggedUser, tweetsToDisplay.getContent());
 
         return "feed";

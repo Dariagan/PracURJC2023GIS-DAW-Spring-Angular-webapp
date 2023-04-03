@@ -25,7 +25,6 @@ public class LoginController
     public String login(Model model)
     {
         model.addAttribute("inLogin", true);
-
         return "loginpage";
     }
 

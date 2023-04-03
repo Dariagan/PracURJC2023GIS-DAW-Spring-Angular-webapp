@@ -42,9 +42,8 @@ public class TweetInteractionController {
         {
             if (tweetOpt.isPresent()) 
             {
-                Tweet tweet = tweetOpt.get();
-                tweet.switchLike(userOpt.get());
-                tweetRepository.save(tweet);
+                tweetOpt.get().switchLike(userOpt.get());
+                tweetRepository.save(tweetOpt.get());
             }
             return UserService.redirectToReferer(req);
         }

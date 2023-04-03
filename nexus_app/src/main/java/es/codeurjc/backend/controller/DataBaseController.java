@@ -42,7 +42,6 @@ public class DataBaseController {
             .setEncodedPassword(passwordEncoder.encode("a"))
             .setAdmin();
         
-
         User userA = builder.build();
         User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
         User userC = builder.setUsername("c").setEmail("c@c.com").build();
@@ -51,6 +50,8 @@ public class DataBaseController {
         
         userService.save(userA).save(userB).save(userC).save(userD).save(userE);
         userRepository.flush();
+
+        // /Building users
 
         userA.switchFollow(userB);
         userService.save(userA);
