@@ -23,7 +23,7 @@ public class Tweet implements Comparable<Tweet>
 {    
     public interface AuthorView extends User.BasicView{}
     public interface BasicView {}
-    public interface LikesView extends User.UsernameView{}
+    public interface LikesView extends User.BasicView{}
     public interface ReportersView extends User.UsernameView{}
     public interface FullView extends Tweet.AuthorView, Tweet.BasicView, Tweet.LikesView, Tweet.ReportersView {}
 
