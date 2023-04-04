@@ -2,9 +2,7 @@ package es.codeurjc.backend.controller;
 
 import java.io.IOException;
 import java.net.URI;
-import java.security.Principal;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +13,9 @@ import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import es.codeurjc.backend.repository.TweetRepository;
+import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
+import es.codeurjc.backend.utilities.Sorter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,8 +53,13 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
-    //Find specific user
-    @Operation(summary = "Get user by id")
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private TweetRepository tweetRepository;
+
+    @Operation(summary = "Get user by username")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
@@ -67,29 +76,29 @@ public class UserRestController {
         ),
         @ApiResponse(
             responseCode = "404",
-            description = "not found",
+            description = "Not found",
             content = @Content
         )
     })
+    @JsonView(User.FullView.class)
     @GetMapping("/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         Optional<User> userOpt = userService.getUserBy(username);
-        if (userOpt.isPresent()) {
+        if (userOpt.isPresent()) 
+        {
             return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        } 
+        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     
-    //GET all users
-    @Operation(summary = "Get all users")
+    @Operation(summary = "Get paged users from Pageable params")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Found the users",
+            description = "Found all tweets",
             content = {@Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = User.class)
+                schema = @Schema(implementation = Tweet.class)
             )}
         ),
         @ApiResponse(
@@ -97,18 +106,24 @@ public class UserRestController {
             description = "Not found",
             content = @Content
         )
-    })
+    }) 
+    @JsonView(User.FullView.class)
     @GetMapping("")
-    public ResponseEntity<List<User>> getUsers() {
-        return new ResponseEntity<>(userService.findAll(), HttpStatus.OK);
+    public Page<User> getAll(
+        @RequestParam(value = "page", defaultValue = "0") int page ,
+        @RequestParam(value = "size", defaultValue = "10") int size,
+        @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
+        @RequestParam(value = "direction", defaultValue = "desc") String direction) 
+    {   
+        Pageable pageable = PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction));
+        return userRepository.findAll(pageable);
     }
 
-    //Logged user
     @Operation(summary = "Get logged user")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "User found.",
+            description = "User found",
             content = {@Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = User.class)
@@ -120,8 +135,10 @@ public class UserRestController {
             content = @Content
         )
     })
+    @JsonView(User.FullView.class)
     @GetMapping("/me")
-    public ResponseEntity<User> getLoggedUser(HttpServletRequest request) {
+    public ResponseEntity<User> getLoggedUser(HttpServletRequest request) 
+    {
         Optional<User> userOpt = userService.getUserBy(request);
         if (userOpt.isPresent()) 
             return ResponseEntity.ok(userOpt.get());
@@ -151,18 +168,59 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/tweets")
+    @JsonView(Tweet.FullView.class)
     public ResponseEntity<List<Tweet>> getUserTweets(HttpServletRequest request) 
     {
         Optional<User> userOpt = userService.getUserBy(request);
-        if (userOpt.isPresent()) {
+        if (userOpt.isPresent()) 
+        {
             User user = userOpt.get();
             List<Tweet> tweets = user.getTweets();
-            if(tweets != null)
-                return new ResponseEntity<>(tweets, HttpStatus.OK);
-            else
-                return new ResponseEntity<>(tweets, HttpStatus.NO_CONTENT);
-        } else
-            return ResponseEntity.notFound().build();
+
+            return new ResponseEntity<>(tweets, HttpStatus.OK);
+        } 
+        else return ResponseEntity.notFound().build();
+    }
+
+    @Operation(summary = "Get followed users' tweets")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Found",
+            content = {@Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Tweet.class)
+            )}
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Not found",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden",
+            content = @Content
+        )
+    })
+    @JsonView(Tweet.FullView.class)
+    @GetMapping("/{username}/following/tweets")
+    public ResponseEntity<List<Tweet>> getFollowedUserTweets(@PathVariable String username,
+        @RequestParam(value = "page", defaultValue = "0") int page ,
+        @RequestParam(value = "size", defaultValue = "10") int size/*,
+        @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
+        @RequestParam(value = "direction", defaultValue = "desc") String direction*/) 
+    {
+        Optional<User> userOpt = userService.getUserBy(username);
+        if (userOpt.isPresent()) 
+        {  
+            Pageable pageable = PageRequest.of(page, size/*, Sorter.getCustomSort(sortBy, direction)*/);
+            User user = userOpt.get();
+            List<Tweet> tweets = tweetRepository.findFollowedUsersTweets(user, pageable).getContent();
+
+            return new ResponseEntity<>(tweets, HttpStatus.OK);
+        } 
+        else return ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "Get User followers")
@@ -186,6 +244,7 @@ public class UserRestController {
             content = @Content
         )
     })
+    @JsonView(User.UsernameView.class)
     @GetMapping("/me/followers")
     public ResponseEntity<Set<User>> getUserFollowers(HttpServletRequest request)
     {
@@ -219,6 +278,7 @@ public class UserRestController {
             content = @Content
         )
     })
+    @JsonView(User.UsernameView.class)
     @GetMapping("/me/following")
     public ResponseEntity<Set<User>> getUserFollowing(HttpServletRequest request) 
     {
@@ -231,15 +291,14 @@ public class UserRestController {
 
             return new ResponseEntity<>(users, HttpStatus.OK);
         }
-        else
-            return ResponseEntity.notFound().build();
+        else return ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "Get user profile picture")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200",
-            description = "Found the exercise",
+            description = "Found the profile picture",
             content = {@Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = User.class)
@@ -252,22 +311,20 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/image")
-    public ResponseEntity<Object> downloadImage(HttpServletRequest request) throws SQLException 
+    public ResponseEntity<Resource> downloadImage(HttpServletRequest request) throws SQLException 
     {
         Optional<User> userOpt = userService.getUserBy(request);
 
-        if (userOpt.isPresent() && userOpt.get().hasProfilePicture()) {
-
+        if (userOpt.isPresent() && userOpt.get().hasProfilePicture()) 
+        {
             Resource file = new InputStreamResource(userOpt.get().getProfilePicture().getBinaryStream());
 
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
                     .contentLength(userOpt.get().getProfilePicture().length()).body(file);
-        } else {
-            return ResponseEntity.notFound().build();
         }
+        else return ResponseEntity.notFound().build();
     }
 
-    //POST new user
     @Operation(summary = "Post new user")
     @ApiResponses(value = 
     {
@@ -287,20 +344,19 @@ public class UserRestController {
     })
     @PostMapping("/users/")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@RequestBody User user) 
+    public ResponseEntity<User> createUser(HttpServletRequest request, @RequestBody User createdUser) 
     {
-        //Only for creating non-admins
-        if (!user.isAdmin()) {
-            userService.save(user);
+        if (userService.isAdmin(request)) 
+        {
+            userService.save(createdUser);
             URI location = fromCurrentRequest().path("/{id}")
-                .buildAndExpand(user.getUsername()).toUri();
-            return ResponseEntity.created(location).body(user);
+                .buildAndExpand(createdUser.getUsername()).toUri();
+            return ResponseEntity.created(location).body(createdUser);
         } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
-    //Upload profile picture
     @Operation(summary = "POST a user profile picture")
     @ApiResponses(value = {
         @ApiResponse(
@@ -327,15 +383,15 @@ public class UserRestController {
     {
         Optional<User> userOpt = userService.getUserBy(request);
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
+        if (userOpt.isPresent())
+        {
             URI location = fromCurrentRequest().build().toUri();
-            user.setProfilePicture(
-                BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()),
-                userService
-                );
+            userOpt.get().setProfilePicture(
+               BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()),
+               userRepository
+               );
             return ResponseEntity.created(location).build();
-        } else 
-            return ResponseEntity.notFound().build();
+        } 
+        else return ResponseEntity.notFound().build();
     }
 }

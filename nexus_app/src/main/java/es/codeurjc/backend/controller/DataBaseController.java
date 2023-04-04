@@ -1,21 +1,16 @@
 package es.codeurjc.backend.controller;
 
-import java.util.stream.IntStream;
-
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
-
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
-import es.codeurjc.backend.service.TweetService;
-
 
 @RestController
 public class DataBaseController {
@@ -24,8 +19,7 @@ public class DataBaseController {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
-    @Autowired
-    private TweetService tweetService;
+
     @Autowired
     private TweetRepository tweetRepository;
     @Autowired
@@ -45,7 +39,6 @@ public class DataBaseController {
             .setEncodedPassword(passwordEncoder.encode("a"))
             .setAdmin();
         
-
         User userA = builder.build();
         User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
         User userC = builder.setUsername("c").setEmail("c@c.com").build();
@@ -55,7 +48,10 @@ public class DataBaseController {
         userService.save(userA).save(userB).save(userC).save(userD).save(userE);
         userRepository.flush();
 
+        // /Building users
+
         userA.switchFollow(userB);
+        userService.save(userA);
         
         // Building tweets
         tweetBuilder
@@ -69,7 +65,7 @@ public class DataBaseController {
         tweet1.switchLike(userB);
         tweet1.report(userB);
    
-        tweetService.save(tweet1);
+        tweetRepository.save(tweet1);
 
         //-------------------------------------
         tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
@@ -87,7 +83,8 @@ public class DataBaseController {
         tweet3.switchLike(userD);
         tweet3.switchLike(userE);
 
-        tweetService.save(tweet2).save(tweet3);
+        tweetRepository.save(tweet2);
+        tweetRepository.save(tweet3);
 
         tweetBuilder.setAuthor(userB);
 

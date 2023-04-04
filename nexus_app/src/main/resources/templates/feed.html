@@ -216,18 +216,29 @@
     </div>
   </body>
   <script>
+    
     var page = 2;
+    
     const showMoreTweets = () => {
+      
       var tweetComponentTemplate;
+      var url;
+      if ({{authenticated}}){
+        var username = '{{username}}';
+        url = `/api/users/` + username + `/following/tweets?page=${page}&size=${5}`;
+      } else {
+        url = `/api/tweets?page=${page}&size=${5}`;
+      };
+      
 
       $.get("/tweetcomponent.html", data => {
         tweetComponentTemplate = data;
       })
-
-      const url = `/api/tweets?page=${page}&size=${5}`
+      
+       
       $.get(url, (tweets, status) => {
-        for (var i = 0; i < tweets.content.length; i++) {
-          var post = Mustache.render(tweetComponentTemplate, tweets.content[i])
+        for (var i = 0; i < tweets.length; i++) {
+          var post = Mustache.render(tweetComponentTemplate, tweets[i])
           $("#posts-container").append(post);
         }
       })

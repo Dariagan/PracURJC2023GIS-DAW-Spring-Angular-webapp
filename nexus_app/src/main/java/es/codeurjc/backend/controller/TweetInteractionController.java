@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +18,7 @@ import org.springframework.core.io.Resource;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A
@@ -26,35 +26,34 @@ import es.codeurjc.backend.service.UserService;
 public class TweetInteractionController {
     
     @Autowired
-    TweetService tweetService;
+    TweetRepository tweetRepository;
 
     @Autowired
     UserService userService;
     
     @RequestMapping("/tweet/{id}/like")
-    public String handleLike(HttpServletRequest req, @PathVariable String id) 
+    public String handleLike(HttpServletRequest request, @PathVariable long id) 
     {
-        Optional<User> userOpt = userService.getUserBy(req);
-        Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
+        Optional<User> userOpt = userService.getUserBy(request);
+        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (userOpt.isPresent()) 
         {
             if (tweetOpt.isPresent()) 
             {
-                Tweet tweet = tweetOpt.get();
-                tweet.switchLike(userOpt.get());
-                tweetService.save(tweet);
+                tweetOpt.get().switchLike(userOpt.get());
+                tweetRepository.save(tweetOpt.get());
             }
-            return UserService.redirectToReferer(req);
+            return UserService.redirectToReferer(request);
         }
         else return "redirect:/login";
     }
 
     @RequestMapping("/tweet/{id}/report")
-    public String reportTweet(Model model, HttpServletRequest req, @PathVariable Long id) 
+    public String reportTweet(HttpServletRequest request, @PathVariable Long id) 
     {
-        Optional<User> reportingUserOpt = userService.getUserBy(req);
-        Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
+        Optional<User> reportingUserOpt = userService.getUserBy(request);
+        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (reportingUserOpt.isPresent())
         {
@@ -63,38 +62,38 @@ public class TweetInteractionController {
                 Tweet tweet = tweetOpt.get();
 
                 if (TweetService.readIfPostShouldGetdeleted(id))
-                    tweetService.delete(tweet);
+                    tweetRepository.delete(tweet);
                 else {
                     tweet.report(reportingUserOpt.get());     
-                    tweetService.save(tweet);      
+                    tweetRepository.save(tweet);      
                 }
             }
-            return UserService.redirectToReferer(req);
+            return UserService.redirectToReferer(request);
         }
         else return "redirect:/login";
     }
 
     @RequestMapping("/tweet/{id}/delete")
-    public String deleteTweet(@PathVariable Long id, HttpServletRequest req) 
+    public String deleteTweet(@PathVariable long id, HttpServletRequest request) 
     {
-        Optional<User> deletingUserOpt = userService.getUserBy(req);
-        Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
+        Optional<User> deletingUserOpt = userService.getUserBy(request);
+        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (tweetOpt.isPresent() && 
-        (TweetService.isOwnTweet(tweetOpt.get(), req) ||
+        (TweetService.isOwnTweet(tweetOpt.get(), request) ||
         UserService.isAdmin(deletingUserOpt) || 
         TweetService.readIfPostShouldGetdeleted(id))) 
         {
-            tweetService.delete(tweetOpt.get());
-            return "redirect:" + req.getHeader("referer");
+            tweetRepository.delete(tweetOpt.get());
+            return "redirect:" + request.getHeader("referer");
         } 
         else return "error";
     }
 
     @GetMapping("/tweet/{id}/media")
-	public ResponseEntity<Resource> downloadImage(@PathVariable Long id) 
+	public ResponseEntity<Resource> downloadImage(@PathVariable long id) 
     {
-		Optional<Tweet> tweetOpt = tweetService.getTweetById(id);
+		Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         Optional<Blob> mediaOpt = Optional.ofNullable(tweetOpt.get().getMedia());
   

@@ -17,10 +17,10 @@ import es.codeurjc.backend.model.User;
 
 import es.codeurjc.backend.repository.UserRepository;
 
-// Whole service programmed by group 13 A
+// Whole service programmed by group 13-A
 @Service
-public final class UserService {
-
+public final class UserService 
+{
     @Autowired
     private UserRepository userRepository;
 
@@ -64,7 +64,7 @@ public final class UserService {
         userRepository.delete(user);
         return this;
     }
-    public static boolean visitorAuthenticated(OptTwo<User> users){
+    public static boolean isVisitorAuthenticated(OptTwo<User> users){
         return users.isRight();
     }
     public static boolean urlUserExists(OptTwo<User> users){
@@ -76,8 +76,15 @@ public final class UserService {
     public static boolean urlUserExistsAndNotSelfAction(OptTwo<User> users){
         return urlUserExists(users) || !isSelfAction(users);
     }
+    public static boolean isVisitorAdmin(OptTwo<User> users){
+        return users.getRight().isAdmin();
+    }
     public static boolean isAdmin(Optional<User> user){
         return user.isPresent() && user.get().isAdmin();
+    }
+    public boolean isAdmin(HttpServletRequest request){
+        Optional<User> userOpt = this.getUserBy(request);
+        return userOpt.isPresent() && userOpt.get().isAdmin();
     }
 
     public static boolean isEmail(String input){

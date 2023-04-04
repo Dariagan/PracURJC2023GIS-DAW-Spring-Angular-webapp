@@ -7,7 +7,9 @@ import es.codeurjc.backend.repository.TweetRepository;
 
 import es.codeurjc.backend.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
+
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,14 +44,15 @@ public class FeedController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        List<Tweet> tweetsToDisplay;
+        Page<Tweet> tweetsToDisplay;
 
         if (loggedUser.isPresent() && loggedUser.get().getFollowing().size() > 0)
             tweetsToDisplay = tweetRepository.findFollowedUsersTweets(loggedUser.get(), PageRequest.of(0, 10));
-        else
-            tweetsToDisplay = tweetRepository.findTop10ByOrderByDateDesc();
-        
-        updateFeedModel(model, loggedUser, tweetsToDisplay);
+        else {
+            Sort sort = Sort.by("date").descending();
+            tweetsToDisplay = tweetRepository.findAll(PageRequest.of(0, 10, sort));
+        }
+        updateFeedModel(model, loggedUser, tweetsToDisplay.getContent());
 
         return "feed";
     }
@@ -91,27 +97,14 @@ public class FeedController {
     private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) 
     {
         if (loggedUser.isPresent())
+        {
             model.addAttribute("loggedUser", loggedUser.get());
+            model.addAttribute("username", loggedUser.get().getUsername());
+        } else 
+            model.addAttribute("username", "");
+
         model.addAttribute("authenticated", loggedUser.isPresent());
         model.addAttribute("inLogin", false);
         model.addAttribute("tweets", displayedTweets); 
     }
-
-    /*
-    // FIXME if a tweet has N likes it will query all the N likes, in this sense
-    // the model for Tweet should store the likes count. Same applies to replies.
-    @GetMapping("/api/tweets")
-    public ResponseEntity<Page<Tweet>> getTweets(
-        @RequestParam("page") int page, @RequestParam("size") int size
-    ) {
-        if (size > 10) return ResponseEntity.badRequest().build();
-
-        Page<Tweet> tweetsPage = tweetRepository
-            .findAllByOrderByDateDesc(PageRequest.of(page, size));
-
-        return ResponseEntity
-            .ok()
-            .header("X-Total-Count", String.valueOf(tweetsPage.getTotalElements()))
-            .body(tweetsPage);
-    }*/
 }

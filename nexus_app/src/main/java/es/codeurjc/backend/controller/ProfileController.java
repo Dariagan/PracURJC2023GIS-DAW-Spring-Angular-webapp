@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.repository.TweetRepository;
+import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 
 import org.hibernate.engine.jdbc.BlobProxy;
@@ -39,13 +40,15 @@ public class ProfileController {
     private UserService userService;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private TweetRepository tweetRepository;
 
-    private Optional<User> loggedUser;
+    private Optional<User> loggedUserOpt;
     private User profileUser;
 
     private boolean following;
-
 
     @RequestMapping("/u/{username}")
     public String redirect(Model model, @PathVariable String username, HttpServletRequest req)
@@ -55,15 +58,15 @@ public class ProfileController {
         // If URL-user exists
         if (users.isLeft()) {
             profileUser = users.getLeft();
-            loggedUser = users.getOptRight();
+            loggedUserOpt = users.getOptRight();
 
-            model.addAttribute("authenticated", loggedUser.isPresent());
+            model.addAttribute("authenticated", loggedUserOpt.isPresent());
 
             following = Try
-                .of(() -> loggedUser.get().getFollowing().contains(profileUser))
+                .of(() -> loggedUserOpt.get().getFollowing().contains(profileUser))
                 .getOrElse(false);
 
-            modelProfile(model, UserService.isOwnResource(username, loggedUser));
+            modelProfile(model, UserService.isOwnResource(username, loggedUserOpt));
 
             return "profile";
         } else 
@@ -93,7 +96,7 @@ public class ProfileController {
     @GetMapping("/u/{username}/write")
     public String startWritingTweet(@PathVariable String username, Model model) 
     {
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
             model.addAttribute("posting", true);
             modelProfile(model, true);
@@ -106,14 +109,13 @@ public class ProfileController {
     public String startWritingTweet(Model model, @PathVariable String username, 
     @RequestParam String text, @RequestParam MultipartFile image) 
     {
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
             Tweet.Builder builder = 
             new Tweet.Builder()
-                .setAuthor(loggedUser.get())
+                .setAuthor(loggedUserOpt.get())
                 .setText(text);
 
-            //FIXME refactor
             if (image.isEmpty())
                 builder.setMedia(null);   
             else
@@ -133,17 +135,17 @@ public class ProfileController {
     @PostMapping("/u/{username}/profilepicture/update")
     public String uploadProfilePicture(@RequestParam MultipartFile image, @PathVariable String username)
     {     
-        if (UserService.isOwnResource(username, loggedUser))
+        if (UserService.isOwnResource(username, loggedUserOpt))
         {
             if (!image.isEmpty()) 
             {
                 Try.run(() -> profileUser.setProfilePicture(
                     BlobProxy.generateProxy(image.getInputStream(), image.getSize()),
-                    userService
+                    userRepository
                 ));
-                userService.save(profileUser);
             }
-            return "redirect:/u/" + loggedUser.get().getUsername();
+           
+            return "redirect:/u/" + loggedUserOpt.get().getUsername();
         } 
         else return "error";
     }
@@ -151,9 +153,9 @@ public class ProfileController {
     @RequestMapping("/u/{username}/profilepicture/remove")
     public String removeProfilePicture(@PathVariable String username) 
     {
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
-            profileUser.setProfilePicture(null, userService);
+            profileUser.setProfilePicture(null, userRepository);
             return "profile";
         } 
         else return "error";
@@ -166,7 +168,9 @@ public class ProfileController {
         model.addAttribute("followerCount", profileUser.getFollowers(userService).size());
         model.addAttribute("ownProfile", ownProfile);
         model.addAttribute("following", following);
-        if (loggedUser.isEmpty()) return;
-        model.addAttribute("loggedUser", loggedUser.get());
+        if (loggedUserOpt.isEmpty()) return;
+        User loggedUser = loggedUserOpt.get();
+        model.addAttribute("loggedUser", loggedUser);
+        model.addAttribute("blocked", loggedUser.getBlockedUsers().contains(profileUser));
     }
 }

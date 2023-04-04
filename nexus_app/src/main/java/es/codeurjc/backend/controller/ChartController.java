@@ -22,7 +22,8 @@ import es.codeurjc.backend.repository.TweetRepository;
 @Controller
 public class ChartController 
 {
-    @Autowired TweetRepository tweetRepository;
+    @Autowired 
+    private TweetRepository tweetRepository;
     
     @RequestMapping("/barchart")
     public String showChart(Model model, HttpServletRequest request)
