@@ -45,7 +45,7 @@ public class UserInteractionController {
     }
 
     @RequestMapping("/u/{username}/ban")
-    public String banUser(
+    public String handleBan(
         @PathVariable String username, HttpServletRequest req
     ) {
         OptTwo<User> users = userService.getUserBy(username, req);
@@ -68,6 +68,32 @@ public class UserInteractionController {
         return "error";
     }
 
+    @RequestMapping("/u/{username}/block")
+    public String handleBlock(
+        @PathVariable String username, HttpServletRequest req
+    ) {
+        OptTwo<User> users = userService.getUserBy(username, req);
+        
+        if (UserService.isVisitorAuthenticated(users) &&
+            UserService.urlUserExistsAndNotSelfAction(users)) {
+            
+            User blockingUser = users.getRight();
+            User blockedUser = users.getLeft();
+            
+            if (!blockingUser.getBlockedUsers().contains(blockedUser))
+                blockingUser.block(blockedUser);
+            else
+                blockingUser.unblock(blockedUser);
+
+            userService.save(blockingUser);
+
+            return UserService.redirectToReferer(req);
+    
+        }   
+        return "error";
+    }
+
+    //TODO before getting here, add prompt asking whether you want to delete your account
     @RequestMapping("/u/{username}/delete")
     public String deleteUser(
         @PathVariable String username, HttpServletRequest req
@@ -85,7 +111,8 @@ public class UserInteractionController {
                 tweetRepository.save(tweet);
             }
 
-            //TODO add prompt asking whether you want to delete your account
+            // FIXME handle all SQL foreign keys which reference the user 
+            // (either delete object which is referencing the uer or set the user F.K. to null)
             userService.delete(deletedUser);
 
             return UserService.redirectToReferer(req);

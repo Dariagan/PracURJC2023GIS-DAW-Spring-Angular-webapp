@@ -1,0 +1,15 @@
+<!-- Made by group 13 A -->
+<a href="/u/{{profileUser.username}}/block">
+    {{#authenticated}}
+    {{^ownProfile}}
+            <div>
+                {{#blocked}}
+                <span class="profileanon-text06">[UNBLOCK USER]</span>
+                {{/blocked}}
+                {{^blocked}}
+                <span class="profileanon-text06">[BLOCK USER]</span>
+                {{/blocked}}
+            </div>  
+    {{/ownProfile}}
+    {{/authenticated}}
+</a>

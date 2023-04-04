@@ -33,9 +33,9 @@ public class TweetInteractionController {
     UserService userService;
     
     @RequestMapping("/tweet/{id}/like")
-    public String handleLike(HttpServletRequest req, @PathVariable long id) 
+    public String handleLike(HttpServletRequest request, @PathVariable long id) 
     {
-        Optional<User> userOpt = userService.getUserBy(req);
+        Optional<User> userOpt = userService.getUserBy(request);
         Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (userOpt.isPresent()) 
@@ -45,15 +45,15 @@ public class TweetInteractionController {
                 tweetOpt.get().switchLike(userOpt.get());
                 tweetRepository.save(tweetOpt.get());
             }
-            return UserService.redirectToReferer(req);
+            return UserService.redirectToReferer(request);
         }
         else return "redirect:/login";
     }
 
     @RequestMapping("/tweet/{id}/report")
-    public String reportTweet(Model model, HttpServletRequest req, @PathVariable Long id) 
+    public String reportTweet(HttpServletRequest request, @PathVariable Long id) 
     {
-        Optional<User> reportingUserOpt = userService.getUserBy(req);
+        Optional<User> reportingUserOpt = userService.getUserBy(request);
         Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (reportingUserOpt.isPresent())
@@ -69,24 +69,24 @@ public class TweetInteractionController {
                     tweetRepository.save(tweet);      
                 }
             }
-            return UserService.redirectToReferer(req);
+            return UserService.redirectToReferer(request);
         }
         else return "redirect:/login";
     }
 
     @RequestMapping("/tweet/{id}/delete")
-    public String deleteTweet(@PathVariable long id, HttpServletRequest req) 
+    public String deleteTweet(@PathVariable long id, HttpServletRequest request) 
     {
-        Optional<User> deletingUserOpt = userService.getUserBy(req);
+        Optional<User> deletingUserOpt = userService.getUserBy(request);
         Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
         if (tweetOpt.isPresent() && 
-        (TweetService.isOwnTweet(tweetOpt.get(), req) ||
+        (TweetService.isOwnTweet(tweetOpt.get(), request) ||
         UserService.isAdmin(deletingUserOpt) || 
         TweetService.readIfPostShouldGetdeleted(id))) 
         {
             tweetRepository.delete(tweetOpt.get());
-            return "redirect:" + req.getHeader("referer");
+            return "redirect:" + request.getHeader("referer");
         } 
         else return "error";
     }

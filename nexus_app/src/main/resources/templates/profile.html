@@ -51,11 +51,12 @@
             <div class="profileanon-container1">
               <div class="profileanon-twitslayout">
                 {{^profileUser.isBanned}} 
-                  {{> tweetwritecomponent}}
-                
-                  {{#profileUser.tweets}}
-                    {{> tweetcomponent}}
-                  {{/profileUser.tweets}}
+                  {{^blocked}}
+                    {{> tweetwritecomponent}}             
+                    {{#profileUser.tweets}}
+                      {{> tweetcomponent}}
+                    {{/profileUser.tweets}}
+                  {{/blocked}}
                 {{/profileUser.isBanned}} 
               </div>
             </div>
@@ -128,10 +129,9 @@
                 class="profileanon-iconsax-linearboxsearch"
               />
               <span class="profileanon-text076">
-                <span>search over nexus</span>
                 {{> uploadprofilepicturebutton}}
                 {{> banbutton}} 
-                {{> deleteprofilebutton}} 
+                {{> blockbutton}}
               </span>
             </div>
             <div class="profileanon-profile-variant3">
@@ -142,9 +142,11 @@
               />
                 <div class="profileanon-pfp3">
                   {{^profileUser.isBanned}} 
-                    {{#profileUser}}
-                      {{> userimage}}
-                    {{/profileUser}}
+                    {{^blocked}}
+                      {{#profileUser}}
+                        {{> userimage}}
+                      {{/profileUser}}
+                    {{/blocked}}
                   {{/profileUser.isBanned}} 
                 </div>
               <span class="profileanon-text078">{{profileUser.username}}</span>
@@ -164,21 +166,30 @@
               
               <span class="profileanon-text082">                  
                 {{^profileUser.isBanned}}     
-                  {{profileUser.description}}
+                  {{#blocked}}
+                    You blocked this user.
+                  {{/blocked}}
+                  {{^blocked}}
+                    {{profileUser.description}}
+                  {{/blocked}}
                 {{/profileUser.isBanned}}   
                 {{#profileUser.isBanned}}    
                   This user has been banned.
                 {{/profileUser.isBanned}}  
               </span>
-              {{^profileUser.isBanned}}     
+              {{^profileUser.isBanned}}    
                 {{> writebutton}}
+                {{^blocked}} 
                 {{> followprofilebutton}}
+                {{/blocked}}
               {{/profileUser.isBanned}}   
                   
              
               <span class="profileanon-text086">
                 {{^profileUser.isBanned}}
+                {{^blocked}}
                 following {{profileUser.following.size}}/ {{followerCount}} followers
+                {{/blocked}}
                 {{/profileUser.isBanned}}
               </span>
             </div>

@@ -76,10 +76,10 @@ public class User {
     @ManyToMany
     private Set<User> following = new HashSet<User>();
 
-    @JsonIgnore
-    @Nullable
-    @ManyToMany
-    private Set<User> blockedUsers = new HashSet<>();  
+        @JsonIgnore
+        @Nullable
+        @ManyToMany
+        private Set<User> blockedUsers = new HashSet<>();  
 
     public static class Builder {
         private String username, email, encodedPassword, name = "", description = "";
@@ -208,8 +208,14 @@ public class User {
     }
 
     public Set<User> getBlockedUsers() {return blockedUsers;}
-    public void block(User user){blockedUsers.add(user);};
-    public void unblock(User user){blockedUsers.remove(user);};
+    public void block(User user) {
+        assert user != this;
+        blockedUsers.add(user);
+    };
+    public void unblock(User user){
+        assert user != this;
+        blockedUsers.remove(user);
+    };
 
     public LocalDateTime getSignUpDate() {return signUpDate;}
 
