@@ -112,7 +112,7 @@ public class UserInteractionController {
             }
 
             // FIXME handle all SQL foreign keys which reference the user 
-            // (either delete object which is referencing the uer or set the user F.K. to null)
+            // (either delete entities which are referencing the deleted user or set the user F.K. to null)
             userService.delete(deletedUser);
 
             return UserService.redirectToReferer(req);

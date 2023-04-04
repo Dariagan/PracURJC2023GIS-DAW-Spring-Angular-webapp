@@ -15,6 +15,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 import es.codeurjc.backend.utilities.Sorter;
@@ -53,6 +55,9 @@ public class UserRestController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TweetRepository tweetRepository;
 
     @Operation(summary = "Get user by username")
     @ApiResponses(value = {
@@ -110,7 +115,8 @@ public class UserRestController {
         @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction) 
     {   
-        return userRepository.findAll(PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction)));
+        Pageable pageable = PageRequest.of(page, size, Sorter.getCustomSort(sortBy, direction));
+        return userRepository.findAll(pageable);
     }
 
     @Operation(summary = "Get logged user")
@@ -162,6 +168,7 @@ public class UserRestController {
         )
     })
     @GetMapping("/me/tweets")
+    @JsonView(Tweet.FullView.class)
     public ResponseEntity<List<Tweet>> getUserTweets(HttpServletRequest request) 
     {
         Optional<User> userOpt = userService.getUserBy(request);
@@ -169,6 +176,47 @@ public class UserRestController {
         {
             User user = userOpt.get();
             List<Tweet> tweets = user.getTweets();
+
+            return new ResponseEntity<>(tweets, HttpStatus.OK);
+        } 
+        else return ResponseEntity.notFound().build();
+    }
+
+    @Operation(summary = "Get followed users' tweets")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Found",
+            content = {@Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Tweet.class)
+            )}
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "Not found",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "Forbidden",
+            content = @Content
+        )
+    })
+    @JsonView(Tweet.FullView.class)
+    @GetMapping("/{username}/following/tweets")
+    public ResponseEntity<List<Tweet>> getFollowedUserTweets(@PathVariable String username,
+        @RequestParam(value = "page", defaultValue = "0") int page ,
+        @RequestParam(value = "size", defaultValue = "10") int size/*,
+        @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
+        @RequestParam(value = "direction", defaultValue = "desc") String direction*/) 
+    {
+        Optional<User> userOpt = userService.getUserBy(username);
+        if (userOpt.isPresent()) 
+        {  
+            Pageable pageable = PageRequest.of(page, size/*, Sorter.getCustomSort(sortBy, direction)*/);
+            User user = userOpt.get();
+            List<Tweet> tweets = tweetRepository.findFollowedUsersTweets(user, pageable).getContent();
 
             return new ResponseEntity<>(tweets, HttpStatus.OK);
         } 

@@ -17,9 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
-import es.codeurjc.backend.utilities.Sorter;
 
 import org.springframework.web.bind.annotation.RequestParam;
+
+import com.google.gson.Gson;
 
 import java.util.List;
 import java.util.Optional;
@@ -96,7 +97,12 @@ public class FeedController {
     private void updateFeedModel(Model model, Optional<User> loggedUser, List<Tweet> displayedTweets) 
     {
         if (loggedUser.isPresent())
+        {
             model.addAttribute("loggedUser", loggedUser.get());
+            model.addAttribute("username", loggedUser.get().getUsername());
+        } else 
+            model.addAttribute("username", "");
+
         model.addAttribute("authenticated", loggedUser.isPresent());
         model.addAttribute("inLogin", false);
         model.addAttribute("tweets", displayedTweets); 
