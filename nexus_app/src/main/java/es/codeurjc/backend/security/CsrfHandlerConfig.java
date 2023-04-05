@@ -10,10 +10,10 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-// Teacher's
+import java.util.Optional;
+
 @Configuration
 public class CsrfHandlerConfig implements WebMvcConfigurer{
-    
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new CsrfHandlerInterceptor());
@@ -21,17 +21,15 @@ public class CsrfHandlerConfig implements WebMvcConfigurer{
 }
 
 class CsrfHandlerInterceptor implements HandlerInterceptor {
-
     @Override
-    public void postHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler,
-                           final ModelAndView modelAndView) throws Exception {
-
-        if (modelAndView != null) {
-
-            CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
-            if (token != null) {
-                modelAndView.addObject("token", token.getToken());
-            }
-        }
+    public void postHandle(
+        final HttpServletRequest request,
+        final HttpServletResponse response,
+        final Object handler,
+        final ModelAndView modelAndView
+    ) {
+        if (modelAndView != null) Optional
+            .ofNullable((CsrfToken) request.getAttribute("_csrf"))
+            .ifPresent(t -> modelAndView.addObject("token", t.getToken()));
     }
 }
