@@ -140,10 +140,9 @@ public class UserRestController {
     public ResponseEntity<User> getLoggedUser(HttpServletRequest request) 
     {
         Optional<User> userOpt = userService.getUserBy(request);
-        if (userOpt.isPresent()) 
-            return ResponseEntity.ok(userOpt.get());
-        else 
-            return ResponseEntity.notFound().build();
+        return userOpt
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Get User Tweets")

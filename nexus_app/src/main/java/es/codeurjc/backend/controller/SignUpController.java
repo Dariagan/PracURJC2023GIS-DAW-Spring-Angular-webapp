@@ -1,63 +1,65 @@
 package es.codeurjc.backend.controller;
 
+import es.codeurjc.backend.utilities.ResponseBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
 // Entire controller programmed by group 13 A
-@Controller
-public class SignUpController {
-
+@RestController
+@RequestMapping("/api/auth")
+public class SignUpController
+{
     @Autowired
     private UserService userService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    // FIXME this endpoints returns the signup page on URI /api/auth/signup,
+    // but it should get returned on simply /signup
     @GetMapping("/signup")
-    public String showSignUpForm(Model model) {
+    public String showSignUpForm(Model model)
+    {
         return "signuppage";
     }
-   
+
     @PostMapping("/signup")
-    public String processSignUpForm(@RequestParam String email, @RequestParam String username, @RequestParam String password, Model model) {
-        
-        if (!UserService.isEmail(email)) 
+    public ResponseEntity<?> processSignUpForm(
+        @RequestParam String email,
+        @RequestParam String username,
+        @RequestParam String password
+    ) {
+        if (!emailIsValid(email))
+            return ResponseBuilder.badReq("Wrong email provided");
 
-            model.addAttribute("fail", "E-mail format not adequate.");
-        
-        else if(userService.isEmailTaken(email)) 
+        if (userService.isUsernameTaken(username))
+            return ResponseBuilder.badReq("Username already in use");
 
-            model.addAttribute("fail", "E-mail address already in use.");
-        
-        else if (userService.isUsernameTaken(username)) 
+        // NOTE not production ready code
+        if (password.length() == 0)
+            return ResponseBuilder.badReq("Password too short");
 
-            model.addAttribute("fail", "Username is taken.");
-        
-        else if (password.length() <= -1) 
+        User newUser = userService.buildHelper(username, email, passwordEncoder.encode(password));
+        userService.save(newUser);
+        processEmailVerification(newUser);
 
-            model.addAttribute("fail", "Password is too short (min 8 characters).");
-        
-        else {
-            User.Builder builder = new User.Builder();
+        return ResponseEntity.ok().body("Account registered successfully");
+    }
 
-            builder.setUsername(username).setEmail(email)
-            .setEncodedPassword(passwordEncoder.encode(password));
+    private boolean emailIsValid(String email)
+    {
+        return UserService.isEmail(email) && !userService.isEmailTaken(email);
+    }
 
-            User newUser = builder.build();
+    // TODO
+    private void processEmailVerification(User newUser)
+    {
 
-            userService.save(newUser);
-
-            return "redirect:/login";
-        }
-
-        return showSignUpForm(model);
     }
 }

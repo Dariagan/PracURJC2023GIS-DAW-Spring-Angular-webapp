@@ -1,6 +1,5 @@
 package es.codeurjc.backend.service;
 
-import java.lang.ProcessBuilder.Redirect;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -90,8 +89,7 @@ public final class UserService
     public static boolean isEmail(String input){
         return input.matches("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     }
-    public static boolean isOwnResource(String resourceUsername, Optional<User> loggedUser){
-
+    public static boolean isOwnResource(String resourceUsername, Optional<User> loggedUser) {
         return loggedUser.isPresent() && loggedUser.get().getUsername().equals(resourceUsername);
     }
     public static String redirectToReferer(HttpServletRequest req) {
@@ -100,5 +98,16 @@ public final class UserService
 
     public List<User> findAll() {
         return userRepository.findAll();
+    }
+
+    public User buildHelper(String username, String email, String encodedPassword) {
+        User.Builder builder = new User.Builder();
+
+        builder
+            .setUsername(username)
+            .setEmail(email)
+            .setEncodedPassword(encodedPassword);
+
+        return builder.build();
     }
 }
