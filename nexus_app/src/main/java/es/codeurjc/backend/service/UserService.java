@@ -43,55 +43,57 @@ public final class UserService
         return userRepository.findByUsername(username);
     }
 
-    public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
     public Set<User> getFollowers(User user) {
         return userRepository.findByFollowing(user);
     }
-    public boolean isEmailTaken(String email){
-        return userRepository.existsByEmail(email);
-    }
+
     public boolean isUsernameTaken(String username){
         return userRepository.existsByUsername(username);
     }
+
     public UserService save(User user){
         userRepository.save(user);
         return this;
     }
+
     public UserService delete(User user){
         userRepository.delete(user);
         return this;
     }
+
     public static boolean isVisitorAuthenticated(OptTwo<User> users){
         return users.isRight();
     }
+
     public static boolean urlUserExists(OptTwo<User> users){
         return users.isLeft();
     }
+
     public static boolean isSelfAction(OptTwo<User> users){
         return users.getRight().equals(users.getLeft());
     }
+
     public static boolean urlUserExistsAndNotSelfAction(OptTwo<User> users){
         return urlUserExists(users) || !isSelfAction(users);
     }
+
     public static boolean isVisitorAdmin(OptTwo<User> users){
         return users.getRight().isAdmin();
     }
+
     public static boolean isAdmin(Optional<User> user){
         return user.isPresent() && user.get().isAdmin();
     }
+
     public boolean isAdmin(HttpServletRequest request){
         Optional<User> userOpt = this.getUserBy(request);
         return userOpt.isPresent() && userOpt.get().isAdmin();
     }
 
-    public static boolean isEmail(String input){
-        return input.matches("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
-    }
     public static boolean isOwnResource(String resourceUsername, Optional<User> loggedUser) {
         return loggedUser.isPresent() && loggedUser.get().getUsername().equals(resourceUsername);
     }
+
     public static String redirectToReferer(HttpServletRequest req) {
         return "redirect:" + req.getHeader("Referer");
     }
