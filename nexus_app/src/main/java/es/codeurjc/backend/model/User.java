@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.backend.repository.UserRepository;
+import es.codeurjc.backend.service.EmailService;
 import es.codeurjc.backend.service.UserService;
 
 import org.springframework.lang.Nullable;
@@ -128,7 +129,7 @@ public class User {
 
             && name != null && name.length() <= 25
 
-            && email != null && UserService.isEmail(email)
+            && email != null && EmailService.isEmail(email)
             
             && encodedPassword != null && encodedPassword.length() >= 10;
 

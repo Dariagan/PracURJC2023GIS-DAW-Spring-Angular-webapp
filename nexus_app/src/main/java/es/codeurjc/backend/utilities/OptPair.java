@@ -1,9 +1,13 @@
 package es.codeurjc.backend.utilities;
 
+import io.vavr.Function2;
+import io.vavr.collection.List;
 import io.vavr.control.Try;
 import org.springframework.data.util.Pair;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 //Programmed by group 13-A
 public class OptPair<T, U> {
@@ -20,10 +24,6 @@ public class OptPair<T, U> {
 
     public static <T, U> OptPair<T, U> empty() {
         return new OptPair(Pair.of(Optional.empty(), Optional.empty()));
-    }
-
-    public boolean isEmpty() {
-        return m.getFirst().isEmpty() && m.getSecond().isEmpty();
     }
 
     public Optional<T> getOptLeft() {
@@ -60,5 +60,21 @@ public class OptPair<T, U> {
             .getOrElse(Optional.empty());
 
         return OptTwo.of(l, r);
+    }
+
+    public boolean isFull() {
+        return this.isRight() && this.isLeft();
+    }
+
+    public boolean isEmpty() {
+        return !this.isRight() && !this.isLeft();
+    }
+
+    public void ifIsFull(BiConsumer<T, U> f) {
+        if (this.isFull()) f.accept(this.getLeft(), this.getRight());
+    }
+
+    public void ifIsEmpty(Runnable f) {
+        if (this.isEmpty()) f.run();
     }
 }

@@ -61,13 +61,10 @@ public class FeedController {
     public String searchBytags(Model model, HttpServletRequest req, @RequestParam String tags) 
     {
         Optional<User> loggedUser = userService.getUserBy(req);
-
         Set<String> inputTags = Set.of(tags.split("\\s+"));
-
         List<Tweet> foundTweets = tweetRepository.findTweetsByTags(inputTags, PageRequest.of(0, 10));
             
         updateFeedModel(model, loggedUser, foundTweets);
-    
         return "feed";
     }
 

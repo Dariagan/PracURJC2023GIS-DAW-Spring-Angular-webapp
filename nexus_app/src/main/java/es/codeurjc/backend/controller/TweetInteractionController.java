@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import es.codeurjc.backend.service.TweetService;
+import es.codeurjc.backend.utilities.OptPair;
+import es.codeurjc.backend.utilities.ResourcesBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,48 +31,39 @@ public class TweetInteractionController {
     TweetRepository tweetRepository;
 
     @Autowired
+    TweetService tweetService;
+
+    @Autowired
     UserService userService;
     
     @RequestMapping("/tweet/{id}/like")
     public String handleLike(HttpServletRequest request, @PathVariable long id) 
     {
-        Optional<User> userOpt = userService.getUserBy(request);
-        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
+        OptPair<Tweet, User> tweetAndUser = OptPair.of(
+            tweetRepository.findById(id), userService.getUserBy(request)
+        );
 
-        if (userOpt.isPresent()) 
-        {
-            if (tweetOpt.isPresent()) 
-            {
-                tweetOpt.get().switchLike(userOpt.get());
-                tweetRepository.save(tweetOpt.get());
-            }
-            return UserService.redirectToReferer(request);
-        }
-        else return "redirect:/login";
+        if (!tweetAndUser.isRight()) return "redirect:/login";
+        if (!tweetAndUser.isLeft()) return "error";
+
+        tweetService.switchLike(tweetAndUser);
+        return UserService.redirectToReferer(request);
     }
 
     @RequestMapping("/tweet/{id}/report")
     public String reportTweet(HttpServletRequest request, @PathVariable Long id) 
     {
-        Optional<User> reportingUserOpt = userService.getUserBy(request);
-        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
+        OptPair<Tweet, User> tweetAndReportingUser = OptPair.of(
+            tweetRepository.findById(id), userService.getUserBy(request)
+        );
 
-        if (reportingUserOpt.isPresent())
-        {
-            if (tweetOpt.isPresent()) 
-            {
-                Tweet tweet = tweetOpt.get();
+        if (!tweetAndReportingUser.isRight()) return "redirect:/login";
 
-                if (TweetService.readIfPostShouldGetdeleted(id))
-                    tweetRepository.delete(tweet);
-                else {
-                    tweet.report(reportingUserOpt.get());     
-                    tweetRepository.save(tweet);      
-                }
-            }
-            return UserService.redirectToReferer(request);
-        }
-        else return "redirect:/login";
+        if (TweetService.readIfPostShouldGetDeleted(id))
+            tweetService.delete(tweetAndReportingUser.getOptLeft());
+        else tweetService.report(tweetAndReportingUser);
+
+        return UserService.redirectToReferer(request);
     }
 
     @RequestMapping("/tweet/{id}/delete")
@@ -79,24 +72,23 @@ public class TweetInteractionController {
         Optional<User> deletingUserOpt = userService.getUserBy(request);
         Optional<Tweet> tweetOpt = tweetRepository.findById(id);
 
-        if (tweetOpt.isPresent() && 
-        (TweetService.isOwnTweet(tweetOpt.get(), request) ||
-        UserService.isAdmin(deletingUserOpt) || 
-        TweetService.readIfPostShouldGetdeleted(id))) 
-        {
-            tweetRepository.delete(tweetOpt.get());
+        if (
+            TweetService.isOwnTweet(tweetOpt, request) ||
+            UserService.isAdmin(deletingUserOpt) ||
+            TweetService.readIfPostShouldGetDeleted(id)
+        ) {
+            tweetService.delete(tweetOpt);
             return "redirect:" + request.getHeader("referer");
         } 
-        else return "error";
+        return "error";
     }
 
     @GetMapping("/tweet/{id}/media")
 	public ResponseEntity<Resource> downloadImage(@PathVariable long id) 
     {
 		Optional<Tweet> tweetOpt = tweetRepository.findById(id);
+        Optional<Blob> mediaOpt = tweetOpt.map(Tweet::getMedia);
 
-        Optional<Blob> mediaOpt = Optional.ofNullable(tweetOpt.get().getMedia());
-  
         return ResourcesBuilder
             .tryBuildImgResponse(mediaOpt)
             .getOrElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
