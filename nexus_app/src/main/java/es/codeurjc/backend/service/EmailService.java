@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class EmailService {
+public class EmailService
+{
     @Autowired
     private UserRepository userRepository;
 
@@ -22,14 +23,8 @@ public class EmailService {
         return userRepository.existsByEmail(email);
     }
 
-    public Optional<User> emailToUser(String email)
-    {
-        return userRepository.findByEmail(email);
-    }
-
     public boolean emailIsValid(String email)
     {
         return isEmail(email) && !isEmailTaken(email);
     }
-
 }

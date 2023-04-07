@@ -23,7 +23,7 @@ public final class UserService
     @Autowired
     private UserRepository userRepository;
 
-    public User getUserByUsernameForced(String username) {
+    public User tryToGetUsernameBy(String username) {
         return userRepository
             .findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
@@ -39,8 +39,10 @@ public final class UserService
         );
     }
 
-    public Optional<User> getUserBy(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> getUserBy(String usernameOrEmail) {
+        if (EmailService.isEmail(usernameOrEmail))
+            return userRepository.findByEmail(usernameOrEmail);
+        return userRepository.findByUsername(usernameOrEmail);
     }
 
     public Set<User> getFollowers(User user) {
