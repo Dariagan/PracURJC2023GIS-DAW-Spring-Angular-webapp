@@ -15,6 +15,7 @@ import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.repository.TweetRepository;
 
 // Group 13-A
+
 @Controller
 public class ChartController 
 {

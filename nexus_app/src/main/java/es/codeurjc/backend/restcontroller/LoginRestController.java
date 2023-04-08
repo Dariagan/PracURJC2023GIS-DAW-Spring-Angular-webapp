@@ -6,12 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/login")
+@RequestMapping("/api")
 public class LoginRestController
 {
     @Autowired
     private LoginService loginService;
 
+    /**
+     * @return JWT base64 encoded as String
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(
         @RequestParam String username,

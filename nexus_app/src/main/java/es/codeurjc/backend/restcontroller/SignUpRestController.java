@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 // Entire controller programmed by group 13 A
 @RestController
-@RequestMapping("/api/signup")
+@RequestMapping("/api")
 public class SignUpRestController
 {
     @Autowired

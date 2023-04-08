@@ -4,21 +4,20 @@ import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.utilities.responseentity.ResponseBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import es.codeurjc.backend.security.JwtService;
+import es.codeurjc.backend.utilities.AuthResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public final class SignUpService
+@RequiredArgsConstructor
+public class SignUpService
 {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public ResponseEntity<?> doSignUpFor(
         String email, String username, String password
@@ -37,7 +36,9 @@ public final class SignUpService
         userService.save(newUser);
         processEmailVerification(newUser);
 
-        return ResponseEntity.ok().body("Account registered successfully");
+        return ResponseEntity.ok(
+            new AuthResponse(JwtService.generateToken(newUser))
+        );
     }
 
     // TODO

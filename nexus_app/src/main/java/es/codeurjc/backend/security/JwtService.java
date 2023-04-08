@@ -1,10 +1,7 @@
 package es.codeurjc.backend.security;
 
-import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.utilities.OptPair;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.PrematureJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
