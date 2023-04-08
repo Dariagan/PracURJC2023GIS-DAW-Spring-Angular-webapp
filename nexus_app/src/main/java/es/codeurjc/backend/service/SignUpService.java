@@ -1,14 +1,15 @@
 package es.codeurjc.backend.service;
 
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.utilities.ResponseBuilder;
+import es.codeurjc.backend.utilities.responseentity.ResponseBuilder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SignUpService
+public final class SignUpService
 {
     @Autowired
     private UserService userService;

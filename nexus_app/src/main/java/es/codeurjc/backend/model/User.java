@@ -1,16 +1,12 @@
 package es.codeurjc.backend.model;
 
-import java.io.IOException;
 import java.sql.Blob;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
-import java.util.Base64;
 
-import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,13 +22,14 @@ import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.EmailService;
 import es.codeurjc.backend.service.UserService;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 
 // Class initially defined by group 13 B in a basic manner, 
 // refactored, reprogrammed, given all functionality by group 13 A
 @Entity(name = "UserTable")
-public class User {
-    
+public class User 
+{
     public interface UsernameView {}
     public interface BasicView extends UsernameView{}
     public interface TweetsView {}
@@ -77,10 +74,10 @@ public class User {
     @ManyToMany
     private Set<User> following = new HashSet<User>();
 
-        @JsonIgnore
-        @Nullable
-        @ManyToMany
-        private Set<User> blockedUsers = new HashSet<>();  
+    @JsonIgnore
+    @Nullable
+    @ManyToMany
+    private Set<User> blocked = new HashSet<>();  
 
     public static class Builder {
         private String username, email, encodedPassword, name = "", description = "";
@@ -197,10 +194,10 @@ public class User {
     public void setAdmin() {assert(!isAdmin()); this.roles.add("ADMIN");}
     public void removeAdmin(){this.roles.remove("ADMIN");}
 
-    public Set<User> getFollowers(UserService userService) {
-        return userService.getFollowers(this);
-    }
     public Set<User> getFollowing() {return following;}
+    public Set<User> getFollowers(UserService userService) {
+        return userService.getFollowers(this, Pageable.unpaged());
+    }
     public void switchFollow(User user) {
         assert user != null && !user.equals(this);
         if (!following.contains(user))
@@ -208,14 +205,16 @@ public class User {
         else following.remove(user);
     }
 
-    public Set<User> getBlockedUsers() {return blockedUsers;}
-    public void block(User user) {
+    public Set<User> getBlocked() {return blocked;}
+    public void block(User user)
+    {
         assert user != this;
-        blockedUsers.add(user);
+        blocked.add(user);
     };
-    public void unblock(User user){
+    public void unblock(User user)
+    {
         assert user != this;
-        blockedUsers.remove(user);
+        blocked.remove(user);
     };
 
     public LocalDateTime getSignUpDate() {return signUpDate;}

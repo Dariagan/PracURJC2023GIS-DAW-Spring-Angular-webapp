@@ -7,7 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.utilities.OptPair;
-import es.codeurjc.backend.utilities.ResourcesBuilder;
+import es.codeurjc.backend.utilities.responseentity.ResourcesBuilder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

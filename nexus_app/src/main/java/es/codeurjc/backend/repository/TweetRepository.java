@@ -20,38 +20,46 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     Optional<Tweet> findById(long id);
     List<Tweet> findFirst10ByAuthor(User author);
     
-    // query made by group 13-A
+    // 13-A
     @Query("SELECT t FROM UserTable u " +
     "JOIN u.following f JOIN f.tweets t WHERE u = :user " +
     "AND t.author.banned = false " +
-    "AND t.author NOT IN (SELECT bu FROM UserTable u2 JOIN u2.blockedUsers bu WHERE u2 = :user) " +
+    "AND t.author NOT IN (SELECT bu FROM UserTable u2 JOIN u2.blocked bu WHERE u2 = :user) " +
     "ORDER BY t.date DESC")
     Page<Tweet> findFollowedUsersTweets(User user, Pageable pageable);
 
+    // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.banned = false " +
-    "AND t.author NOT IN (SELECT bu FROM UserTable u2 JOIN u2.blockedUsers bu WHERE u = :user) ")
+    "AND t.author NOT IN (SELECT bu FROM UserTable u2 JOIN u2.blocked bu WHERE u = :user) ")
     Page<Tweet> findAll(User user, Pageable pageable);
 
+    // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.banned = false")
     Page<Tweet> findAll(Pageable pageable);
 
-    
+
     List<Tweet> findAllByAuthor(User author);
 
     // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.username = :username AND t.author.banned = false")
     List<Tweet> findAllByUsername(String username);
 
-    // query made by group 13-A
+    // 13-A
     @Query("SELECT t FROM Tweet t JOIN t.reporters r GROUP BY t.id ORDER BY COUNT(r) DESC")
     List<Tweet> findMostReportedTweets(Pageable pageable);
 
-    // query made by group 13-A
+    @Query("SELECT t.likes FROM Tweet t WHERE t = :tweet")
+    Page<User> findUsersWhoLikedTweet(Tweet tweet, Pageable pageable);
+
+    @Query("SELECT t.reporters FROM Tweet t WHERE t = :tweet")
+    Page<User> findUsersWhoReportedTweet(Tweet tweet, Pageable pageable);
+
+    // 13-A
     @Query("SELECT t FROM Tweet t JOIN t.likes l " +
     "WHERE t.author.banned = false GROUP BY t.id ORDER BY COUNT(l) DESC")
     List<Tweet> findMostLikedTweets(Pageable pageable);
     
-    // query made by group 13-A
+    // 13-A
     @Query("SELECT t FROM Tweet t " +
     "WHERE EXISTS (SELECT tag FROM t.tags tag WHERE tag IN :tags) " +
     "AND t.author.banned = false")

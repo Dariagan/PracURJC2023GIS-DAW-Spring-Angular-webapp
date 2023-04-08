@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -177,5 +178,26 @@ public class Tweet implements Comparable<Tweet>
         
        return this.date.compareTo(o.date);
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Objects.hash(id, author, date);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Tweet other = (Tweet) obj;
+        return Objects.equals(id, other.id)
+                && Objects.equals(author, other.author)
+                && Objects.equals(date, other.date);
+    }
+
 	
 }

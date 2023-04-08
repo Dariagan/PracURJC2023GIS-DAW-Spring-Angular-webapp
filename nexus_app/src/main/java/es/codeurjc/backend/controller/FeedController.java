@@ -20,8 +20,6 @@ import es.codeurjc.backend.service.UserService;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
