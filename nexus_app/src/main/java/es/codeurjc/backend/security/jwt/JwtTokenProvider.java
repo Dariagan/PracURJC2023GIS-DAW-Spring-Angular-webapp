@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -35,10 +36,10 @@ public class JwtTokenProvider {
 	
 	@Value("${jwt.secret}")
 	private String jwtSecret;
-	
-	private static long JWT_EXPIRATION_IN_MS = 5400000;
-	private static Long REFRESH_TOKEN_EXPIRATION_MSEC = 10800000l;
-	
+
+	private static final Long JWT_EXPIRATION_IN_MS = 5400000L;
+	private static final Long REFRESH_TOKEN_EXPIRATION_MSEC = 10800000L;
+
 	@Autowired
 	private UserDetailsService userDetailsService;
 
@@ -77,12 +78,16 @@ public class JwtTokenProvider {
 		return false;
 	}
 
-	public Token generateToken(UserDetails user) {
+	public Token generateToken(UserDetails user)
+	{
+		List<SimpleGrantedAuthority> userRoles = user
+			.getAuthorities()
+			.stream()
+			.map(s -> new SimpleGrantedAuthority("ROLE_" + s))
+			.collect(Collectors.toList());
 
 		Claims claims = Jwts.claims().setSubject(user.getUsername());
-
-		claims.put("auth", user.getAuthorities().stream().map(s -> new SimpleGrantedAuthority("ROLE_"+s))
-				.filter(Objects::nonNull).collect(Collectors.toList()));
+		claims.put("auth", userRoles);
 
 		Date now = new Date();
 		Long duration = now.getTime() + JWT_EXPIRATION_IN_MS;
@@ -91,12 +96,21 @@ public class JwtTokenProvider {
 		calendar.setTime(now);
 		calendar.add(Calendar.HOUR_OF_DAY, 8);
 
-		String token = Jwts.builder().setClaims(claims).setSubject((user.getUsername())).setIssuedAt(new Date())
-				.setExpiration(expiryDate).signWith(SignatureAlgorithm.HS256, jwtSecret).compact();
+		String token = Jwts
+			.builder()
+			.setClaims(claims)
+			.setSubject(user.getUsername())
+			.setIssuedAt(new Date())
+			.setExpiration(expiryDate)
+			.signWith(SignatureAlgorithm.HS256, jwtSecret)
+			.compact();
 
-		return new Token(Token.TokenType.ACCESS, token, duration,
-				LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault()));
-
+		return new Token(
+			Token.TokenType.ACCESS,
+			token,
+			duration,
+			LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault())
+		);
 	}
 
 	public Token generateRefreshToken(UserDetails user) {

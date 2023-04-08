@@ -2,6 +2,7 @@ package es.codeurjc.backend.restcontroller;
 
 import es.codeurjc.backend.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,10 +13,10 @@ public class LoginRestController
     private LoginService loginService;
 
     @PostMapping("/login")
-    public void login(
+    public ResponseEntity<?> login(
         @RequestParam String username,
         @RequestParam String password
     ) {
-        loginService.doLoginFor(username, password);
+        return loginService.doLoginFor(username, password);
     }
 }
