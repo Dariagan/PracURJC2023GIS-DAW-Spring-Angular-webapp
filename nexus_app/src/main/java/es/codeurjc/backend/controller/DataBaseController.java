@@ -34,7 +34,7 @@ public class DataBaseController {
             .setUsername("a")
             .setEmail("a@a.com")
             .setEncodedPassword(passwordEncoder.encode("a"))
-            .setAdmin();
+            .setIsAdmin();
         
         User userA = builder.build();
         User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
