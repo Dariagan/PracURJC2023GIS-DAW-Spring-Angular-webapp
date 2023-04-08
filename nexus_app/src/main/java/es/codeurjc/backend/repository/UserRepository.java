@@ -15,8 +15,8 @@ import es.codeurjc.backend.model.User;
 
 // Programmed by group 13 A
 @Component
-public interface UserRepository extends JpaRepository<User, String>{
-
+public interface UserRepository extends JpaRepository<User, String>
+{
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
 

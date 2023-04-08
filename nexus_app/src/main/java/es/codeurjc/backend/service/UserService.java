@@ -12,6 +12,7 @@ import io.vavr.control.Try;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -57,10 +58,15 @@ public final class UserService implements EntityService<User>
             return userRepository.findByUsername(usernameOrEmail);
     }
 
-    public Set<User> getFollowers(User user, Pageable pageable) 
+    public Set<User> getFollowers(User user, Pageable pageable)
     {
         return userRepository.findByFollowing(user);
     }
+
+    public Optional<UserDetails> getUserDetailsBy(String username) {
+        return getUserBy(username).map(UserDetails.class::cast);
+    }
+
     public List<User> getFollowers(Optional<User> userOpt, Pageable pageable)
     {
         return userRepository.findByFollowing(userOpt.get(), pageable).getContent();
