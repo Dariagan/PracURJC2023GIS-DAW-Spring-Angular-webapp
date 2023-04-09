@@ -11,7 +11,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 
 @Configuration
@@ -20,44 +22,43 @@ import java.util.List;
 public class SecurityConfig
 {
     // TODO define all endpoints
-    private final String[] authRequiredEndpoints = {
-        "api/tweets/me"
-    };
-
     private final String[] publicEndpoints = {
-        "api/login",
-        "api/signup",
-        "api/tweets/{id}"
+        "/api/auth/**",
+        "/api/ex/public-str"
     };
-
+    
+    private final String[] userEndpoints = {
+        "/api/ex/user-str"
+    };
+    
     private final String[] adminEndpoints = {
-        "api/admin/feed"
+        "api/ex/admin-str"
     };
-
+    
     private final JwtAuthFilter jwtAuthFilter;
     private final AuthenticationProvider authProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
+        
         http
             .csrf()
             .disable()
             .authorizeHttpRequests()
             .antMatchers(publicEndpoints)
-            .permitAll() // Permit all public endpoints
-            .anyRequest()
-            .authenticated() // Any other request requires authentication
-            .and()
-            .authorizeHttpRequests()
+                .permitAll()
+            .antMatchers(userEndpoints)
+                .hasAnyRole(Role.USER.toString(), Role.ADMIN.toString())
             .antMatchers(adminEndpoints)
-            .hasRole(Role.ADMIN.toString());
-
-        http.sessionManagement()
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .hasRole(Role.ADMIN.toString())
+            .anyRequest().authenticated()
             .and()
-            .authenticationProvider(authProvider)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authProvider)
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

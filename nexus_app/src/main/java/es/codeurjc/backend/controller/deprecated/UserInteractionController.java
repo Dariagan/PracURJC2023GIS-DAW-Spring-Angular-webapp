@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +15,7 @@ import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A
+/*
 @Controller
 public class UserInteractionController {
 
@@ -120,3 +121,4 @@ public class UserInteractionController {
         return "error";
     }
 }
+ */

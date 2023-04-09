@@ -15,8 +15,6 @@ import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import es.codeurjc.backend.repository.TweetRepository;
-
 
 // Programmed by group 13-A
 @Entity(name = "Tweet")
@@ -161,12 +159,15 @@ public class Tweet implements Comparable<Tweet>
     }
 
     public List<Tweet> getChildren() {return children;}
+
+    /* FIXME
     public void reply(Tweet tweet, TweetRepository tweetRepository) {
         assert tweet != this;
         children.add(tweet);
         tweetRepository.save(this);
         tweetRepository.save(tweet);
     }
+    */
 
     public Blob getMedia() {return media;}
     public boolean hasMedia() {return media != null;}

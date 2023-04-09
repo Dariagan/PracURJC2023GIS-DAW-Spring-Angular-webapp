@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 
-
+/* FIXME
 @Component
 public interface TweetRepository extends JpaRepository<Tweet, Long>{
 
@@ -65,3 +65,4 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     "AND t.author.banned = false")
     List<Tweet> findTweetsByTags(Set<String> tags, Pageable pageable);
 }
+*/

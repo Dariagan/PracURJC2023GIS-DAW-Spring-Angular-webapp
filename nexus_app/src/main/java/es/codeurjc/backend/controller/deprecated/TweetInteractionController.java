@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import java.sql.Blob;
 import java.util.Optional;
@@ -25,6 +25,7 @@ import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A
+/*
 @Controller
 public class TweetInteractionController {
     
@@ -95,3 +96,4 @@ public class TweetInteractionController {
             .getOrElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 }
+ */

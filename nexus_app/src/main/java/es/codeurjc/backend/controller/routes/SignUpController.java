@@ -1,9 +1,10 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.routes;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/*
 @Controller
 public class SignUpController
 {
@@ -13,3 +14,4 @@ public class SignUpController
         return "signuppage";
     }
 }
+ */
