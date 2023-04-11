@@ -28,9 +28,7 @@ public class ChartController
         List<String> displayedTexts = new ArrayList<>();
         List<Integer> displayedNumbers = new ArrayList<>();
 
-        topTweets.forEach(
-            tweet -> updateTweetDisplays(tweet, displayedTexts, displayedNumbers)
-        );
+        topTweets.forEach(tweet -> updateTweetDisplays(tweet, displayedTexts, displayedNumbers));
 
         Gson gson = new Gson();
         String leftSideNumbersJsonList, bottomTextsJsonList, chartDescription, yAxisLabel;

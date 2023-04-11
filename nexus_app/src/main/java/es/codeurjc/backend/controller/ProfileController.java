@@ -9,7 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import es.codeurjc.backend.utilities.OptTwo;
-import es.codeurjc.backend.utilities.ResourcesBuilder;
+import es.codeurjc.backend.utilities.responseentity.ResourcesBuilder;
 import io.vavr.control.Try;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -172,6 +172,6 @@ public class ProfileController {
         if (loggedUserOpt.isEmpty()) return;
         User loggedUser = loggedUserOpt.get();
         model.addAttribute("loggedUser", loggedUser);
-        model.addAttribute("blocked", loggedUser.getBlockedUsers().contains(profileUser));
+        model.addAttribute("blocked", loggedUser.getBlocked().contains(profileUser));
     }
 }

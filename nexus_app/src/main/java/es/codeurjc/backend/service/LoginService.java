@@ -1,11 +1,12 @@
 package es.codeurjc.backend.service;
 
-import es.codeurjc.backend.utilities.ResponseBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import es.codeurjc.backend.utilities.responseentity.ResponseBuilder;
+
 @Service
-public class LoginService
+public final class LoginService
 {
     // TODO
     public ResponseEntity<?> doLoginFor(String username, String password)

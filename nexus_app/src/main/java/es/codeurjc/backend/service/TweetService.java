@@ -20,8 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 
 // Programmed entirely by group 13-A
 @Service
-public class TweetService{
-
+public final class TweetService implements EntityService<Tweet>
+{
     final static String MOD_ENDPOINT = "https://mod-microservice.vercel.app/postShouldGetDeleted/";
 
     @Autowired
@@ -37,9 +37,20 @@ public class TweetService{
         return tweet.getAuthor().getUsername().equals(req.getUserPrincipal().getName());
     }
 
+    public static boolean isAllowedToDelete(Tweet tweet, Optional<User> userOpt)
+    {
+        return userOpt.isPresent() && 
+        (tweet.getAuthor().equals(userOpt.get()) || userOpt.get().isAdmin());
+    }
+
     public static boolean isAllowedToDelete(Tweet tweet, User user)
     {
         return tweet.getAuthor().equals(user) || user.isAdmin();
+    }
+
+    public Optional<Tweet> getTweetBy(String id){
+        long numericalId = Long.parseLong(id);
+        return tweetRepository.findById(numericalId);
     }
 
     public Page<Tweet> getPage(Pageable pageable)
@@ -57,14 +68,33 @@ public class TweetService{
             .getOrElse(false);
     }
 
-    public void delete(Optional<Tweet> tweet) {
+    public void delete(Optional<Tweet> tweet) 
+    {
         if (tweet.isPresent() && readIfPostShouldGetDeleted(tweet.get().getId()))
             tweetRepository.delete(tweet.get());
+    }
+
+    public List<Tweet> getFollowedUsersTweets(Optional<User> userOpt, Pageable pageable)
+    {
+        assert userOpt.isPresent();
+        return tweetRepository.findFollowedUsersTweets(userOpt.get(), pageable).getContent();
     }
 
     public List<Tweet> queryTweetsToModerate()
     {
         return tweetRepository.findMostReportedTweets(Pageable.ofSize(10));
+    }
+
+    public List<User> getLikingUsers(Optional<Tweet> tweetOpt, Pageable pageable)
+    {
+        assert tweetOpt.isPresent();
+        return tweetRepository.findUsersWhoLikedTweet(tweetOpt.get(), pageable).getContent();
+    }
+
+    public List<User> getReportingUsers(Optional<Tweet> tweetOpt, Pageable pageable)
+    {
+        assert tweetOpt.isPresent();
+        return tweetRepository.findUsersWhoReportedTweet(tweetOpt.get(), pageable).getContent();
     }
 
     public List<Tweet> getTweetsByUser(User user)
@@ -88,8 +118,23 @@ public class TweetService{
         tweetAndUser.ifIsFull(this::report);
     }
 
-    private void report(Tweet tweet, User reportingUser) {
+    private void report(Tweet tweet, User reportingUser) 
+    {
         tweet.report(reportingUser);
         tweetRepository.save(tweet);
     }
+
+    @Override
+	public TweetService save(Tweet tweet) {
+		tweetRepository.save(tweet);
+        return this;
+	}
+
+    @Override
+    public TweetService delete(Tweet tweet)
+    {
+        tweetRepository.delete(tweet);
+        return this;
+    }	
+   
 }

@@ -80,7 +80,7 @@ public class UserInteractionController {
             User blockingUser = users.getRight();
             User blockedUser = users.getLeft();
             
-            if (!blockingUser.getBlockedUsers().contains(blockedUser))
+            if (!blockingUser.getBlocked().contains(blockedUser))
                 blockingUser.block(blockedUser);
             else
                 blockingUser.unblock(blockedUser);
@@ -102,7 +102,7 @@ public class UserInteractionController {
         
         if (UserService.isVisitorAuthenticated(users) &&
             UserService.urlUserExists(users) &&
-            (UserService.isVisitorAdmin(users)|| UserService.isSelfAction(users))) {
+            (UserService.isVisitorAdmin(users)||UserService.isSelfAction(users))) {
 
             User deletedUser = users.getLeft();
 

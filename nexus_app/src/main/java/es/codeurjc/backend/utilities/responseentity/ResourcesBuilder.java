@@ -1,4 +1,4 @@
-package es.codeurjc.backend.utilities;
+package es.codeurjc.backend.utilities.responseentity;
 
 import io.vavr.control.Try;
 import org.springframework.core.io.InputStreamResource;

@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-// Programmed by group 13-A
+// 13-A
 public class OptTwo<T> {
 
     private final Pair<Optional<T>, Optional<T>> m;

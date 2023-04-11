@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-//Programmed by group 13-A
+// 13-A
 public class OptPair<T, U> {
 
     private final Pair<Optional<T>, Optional<U>> m;

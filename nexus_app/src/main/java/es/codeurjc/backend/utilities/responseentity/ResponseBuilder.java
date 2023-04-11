@@ -1,7 +1,8 @@
-package es.codeurjc.backend.utilities;
+package es.codeurjc.backend.utilities.responseentity;
 
 import org.springframework.http.ResponseEntity;
 
+// 13-A
 public class ResponseBuilder
 {
     public static ResponseEntity<?> badReq(String info)
