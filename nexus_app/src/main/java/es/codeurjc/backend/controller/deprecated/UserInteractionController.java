@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
-import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A

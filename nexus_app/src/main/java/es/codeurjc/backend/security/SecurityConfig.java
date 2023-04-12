@@ -11,10 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
-
 
 @Configuration
 @EnableWebSecurity
@@ -32,7 +28,7 @@ public class SecurityConfig
     };
     
     private final String[] adminEndpoints = {
-        "api/ex/admin-str"
+        "/api/ex/admin-str"
     };
     
     private final JwtAuthFilter jwtAuthFilter;
@@ -41,24 +37,22 @@ public class SecurityConfig
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
-        
-        http
-            .csrf()
+        http.csrf()
             .disable()
             .authorizeHttpRequests()
             .antMatchers(publicEndpoints)
-                .permitAll()
+            .permitAll()
             .antMatchers(userEndpoints)
-                .hasAnyRole(Role.USER.toString(), Role.ADMIN.toString())
+            .hasAnyAuthority(Role.USER.toString(), Role.ADMIN.toString())
             .antMatchers(adminEndpoints)
-                .hasRole(Role.ADMIN.toString())
+            .hasAuthority(Role.ADMIN.toString())
             .anyRequest().authenticated()
             .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authenticationProvider(authProvider)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authenticationProvider(authProvider)
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

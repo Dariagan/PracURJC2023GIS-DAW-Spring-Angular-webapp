@@ -138,6 +138,8 @@ public class User implements UserDetails
         }
     }
     
+    public User() {}
+    
     private User(User.Builder builder){
         this(
             builder.username, builder.email, builder.encodedPassword, builder.name,

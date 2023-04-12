@@ -32,7 +32,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 import es.codeurjc.backend.utilities.Sorter;

@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.utilities.OptPair;
 import es.codeurjc.backend.utilities.responseentity.ResourcesBuilder;
 
@@ -21,7 +20,6 @@ import org.springframework.core.io.Resource;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A

@@ -45,7 +45,7 @@ public class JwtAuthFilter extends OncePerRequestFilter
         Option<String> jwt = authHeader.flatMap(this::getJwtFromHeader);
         Option<String> username = jwt.map(JwtService::extractUsername);
 
-        if (username.isDefined() && JwtService.userAlreadyAuthenticated())
+        if (username.isDefined() && !JwtService.userAlreadyAuthenticated())
         {
             Optional<UserDetails> userDetails = username
                 .map(userService::getUserDetailsBy)
