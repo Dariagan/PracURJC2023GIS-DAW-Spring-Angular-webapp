@@ -48,9 +48,15 @@ public final class TweetService implements EntityService<Tweet>
         return tweet.getAuthor().equals(user) || user.isAdmin();
     }
 
-    public Optional<Tweet> getTweetBy(String id){
+    public Optional<Tweet> getTweetBy(String id) throws NumberFormatException
+    {
         long numericalId = Long.parseLong(id);
-        return tweetRepository.findById(numericalId);
+        return getTweetBy(numericalId);
+    }
+
+    public Optional<Tweet> getTweetBy(long id)
+    {
+        return tweetRepository.findById(id);
     }
 
     public Page<Tweet> getPage(Pageable pageable)
@@ -97,9 +103,9 @@ public final class TweetService implements EntityService<Tweet>
         return tweetRepository.findUsersWhoReportedTweet(tweetOpt.get(), pageable).getContent();
     }
 
-    public List<Tweet> getTweetsByUser(User user)
+    public Page<Tweet> getTweetsByUser(User user, Pageable pageable)
     {
-        return tweetRepository.findAllByAuthor(user);
+        return tweetRepository.findAllByAuthor(user, pageable);
     }
 
     public void switchLike(OptPair<Tweet, User> tweetAndUser)

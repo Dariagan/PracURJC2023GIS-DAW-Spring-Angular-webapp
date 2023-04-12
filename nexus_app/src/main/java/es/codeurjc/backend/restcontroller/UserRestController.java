@@ -86,6 +86,31 @@ public class UserRestController {
         else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @Operation(summary = "POST new user")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201", description = "Created",
+            content = {@Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = User.class)
+            )}
+        ),
+        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
+    @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<User> createUser(HttpServletRequest request, @RequestBody User createdUser) 
+    {
+        if (userService.isAdmin(request)) 
+        {
+            userService.save(createdUser);
+            URI location = fromCurrentRequest().path("/{username}")
+                .buildAndExpand(createdUser.getUsername()).toUri();
+            return ResponseEntity.created(location).body(createdUser);
+        } else {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
     @Operation(summary = "Get tweets by username")
     @ApiResponses(value = {
         @ApiResponse(
@@ -296,7 +321,7 @@ public class UserRestController {
         else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     
-    @Operation(summary = "Get paged users from Pageable parameters")
+    @Operation(summary = "GET paged users from Pageable parameters")
     @ApiResponses(value = { @ApiResponse(
             responseCode = "200",  description = "Found users",
             content = {@Content(
@@ -314,7 +339,7 @@ public class UserRestController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @Operation(summary = "Get followed users' tweets")
+    @Operation(summary = "GET followed users' tweets")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", description = "Found",
@@ -341,32 +366,7 @@ public class UserRestController {
         (username, page, size, sortBy, direction, tweet, new FollowedUsersTweetsQuerier(tweetService));
     }
 
-    @Operation(summary = "Post new user")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201", description = "Created",
-            content = {@Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = User.class)
-            )}
-        ),
-        @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
-    @PostMapping("")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(HttpServletRequest request, @RequestBody User createdUser) 
-    {
-        if (userService.isAdmin(request)) 
-        {
-            userService.save(createdUser);
-            URI location = fromCurrentRequest().path("/{username}")
-                .buildAndExpand(createdUser.getUsername()).toUri();
-            return ResponseEntity.created(location).body(createdUser);
-        } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-    }
-
-    @Operation(summary = "Get authenticated user")
+    @Operation(summary = "GET authenticated user")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", description = "User found",

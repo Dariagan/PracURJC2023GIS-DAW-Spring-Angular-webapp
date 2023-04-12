@@ -9,9 +9,9 @@ import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.TweetService;
 
-public class LikersQuerier extends CollectionQueriable<Tweet, User, TweetService>
+public class LikesQuerier extends CollectionQueriable<Tweet, User, TweetService>
 {
-    public LikersQuerier(TweetService service) 
+    public LikesQuerier(TweetService service) 
     {
         super(service);
     }

@@ -42,7 +42,8 @@ public final class UserService implements EntityService<User>
         return OptTwo.of(getUserBy(username), getUserBy(request));
     }
 
-    public Optional<User> getUserBy(HttpServletRequest request) {
+    public Optional<User> getUserBy(HttpServletRequest request)
+    {
         return getUserBy(
             Try.of(() -> request.getUserPrincipal().getName()).getOrElse("")
         );
@@ -81,7 +82,8 @@ public final class UserService implements EntityService<User>
         return userRepository.findBlockedByUser(userOpt.get(), pageable).getContent();
     }
 
-    public boolean isUsernameTaken(String username){
+    public boolean isUsernameTaken(String username)
+    {
         return userRepository.existsByUsername(username);
     }
 
