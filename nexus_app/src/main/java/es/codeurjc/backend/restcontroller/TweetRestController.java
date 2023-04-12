@@ -30,12 +30,10 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 import es.codeurjc.backend.utilities.PageableUtil;
-import es.codeurjc.backend.utilities.queriers.AuthorTweetsQuerier;
-import es.codeurjc.backend.utilities.queriers.LikersQuerier;
+import es.codeurjc.backend.utilities.queriers.LikesQuerier;
 import es.codeurjc.backend.utilities.queriers.ReportersQuerier;
 import es.codeurjc.backend.utilities.queriers.TweetQuerier;
 import es.codeurjc.backend.utilities.queriers.UserQuerier;
@@ -55,9 +53,6 @@ public class TweetRestController {
     @Autowired
     private TweetService tweetService;
 
-    @Autowired
-    private TweetRepository tweetRepository;
-
     @Operation(summary = "Get tweet by id")
     @ApiResponses(value = {
         @ApiResponse(
@@ -68,16 +63,25 @@ public class TweetRestController {
                 schema = @Schema(implementation = Tweet.class)
                 )}
         ),
-        @ApiResponse(responseCode = "400", description = "Invalid id supplied", content = @Content),
-        @ApiResponse(responseCode = "404", description = "not found", content = @Content)})
+        @ApiResponse(responseCode = "400", description = "Id is not an integer", content = @Content),
+        @ApiResponse(responseCode = "404", description = "Not found", content = @Content)})
     @JsonView(Tweet.FullView.class)
     @GetMapping("/{id}")
-    public ResponseEntity<Tweet> getTweetById(@PathVariable long id) {
-        Optional<Tweet> tweetOpt = tweetRepository.findById(id);
-        if (tweetOpt.isPresent()) 
-            return new ResponseEntity<>(tweetOpt.get(), HttpStatus.OK);
-        else 
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Tweet> getTweetById(@PathVariable String id) 
+    {
+        try
+        {
+            Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
+            
+            if (tweetOpt.isPresent()) 
+                return new ResponseEntity<>(tweetOpt.get(), HttpStatus.OK);
+            else 
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } 
+        catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Operation(summary = "Post new tweet")
@@ -94,14 +98,14 @@ public class TweetRestController {
     public ResponseEntity<Tweet> postTweet(@RequestBody Tweet tweet) 
     {
         try {
-            tweetRepository.save(tweet);
+            tweetService.save(tweet);
             URI location = fromCurrentRequest().path("/{id}")
                 .buildAndExpand(tweet.getId()).toUri();
             return ResponseEntity.created(location).body(tweet);
         }
         catch (EmptyResultDataAccessException e) 
         {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -117,55 +121,28 @@ public class TweetRestController {
             @ApiResponse(responseCode = "400", description = "Invalid id given", content = @Content),
             @ApiResponse(responseCode = "404",description = "Not found",content = @Content)})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Tweet> deleteTweet(@RequestParam long id, HttpServletRequest request) 
+    public ResponseEntity<Tweet> deleteTweet(@RequestParam String id, HttpServletRequest request) 
     {
         Optional <User> userOpt = userService.getUserBy(request);
-        Optional <Tweet> tweetOpt = tweetRepository.findById(id);
-
-        if(TweetService.isAllowedToDelete(tweetOpt.get(), userOpt)) 
+        try 
         {
-            if (tweetOpt.isPresent())
+            Optional <Tweet> tweetOpt = tweetService.getTweetBy(id);
+
+            if(TweetService.isAllowedToDelete(tweetOpt.get(), userOpt)) 
             {
-                tweetRepository.delete(tweetOpt.get());
-                return new ResponseEntity<>(null,HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(null,HttpStatus.NOT_FOUND);
+                if (tweetOpt.isPresent())
+                {
+                    tweetService.delete(tweetOpt.get());
+                    return new ResponseEntity<>(null, HttpStatus.OK);
+                }
+                else return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            } 
+            else return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         } 
-        else return new ResponseEntity<>(null,HttpStatus.UNAUTHORIZED);
-    }
-    
-    @Operation(summary = "Get tweets of the current user")
-    @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Found",
-            content = {@Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Tweet.class)
-            )}
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            description = "Not found",
-            content = @Content
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            description = "Forbidden",
-            content = @Content
-        )
-    })
-    @JsonView(User.BasicView.class)
-    @GetMapping("/me")
-    public ResponseEntity<List<Tweet>> getTweetsOfCurrentUser(HttpServletRequest request) {
-        
-        Optional<User> userOpt = userService.getUserBy(request);
-
-        if (userOpt.isPresent())
-            tweetRepository.findFirst10ByAuthor(userOpt.get());
-
-        List<Tweet> tweets = userOpt.get().getTweets();
-        return new ResponseEntity<>(tweets, HttpStatus.OK);
+        catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     
     @Operation(summary = "Get tweets from pageable params")
@@ -193,8 +170,8 @@ public class TweetRestController {
         @RequestParam(value = "direction", defaultValue = "desc") String direction) 
     {   
         return new ResponseEntity<>(
-            tweetRepository
-            .findAll(PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
+            tweetService
+            .getPage(PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
             .getContent(), 
             HttpStatus.OK
             );
@@ -212,7 +189,7 @@ public class TweetRestController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid id supplied",
+            description = "Tweet id is not integer",
             content = @Content
         ),
         @ApiResponse(
@@ -230,10 +207,10 @@ public class TweetRestController {
     {
         var reg = new GetResponseEntityGenerator<Tweet, User>(new TweetQuerier(tweetService), new UserQuerier(userService));
 
-        return reg.generateResponseEntity(id, page, size, Optional.empty(), new LikersQuerier(tweetService));
+        return reg.generateResponseEntity(id, page, size, Optional.empty(), new LikesQuerier(tweetService));
     }
 
-    @Operation(summary = "Post liking user to tweet's likelist")
+    @Operation(summary = "POST liking user to tweet's likelist")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "201",
@@ -242,6 +219,11 @@ public class TweetRestController {
                 mediaType = "application/json",
                 schema = @Schema(implementation = User.class)
             )}
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Tweet id is not integer",
+            content = @Content
         ),
         @ApiResponse(
             responseCode = "403", description = "Forbidden",
@@ -259,7 +241,7 @@ public class TweetRestController {
             {
                 Tweet tweet = tweetOpt.get();
                 tweet.getLikes().add(user);
-                tweetRepository.save(tweet);
+                tweetService.save(tweet);
                 URI location = fromCurrentRequest().path("/{id}/likes/{username}")
                     .buildAndExpand(tweet.getId(), user.getUsername()).toUri();
 
@@ -267,9 +249,13 @@ public class TweetRestController {
             } 
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        catch (EmptyResultDataAccessException e) 
+        catch (NumberFormatException e)
         {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (EmptyResultDataAccessException e) 
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -284,6 +270,11 @@ public class TweetRestController {
             )}
         ),
         @ApiResponse(
+            responseCode = "400",
+            description = "Tweet id is not integer",
+            content = @Content
+        ),
+        @ApiResponse(
             responseCode = "403",
             description = "Forbidden",
             content = @Content
@@ -295,21 +286,28 @@ public class TweetRestController {
         @PathVariable String id,
         @PathVariable String username) 
     {
-        Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
         Optional<User> userOpt = userService.getUserBy(request);
+        try
+        { 
+            Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
 
-        if (tweetOpt.isPresent() && userOpt.isPresent())
-        {
-            if (UserService.isOwnResource(username, userOpt))
+            if (tweetOpt.isPresent() && userOpt.isPresent())
             {
-                Tweet tweet = tweetOpt.get();
-                tweet.getLikes().remove(userOpt.get());
-                tweetService.save(tweet);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        } 
-        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                if (UserService.isOwnResource(username, userOpt))
+                {
+                    Tweet tweet = tweetOpt.get();
+                    tweet.getLikes().remove(userOpt.get());
+                    tweetService.save(tweet);
+                    return new ResponseEntity<>(HttpStatus.OK);
+                }
+                else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            } 
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @Operation(summary = "Get reporters of a tweet by tweet id")
@@ -324,7 +322,7 @@ public class TweetRestController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "Invalid id supplied",
+            description = "Tweet id is not integer",
             content = @Content
         ),
         @ApiResponse(
@@ -335,7 +333,8 @@ public class TweetRestController {
     })
     @JsonView(User.UsernameView.class)
     @GetMapping("/{id}/reporters")
-    public ResponseEntity<Object> getReportersByTweetId(@PathVariable String id,
+    public ResponseEntity<Object> getReportersByTweetId(
+        @PathVariable String id,
         @RequestParam(value = "page", defaultValue = "0") int page,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam Optional<String> user) 
@@ -344,6 +343,4 @@ public class TweetRestController {
 
         return greg.generateResponseEntity(id, page, size, user, new ReportersQuerier(tweetService));
     }
-
-    
 }

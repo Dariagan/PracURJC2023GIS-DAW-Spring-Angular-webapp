@@ -20,7 +20,7 @@ public class AuthorTweetsQuerier extends CollectionQueriable<User, Tweet, TweetS
     public Collection<Tweet> doQuery(Optional<User> pathVariableSubject, Pageable pageable)
     {
         assert pathVariableSubject.isPresent();
-        return getService().getTweetsByUser(pathVariableSubject.get());
+        return getService().getTweetsByUser(pathVariableSubject.get(), pageable).getContent();
     }
     
 }

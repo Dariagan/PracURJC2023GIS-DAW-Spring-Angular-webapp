@@ -38,7 +38,7 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     Page<Tweet> findAll(Pageable pageable);
 
 
-    List<Tweet> findAllByAuthor(User author);
+    Page<Tweet> findAllByAuthor(User author, Pageable pageable);
 
     // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.username = :username AND t.author.banned = false")

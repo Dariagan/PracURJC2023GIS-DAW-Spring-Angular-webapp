@@ -9,20 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
-import es.codeurjc.backend.repository.UserRepository;
+import es.codeurjc.backend.service.TweetService;
 import es.codeurjc.backend.service.UserService;
 
 @RestController
 public class DataBaseController {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private UserService userService;
-
     @Autowired
-    private TweetRepository tweetRepository;
+    private TweetService tweetService;
     @Autowired
 	private PasswordEncoder passwordEncoder;
    
@@ -47,7 +43,6 @@ public class DataBaseController {
         User userE = builder.setUsername("e").setEmail("e@e.com").build();
         
         userService.save(userA).save(userB).save(userC).save(userD).save(userE);
-        userRepository.flush();
 
         // /Building users
 
@@ -66,7 +61,7 @@ public class DataBaseController {
         tweet1.switchLike(userB);
         tweet1.report(userB);
    
-        tweetRepository.save(tweet1);
+        tweetService.save(tweet1);
 
         //-------------------------------------
         tweetBuilder.setAuthor(userB).setText("I dislike fat cats");
@@ -84,14 +79,13 @@ public class DataBaseController {
         tweet3.switchLike(userD);
         tweet3.switchLike(userE);
 
-        tweetRepository.save(tweet2);
-        tweetRepository.save(tweet3);
+        tweetService.save(tweet2).save(tweet3);
 
         tweetBuilder.setAuthor(userB);
 
         for (int i = 0; i < 20; i++)
         {
-            tweetRepository.save(tweetBuilder.setText("tweet " + i).build());
+            tweetService.save(tweetBuilder.setText("tweet " + i).build());
             if (i == 6)
                 tweetBuilder.clearTags().addTag("sports").setAuthor(userC);
             if (i == 10)

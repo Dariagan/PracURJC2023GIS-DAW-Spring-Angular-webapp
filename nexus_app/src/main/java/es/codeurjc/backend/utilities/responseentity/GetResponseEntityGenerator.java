@@ -39,37 +39,44 @@ public class GetResponseEntityGenerator <T, U> {
         String subjectId, int page, int size, Optional<String> sortBy, String direction,
         Optional<String> searchedId, CollectionQueriable<T, U, ?> checkedCollectionQuerier)
     {
-        Optional<T> pathVariableSubjectOpt = pathVariableSubjectQueriable.doQuery(subjectId);
-        if (pathVariableSubjectOpt.isPresent()) 
-        {
-            if (searchedId.isEmpty()) 
+        try
+        {    
+            Optional<T> pathVariableSubjectOpt = pathVariableSubjectQueriable.doQuery(subjectId);
+            if (pathVariableSubjectOpt.isPresent()) 
             {
-                Pageable pageable;
-                
-                if (sortBy.isEmpty())
-                    pageable = PageRequest.of(page, size);
-                else
-                    pageable = PageableUtil.getPageable(page, size, sortBy.get(), direction);
+                if (searchedId.isEmpty()) 
+                {
+                    Pageable pageable;
+                    
+                    if (sortBy.isEmpty())
+                        pageable = PageRequest.of(page, size);
+                    else
+                        pageable = PageableUtil.getPageable(page, size, sortBy.get(), direction);
+                    
+                    Collection<U> collection = checkedCollectionQuerier.doQuery(pathVariableSubjectOpt, pageable);
+                    return new ResponseEntity<>(collection, HttpStatus.OK);  
+                } 
+                else 
+                {
+                    Collection<U> checkedCollection = 
+                    checkedCollectionQuerier.doQuery(pathVariableSubjectOpt, Pageable.unpaged());
 
-                return new ResponseEntity<>(
-                    checkedCollectionQuerier.doQuery(pathVariableSubjectOpt, pageable),
-                    HttpStatus.OK);
-            } else 
-            {
-                Collection<U> checkedCollection = 
-                checkedCollectionQuerier.doQuery(pathVariableSubjectOpt, Pageable.unpaged());
+                    Optional<U> paramSubject = paramSubjectQueriable.doQuery(searchedId.get());      
+                    Boolean inCollection;
 
-                Optional<U> paramSubject = paramSubjectQueriable.doQuery(searchedId.get());      
-                Boolean inCollection;
+                    if (paramSubject.isPresent())
+                        inCollection = checkedCollection.contains(paramSubject.get());
+                    else
+                        inCollection = false;
 
-                if (paramSubject.isPresent())
-                    inCollection = checkedCollection.contains(paramSubject.get());
-                else
-                    inCollection = false;
-
-                return new ResponseEntity<>(inCollection, HttpStatus.OK);
+                    return new ResponseEntity<>(inCollection, HttpStatus.OK);
+                }
             }
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }
