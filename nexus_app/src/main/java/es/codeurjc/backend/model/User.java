@@ -21,12 +21,12 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
-import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.EmailService;
-import es.codeurjc.backend.service.UserService;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,6 +34,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 // Class initially defined by group 13 B in a basic manner, 
 // refactored, reprogrammed, given all functionality by group 13 A
+@EqualsAndHashCode
 @NoArgsConstructor
 @Entity(name = "UserTable")
 public class User implements UserDetails
@@ -46,45 +47,45 @@ public class User implements UserDetails
     
     @JsonView(UsernameView.class)
     @Id
-    private String username;
+    @Getter private String username;
 
     @JsonView(BasicView.class)
-    private String name;
+    @Getter @Setter private String name;
 
     @JsonView(BasicView.class)
-    private String email;
+    @Getter @Setter private String email;
 
     @JsonView(BasicView.class)
-    private String description = "";
+    @Getter @Setter private String description = "";
 
     @JsonView(BasicView.class)
-    private LocalDateTime signUpDate = LocalDateTime.now();
+    @Getter private LocalDateTime signUpDate = LocalDateTime.now();
 
     @JsonIgnore
-    private String encodedPassword;
+    @Setter private String encodedPassword;
 
     @JsonView(BasicView.class)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Getter private Role role;
 
     @Nullable
     @Lob
     @JsonIgnore
-    private Blob profilePicture;
+    @Getter @Setter private Blob profilePicture;
 
     @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
-    private List<Tweet> tweets = new ArrayList<>();
+    @Getter private List<Tweet> tweets = new ArrayList<>();
 
     @JsonView(FollowingView.class)
     @Nullable
     @ManyToMany
-    private Set<User> following = new HashSet<>();
+    @Getter private Set<User> following = new HashSet<>();
 
     @JsonIgnore
     @Nullable
     @ManyToMany
-    private Set<User> blocked = new HashSet<>();
+    @Getter private Set<User> blocked = new HashSet<>();
 
     public static class Builder {
         private String username, email, encodedPassword, name = "", description = "";
@@ -139,14 +140,12 @@ public class User implements UserDetails
             return new User(this);
         }
     }
-    
     private User(User.Builder builder){
         this(
             builder.username, builder.email, builder.encodedPassword, builder.name,
             builder.description, builder.admin, builder.banned
         );
     }
-
     private User(
         String username, String email, String encodedPassword, String name,
         String description, boolean admin, boolean banned
@@ -162,44 +161,15 @@ public class User implements UserDetails
         else this.role = Role.USER;
     }
 
-    public String getName() {return name;}
-    public void setName(String name) {this.name = name; }
-
-    public void setUsername(String username) {this.username = username;}
-
-    public String getEmail() {return email;}
-    public void setEmail(String email) {this.email = email;}
-
-    public String getEncodedPassword() {return encodedPassword;}
-    public void setEncodedPassword(String encodedPassword) {this.encodedPassword = encodedPassword;}
-
-    public String getDescription() {return description;}
-    public void setDescription(String description) {this.description = description;}
-
     public void ban() { role = Role.BANNED; }
-
     public void unban() { role = Role.USER; }
-
     public boolean isBanned() { return role == Role.BANNED; }
 
-    public Blob getProfilePicture() {return profilePicture;}
     public boolean hasProfilePicture() {return profilePicture != null;}
-    public void setProfilePicture(Blob profilePicture, UserRepository userRepository) {
-        this.profilePicture = profilePicture;
-        userRepository.save(this);
-    }
-
-    public List<Tweet> getTweets() {return tweets;}
-  
-    public Role getRole() { return role; }
 
     public boolean isAdmin() { return role == Role.ADMIN; }
-
     public void setAdmin() { role = Role.ADMIN; }
-
     public void removeAdmin() { role = Role.USER; }
-
-    public Set<User> getFollowing() { return following; }
 
     // FIXME the next few codeblocks can produce null pointer exceptions.
     public void switchFollow(User user)
@@ -209,10 +179,6 @@ public class User implements UserDetails
             following.add(user);
         else following.remove(user);
     }
-
-    public Set<User> getBlocked() {return blocked;}
-
-    public Set<User> getBlockedUsers() { return blocked; }
 
     public void block(User user)
     {
@@ -226,40 +192,17 @@ public class User implements UserDetails
         blocked.remove(user);
     };
 
-    public LocalDateTime getSignUpDate() { return signUpDate; }
-
-    public String toString() { return username; }
+    public String toString() {return username;}
 
     // UserDetails interface methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
     }
-
-    @Override
-    public String getPassword() {
-        return encodedPassword;
-    }
-
-    public String getUsername() { return username; }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    
+    @Override public boolean isAccountNonExpired() {return true;}
+    @Override public boolean isAccountNonLocked() {return true;}
+    @Override public boolean isCredentialsNonExpired() { return true;}
+    @Override public boolean isEnabled() {return !isBanned();}
+    @Override public String getPassword() {return encodedPassword;}
 }

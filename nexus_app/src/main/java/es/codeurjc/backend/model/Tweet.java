@@ -15,10 +15,14 @@ import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 // Programmed by group 13-A
+@EqualsAndHashCode
 @NoArgsConstructor
 @Entity(name = "Tweet")
 public class Tweet implements Comparable<Tweet>
@@ -32,48 +36,49 @@ public class Tweet implements Comparable<Tweet>
     @JsonView(BasicView.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Getter private long id;
 
     @JsonView(AuthorView.class)
     @ManyToOne
-    private User author;
+    @Getter private User author;
 
     @JsonView(BasicView.class)
-    private LocalDateTime date;
+    @Getter private LocalDateTime date;
 
     @JsonView(ReportersView.class)
     @ManyToMany
-    private Set<User> reporters = new HashSet<>();
+    @Getter private Set<User> reporters = new HashSet<>();
 
     @JsonView(BasicView.class)
     @Column(columnDefinition = "TEXT")
-    private String text;
+    @Getter @Setter private String text;
 
     @Nullable
     @Lob
     @JsonIgnore
-    private Blob media;
+    @Getter private Blob media;
 
     @JsonView(BasicView.class)
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> tags = new HashSet<String>();
+    @Getter private Set<String> tags = new HashSet<String>();
 
     @JsonView(LikesView.class)
     @Nullable
     @ManyToMany
-    private Set<User> likes  = new HashSet<>();
+    @Getter private Set<User> likes  = new HashSet<>();
 
     @JsonIgnore
     @Nullable
     @OneToMany
-    private List<Tweet> children = new ArrayList<>();
+    @Getter private List<Tweet> children = new ArrayList<>();
 
     @JsonIgnore
     @Nullable
     @OneToMany(cascade = CascadeType.ALL)  
-    private Set<Tweet> shares = new HashSet<>();
+    @Getter private Set<Tweet> shares = new HashSet<>();
 
-    public static class Builder {
+    public static class Builder
+    {
         private User author;
         private String text;
         private Blob media;
@@ -112,11 +117,12 @@ public class Tweet implements Comparable<Tweet>
             return new Tweet(this);
         }
     }
-
-    private Tweet(Tweet.Builder builder) {
+    private Tweet(Tweet.Builder builder)
+    {
         this(builder.author, builder.text, builder.media, builder.tags);
     }
-    private Tweet(User author, String text, Blob media, HashSet<String> tags) {
+    private Tweet(User author, String text, Blob media, HashSet<String> tags)
+    {
         this.author = author;
         this.date = LocalDateTime.now();
         this.text = text;
@@ -125,27 +131,14 @@ public class Tweet implements Comparable<Tweet>
         //this.likes.add(author);
     }
 
-    public long getId() {return id;}
-    public void setId(long id) {this.id = id;}
-
-    public User getAuthor() {return author;}
     public String getUserName() {return author.getUsername();}
     public void setNullAuthor() {this.author = null;}
     public boolean authorIsNull() {return this.author == null;}
 
-    public LocalDateTime getDate() {return date;}
-
-    public Set<User> getReporters() {
-        return reporters;
-    }
     public void report(User reporter) {
         reporters.add(reporter);
     }
-
-    public String getText() {return text;}
-    public void setText(String text) {this.text = text;}
     
-    public Set<User> getLikes() {return likes;}
     public void switchLike(User user) {
         assert(user != null);
         if (!likes.contains(user))
@@ -153,15 +146,11 @@ public class Tweet implements Comparable<Tweet>
         else likes.remove(user);
     }
 
-    public Set<Tweet> getShares() {return shares;}
-    
-    public Set<String> getTags() {return tags;}
     public void addTag(String String) {
         //assert(this.parent == null);
         this.tags.add(String);
     }
 
-    public List<Tweet> getChildren() {return children;}
 
     /* NOTE this business logic should be deoupled to a controller
     public void reply(Tweet tweet, TweetRepository tweetRepository) {
@@ -171,37 +160,8 @@ public class Tweet implements Comparable<Tweet>
         tweetRepository.save(tweet);
     }
     */
-
-    public Blob getMedia() {return media;}
     public boolean hasMedia() {return media != null;}
 
     @Override
-    public int compareTo(Tweet o)
-    {
-        
-       return this.date.compareTo(o.date);
-    }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Objects.hash(id, author, date);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) 
-    {
-        if (this == obj || this.hashCode() == obj.hashCode())
-            return true;
-
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        Tweet other = (Tweet) obj;
-        return Objects.equals(id, other.id)
-                && Objects.equals(author, other.author)
-                && Objects.equals(date, other.date);
-    }
+    public int compareTo(Tweet o) {return date.compareTo(o.date);}
 }

@@ -1,6 +1,7 @@
 package es.codeurjc.backend.model;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,44 +10,34 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
-//Class initially defined by group 13 B, vastly refactored by group 13 A
-@Entity
-public class Message {
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@Entity
+public class Message 
+{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @Getter private long id;
 
-    private Date date;
-
-    @ManyToOne
-    private User recipient;
+    @Getter private LocalDateTime date = LocalDateTime.now();
 
     @ManyToOne
-    private User sender;
+    @Getter private User recipient;
+
+    @ManyToOne
+    @Getter private User sender;
 
     @Column(columnDefinition = "TEXT")
-    private String textContent;
+    @Getter @Setter private String textContent;
 
-    public Message(){}
-
-    public Message(long id, Date date, User recipient, User sender, String textContent) {
+    public Message(long id, User recipient, User sender, String textContent)
+    {
         this.id = id;
-        this.date = date;
         this.recipient = recipient;
         this.sender = sender;
         this.textContent = textContent;
     }
-
-    public Date getDate() {return date;}
-    public void setDate(Date date) {this.date = date;}
-
-    public User getSender() {return sender;}
-    public User getRecipient() {return recipient;}
-
-    public String getTextContent() {return textContent;}
-    public void setTextContent(String textContent) {this.textContent = textContent;}
-
-    public long getId() {return id;}
-    public void setId(long id) {this.id = id;}
 }
