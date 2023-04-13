@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import io.vavr.control.Try;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +12,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.google.gson.Gson;
 import es.codeurjc.backend.model.Tweet;
-import es.codeurjc.backend.repository.TweetRepository;
 
 // Group 13-A
+
+/*
 @Controller
 public class ChartController 
 {
@@ -57,4 +58,4 @@ public class ChartController
         Try.of(() -> displayedNumbers.add(tweet.getLikes().size()));
     }
 }
-
+*/

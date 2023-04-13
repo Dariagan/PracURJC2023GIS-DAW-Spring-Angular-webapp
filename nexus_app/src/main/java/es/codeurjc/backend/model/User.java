@@ -14,6 +14,9 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import java.util.*;
+
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -21,29 +24,36 @@ import com.fasterxml.jackson.annotation.JsonView;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.EmailService;
 import es.codeurjc.backend.service.UserService;
+import lombok.NoArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 // Class initially defined by group 13 B in a basic manner, 
 // refactored, reprogrammed, given all functionality by group 13 A
+@NoArgsConstructor
 @Entity(name = "UserTable")
-public class User 
+public class User implements UserDetails
 {
     public interface UsernameView {}
     public interface BasicView extends UsernameView{}
     public interface TweetsView {}
     public interface FollowingView extends UsernameView{}
-
     public interface FullView extends User.BasicView, User.TweetsView, Tweet.BasicView {}
     
     @JsonView(UsernameView.class)
     @Id
     private String username;
+
     @JsonView(BasicView.class)
     private String name;
+
     @JsonView(BasicView.class)
     private String email;
+
     @JsonView(BasicView.class)
     private String description = "";
 
@@ -54,30 +64,27 @@ public class User
     private String encodedPassword;
 
     @JsonView(BasicView.class)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> roles = new HashSet<>();
-    
-    @JsonView(BasicView.class)
-    private boolean banned = false;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Nullable
     @Lob
     @JsonIgnore
-    private Blob profilePicture = null;
+    private Blob profilePicture;
 
     @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
-    private List<Tweet> tweets = new ArrayList<Tweet>();
+    private List<Tweet> tweets = new ArrayList<>();
 
     @JsonView(FollowingView.class)
     @Nullable
     @ManyToMany
-    private Set<User> following = new HashSet<User>();
+    private Set<User> following = new HashSet<>();
 
     @JsonIgnore
     @Nullable
     @ManyToMany
-    private Set<User> blocked = new HashSet<>();  
+    private Set<User> blocked = new HashSet<>();
 
     public static class Builder {
         private String username, email, encodedPassword, name = "", description = "";
@@ -122,13 +129,12 @@ public class User
             name = ""; description = ""; admin = false; banned = false;
         }
         public User build(){
-            assert username != null && !username.equals("") && username.length() <= 25
-
-            && name != null && name.length() <= 25
-
-            && email != null && EmailService.isEmail(email)
-            
-            && encodedPassword != null && encodedPassword.length() >= 10;
+            assert (
+                username != null && !username.equals("") && username.length() <= 25 &&
+                name != null && name.length() <= 25 &&
+                email != null && EmailService.isEmail(email) &&
+                encodedPassword != null && encodedPassword.length() >= 10
+            );
 
             return new User(this);
         }
@@ -140,24 +146,25 @@ public class User
             builder.description, builder.admin, builder.banned
         );
     }
+
     private User(
         String username, String email, String encodedPassword, String name,
         String description, boolean admin, boolean banned
-    ) {   
+    ) {
         this.username = username;
         this.email = email;
         this.encodedPassword = encodedPassword;
         this.name = name;
         this.description = description;
-        this.roles.add("USER");
-        if (admin) this.roles.add("ADMIN");
         this.profilePicture = null;
+
+        if (admin) this.role = Role.ADMIN;
+        else this.role = Role.USER;
     }
 
     public String getName() {return name;}
     public void setName(String name) {this.name = name; }
 
-    public String getUsername() {return username;}
     public void setUsername(String username) {this.username = username;}
 
     public String getEmail() {return email;}
@@ -169,15 +176,11 @@ public class User
     public String getDescription() {return description;}
     public void setDescription(String description) {this.description = description;}
 
-    public void ban() {
-        this.banned = true;
-        roles.remove("USER");
-    }
-    public void unban() {
-        this.banned = false;
-        roles.add("USER");
-    }
-    public boolean isBanned() {return banned;}
+    public void ban() { role = Role.BANNED; }
+
+    public void unban() { role = Role.USER; }
+
+    public boolean isBanned() { return role == Role.BANNED; }
 
     public Blob getProfilePicture() {return profilePicture;}
     public boolean hasProfilePicture() {return profilePicture != null;}
@@ -188,17 +191,19 @@ public class User
 
     public List<Tweet> getTweets() {return tweets;}
   
-    public Set<String> getRoles() {return this.roles;}
+    public Role getRole() { return role; }
 
-    public boolean isAdmin() {return roles.contains("ADMIN");}
-    public void setAdmin() {assert(!isAdmin()); this.roles.add("ADMIN");}
-    public void removeAdmin(){this.roles.remove("ADMIN");}
+    public boolean isAdmin() { return role == Role.ADMIN; }
 
-    public Set<User> getFollowing() {return following;}
-    public Set<User> getFollowers(UserService userService) {
-        return userService.getFollowers(this, Pageable.unpaged());
-    }
-    public void switchFollow(User user) {
+    public void setAdmin() { role = Role.ADMIN; }
+
+    public void removeAdmin() { role = Role.USER; }
+
+    public Set<User> getFollowing() { return following; }
+
+    // FIXME the next few codeblocks can produce null pointer exceptions.
+    public void switchFollow(User user)
+    {
         assert user != null && !user.equals(this);
         if (!following.contains(user))
             following.add(user);
@@ -206,21 +211,55 @@ public class User
     }
 
     public Set<User> getBlocked() {return blocked;}
+
+    public Set<User> getBlockedUsers() { return blocked; }
+
     public void block(User user)
     {
         assert user != this;
         blocked.add(user);
     };
+
     public void unblock(User user)
     {
         assert user != this;
         blocked.remove(user);
     };
 
-    public LocalDateTime getSignUpDate() {return signUpDate;}
+    public LocalDateTime getSignUpDate() { return signUpDate; }
 
-    public String toString() {return username;}
+    public String toString() { return username; }
 
-    //DON'T USE, ONLY FOR DATABASE 
-    public User() {}
+    // UserDetails interface methods
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return encodedPassword;
+    }
+
+    public String getUsername() { return username; }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

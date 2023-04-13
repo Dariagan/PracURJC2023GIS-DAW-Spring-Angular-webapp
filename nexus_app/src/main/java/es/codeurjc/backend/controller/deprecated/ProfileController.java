@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 
 import java.io.IOException;
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
-import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 
@@ -34,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 // All methods/functionality programmed entirely by group 13-A
+/*
 @Controller
 public class ProfileController {
     
@@ -175,3 +175,4 @@ public class ProfileController {
         model.addAttribute("blocked", loggedUser.getBlocked().contains(profileUser));
     }
 }
+ */

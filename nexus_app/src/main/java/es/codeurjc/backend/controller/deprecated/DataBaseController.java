@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import javax.annotation.PostConstruct;
 

@@ -1,4 +1,4 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -15,6 +15,7 @@ import es.codeurjc.backend.service.UserService;
 import java.util.Optional;
 
 //Programmed by group 13-A
+/*
 @Controller
 public class LoginController 
 {
@@ -43,3 +44,4 @@ public class LoginController
         return "redirect:/feed";
     }
 }
+ */

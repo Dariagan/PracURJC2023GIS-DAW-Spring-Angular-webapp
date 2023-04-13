@@ -8,6 +8,7 @@ import org.springframework.data.util.Pair;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 // 13-A
 public class OptPair<T, U> {

@@ -1,11 +1,9 @@
-package es.codeurjc.backend.controller;
+package es.codeurjc.backend.controller.deprecated;
 
 import javax.servlet.http.HttpServletRequest;
 
 import es.codeurjc.backend.model.Tweet;
-import es.codeurjc.backend.repository.TweetRepository;
 
-import es.codeurjc.backend.service.TweetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 // All methods/functionality programmed entirely by group 13-A
+/*
 @Controller
 public class FeedController {
     
@@ -103,3 +102,4 @@ public class FeedController {
         model.addAttribute("tweets", displayedTweets); 
     }
 }
+ */

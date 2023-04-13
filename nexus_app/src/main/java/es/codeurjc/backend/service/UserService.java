@@ -12,6 +12,7 @@ import io.vavr.control.Try;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,10 @@ public final class UserService implements EntityService<User>
         return userRepository
             .findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+    }
+
+    public OptTwo<User> getUserBy(String user1, String user2) {
+        return OptTwo.of(getUserBy(user1), getUserBy(user2));
     }
 
     public List<User> findAll(Pageable pageable)
@@ -57,10 +62,15 @@ public final class UserService implements EntityService<User>
             return userRepository.findByUsername(usernameOrEmail);
     }
 
-    public Set<User> getFollowers(User user, Pageable pageable) 
+    public Set<User> getFollowers(User user, Pageable pageable)
     {
         return userRepository.findByFollowing(user);
     }
+
+    public Optional<UserDetails> getUserDetailsBy(String username) {
+        return getUserBy(username).map(UserDetails.class::cast);
+    }
+
     public List<User> getFollowers(Optional<User> userOpt, Pageable pageable)
     {
         return userRepository.findByFollowing(userOpt.get(), pageable).getContent();
@@ -93,6 +103,11 @@ public final class UserService implements EntityService<User>
         return this;
     }
 
+    public UserService save(OptTwo<User> users){
+        users.forEach(userRepository::save);
+        return this;
+    }
+
     public UserService delete(User user)
     {
         userRepository.delete(user);
@@ -109,14 +124,14 @@ public final class UserService implements EntityService<User>
         return users.isLeft();
     }
 
-    public static boolean isSelfAction(OptTwo<User> users)
-    {
+    private static boolean isSelfAction(OptTwo<User> users){
         return users.getRight().equals(users.getLeft());
     }
 
-    public static boolean urlUserExistsAndNotSelfAction(OptTwo<User> users)
+    public static boolean selfAction(OptTwo<User> users)
     {
-        return urlUserExists(users) || !isSelfAction(users);
+        if (users.isEmpty()) return false;
+        return isSelfAction(users);
     }
 
     public static boolean isVisitorAdmin(OptTwo<User> users)

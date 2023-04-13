@@ -1,4 +1,4 @@
-package es.codeurjc.backend.restcontroller;
+package es.codeurjc.backend.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;

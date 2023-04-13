@@ -11,5 +11,9 @@ public class ResponseBuilder
             .badRequest()
             .body(info);
     }
+    public static ResponseEntity<?> badReq()
+    {
+        return ResponseEntity.badRequest().build();
+    }
 
 }
