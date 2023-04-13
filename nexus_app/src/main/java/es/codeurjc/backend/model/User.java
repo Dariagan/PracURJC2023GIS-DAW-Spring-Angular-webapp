@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.EmailService;
 import es.codeurjc.backend.service.UserService;
+import lombok.NoArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
@@ -33,6 +34,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 // Class initially defined by group 13 B in a basic manner, 
 // refactored, reprogrammed, given all functionality by group 13 A
+@NoArgsConstructor
 @Entity(name = "UserTable")
 public class User implements UserDetails
 {
@@ -114,7 +116,7 @@ public class User implements UserDetails
             this.admin = false;
             return this;
         }
-        public Builder setIsAdmin(){
+        public Builder setAdmin(){
             this.admin = true;
             return this;
         }
@@ -137,8 +139,6 @@ public class User implements UserDetails
             return new User(this);
         }
     }
-    
-    public User() {}
     
     private User(User.Builder builder){
         this(

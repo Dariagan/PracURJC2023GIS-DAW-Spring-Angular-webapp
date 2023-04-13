@@ -15,8 +15,11 @@ import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
+import lombok.NoArgsConstructor;
+
 
 // Programmed by group 13-A
+@NoArgsConstructor
 @Entity(name = "Tweet")
 public class Tweet implements Comparable<Tweet>
 {    
@@ -172,16 +175,16 @@ public class Tweet implements Comparable<Tweet>
     public Blob getMedia() {return media;}
     public boolean hasMedia() {return media != null;}
 
-    //DON'T USE, ONLY FOR DATABASE
-    public Tweet() {}
     @Override
-    public int compareTo(Tweet o) {
+    public int compareTo(Tweet o)
+    {
         
        return this.date.compareTo(o.date);
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         final int prime = 31;
         int result = 1;
         result = prime * result + Objects.hash(id, author, date);
@@ -189,9 +192,11 @@ public class Tweet implements Comparable<Tweet>
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
+    public boolean equals(Object obj) 
+    {
+        if (this == obj || this.hashCode() == obj.hashCode())
             return true;
+
         if (obj == null || getClass() != obj.getClass())
             return false;
         Tweet other = (Tweet) obj;
@@ -199,6 +204,4 @@ public class Tweet implements Comparable<Tweet>
                 && Objects.equals(author, other.author)
                 && Objects.equals(date, other.date);
     }
-
-	
 }

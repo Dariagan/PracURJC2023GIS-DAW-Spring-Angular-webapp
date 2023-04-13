@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
-
+/*
 @Service
 @RequiredArgsConstructor
 public class UserQuerierService
@@ -29,3 +29,4 @@ public class UserQuerierService
 
     }
 }
+*/

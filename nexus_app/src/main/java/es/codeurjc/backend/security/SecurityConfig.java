@@ -21,7 +21,8 @@ public class SecurityConfig
     private final String[] publicEndpoints = {
         "/api/auth/**",
         "/api/ex/public-str",
-        "/api/user"
+        "/api/**",//FIXME
+        "/h2-console/**"
     };
     
     private final String[] userEndpoints = {
