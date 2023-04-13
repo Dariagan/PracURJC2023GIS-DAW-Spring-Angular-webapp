@@ -1,14 +1,10 @@
 package es.codeurjc.backend.utilities;
 
-import io.vavr.Function2;
-import io.vavr.collection.List;
 import io.vavr.control.Try;
 import org.springframework.data.util.Pair;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 // 13-A
 public class OptPair<T, U> {
@@ -24,7 +20,7 @@ public class OptPair<T, U> {
     }
 
     public static <T, U> OptPair<T, U> empty() {
-        return new OptPair(Pair.of(Optional.empty(), Optional.empty()));
+        return new OptPair<>(Pair.of(Optional.empty(), Optional.empty()));
     }
 
     public Optional<T> getOptLeft() {
