@@ -4,6 +4,9 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import es.codeurjc.backend.repository.TweetRepository;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,17 +15,17 @@ import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.repository.UserRepository;
 import es.codeurjc.backend.service.UserService;
 
-/* FIXME
+import java.util.function.Function;
+
 @RestController
+@RequiredArgsConstructor
 public class DataBaseController {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private TweetService tweetService;
-    @Autowired
-	private PasswordEncoder passwordEncoder;
-   
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final TweetRepository tweetRepository;
+	private final PasswordEncoder passwordEncoder;
+
     //Method body programmed by group 13-A
     @PostConstruct
     public void init() 
@@ -36,15 +39,22 @@ public class DataBaseController {
             .setEmail("a@a.com")
             .setEncodedPassword(passwordEncoder.encode("a"))
             .setIsAdmin();
-        
-        User userA = builder.build();
-        User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
-        User userC = builder.setUsername("c").setEmail("c@c.com").build();
-        User userD = builder.setUsername("d").setEmail("d@d.com").build();
-        User userE = builder.setUsername("e").setEmail("e@e.com").build();
-        
-        userService.save(userA).save(userB).save(userC).save(userD).save(userE);
 
+        Function<String, User> userBuildAux = (c) -> builder
+            .setUsername(c)
+            .setEmail(String.format("%s@%s.com", c, c))
+            .build();
+
+        userService
+            .save(builder.build())
+            .save(userBuildAux.apply("b"))
+            .save(userBuildAux.apply("c"))
+            .save(userBuildAux.apply("d"))
+            .save(userBuildAux.apply("e"));
+
+        userRepository.flush();
+
+        /*
         // /Building users
 
         userA.switchFollow(userB);
@@ -96,7 +106,6 @@ public class DataBaseController {
             if (i == 16)
                 tweetBuilder.clearTags().addTag("cars").addTag("sports").setAuthor(userB);
         }
-
+        */
     }
 }
-*/

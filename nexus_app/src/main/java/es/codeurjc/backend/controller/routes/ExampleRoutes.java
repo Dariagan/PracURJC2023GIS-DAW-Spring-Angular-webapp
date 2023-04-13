@@ -1,6 +1,7 @@
 package es.codeurjc.backend.controller.routes;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,5 +26,11 @@ public class ExampleRoutes
     public ResponseEntity<String> getPublicStr()
     {
         return ResponseEntity.ok("You accessed to this string as anon");
+    }
+
+    @GetMapping("/name")
+    public ResponseEntity<String> getName(Authentication auth)
+    {
+        return ResponseEntity.ok(auth.getName());
     }
 }

@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
+import org.springframework.stereotype.Component;
 
 // Programmed by group 13 A
+@Component
 public interface UserRepository extends JpaRepository<User, String>
 {
     Optional<User> findByUsername(String username);
@@ -33,4 +35,5 @@ public interface UserRepository extends JpaRepository<User, String>
 
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    Page<User> findAllByOrderByNameDesc(Pageable page);
 }

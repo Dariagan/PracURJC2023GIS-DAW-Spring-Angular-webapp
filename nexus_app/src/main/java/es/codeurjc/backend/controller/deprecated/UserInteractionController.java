@@ -2,47 +2,60 @@ package es.codeurjc.backend.controller.deprecated;
 
 import javax.servlet.http.HttpServletRequest;
 
+import es.codeurjc.backend.repository.TweetRepository;
+import es.codeurjc.backend.service.FollowingService;
+import es.codeurjc.backend.service.UserQuerierService;
 import es.codeurjc.backend.utilities.OptTwo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 import es.codeurjc.backend.service.UserService;
 
 // All methods/functionality programmed entirely by group 13 A
-/*
 @Controller
+@RequestMapping("/api/user")
+@RequiredArgsConstructor
 public class UserInteractionController {
 
-    @Autowired
-    UserService userService;
-    @Autowired
-    TweetRepository tweetRepository;
+    private final UserService userService;
+    private final TweetRepository tweetRepository;
+    private final UserQuerierService userQuerierService;
+    private final FollowingService followingService;
 
-    @RequestMapping("/u/{username}/follow")
-    public String handleFollow(
-        @PathVariable String username, HttpServletRequest req
+    @GetMapping
+    public ResponseEntity<Page<User>> getUsers(
+        @RequestParam int page, @RequestParam int size
     ) {
-        OptTwo<User> users = userService.getUserBy(username, req);
-        
-        if (UserService.isVisitorAuthenticated(users)){
-            
-            if (UserService.urlUserExistsAndNotSelfAction(users)){
-            
-                users.getRight().switchFollow(users.getLeft());
-
-                userService.save(users.getLeft()).save(users.getRight());
-
-                return UserService.redirectToReferer(req);
-            } else 
-                return "error";
-        }   
-        else return "redirect:/login";
+        return userQuerierService.getUsers(page, size);
     }
 
+    @PostMapping("/{username}/follow")
+    public ResponseEntity<Void> handleFollow(
+        Authentication auth, @PathVariable String username
+    ) {
+        return followingService.follow(auth.getName(), username);
+    }
+
+    @GetMapping("/{username}/follow")
+    public ResponseEntity<Page<User>> getFollowers(
+        @PathVariable String username,
+        @RequestParam int page,
+        @RequestParam int size
+    ) {
+        return followingService.getFollowersOf(
+            username, PageRequest.of(page, size)
+        );
+    }
+
+    /*
     @RequestMapping("/u/{username}/ban")
     public String handleBan(
         @PathVariable String username, HttpServletRequest req
@@ -66,7 +79,9 @@ public class UserInteractionController {
         }   
         return "error";
     }
+     */
 
+    /*
     @RequestMapping("/u/{username}/block")
     public String handleBlock(
         @PathVariable String username, HttpServletRequest req
@@ -91,8 +106,9 @@ public class UserInteractionController {
         }   
         return "error";
     }
+     */
 
-    //TODO before getting here, add prompt asking whether you want to delete your account
+    /*
     @RequestMapping("/u/{username}/delete")
     public String deleteUser(
         @PathVariable String username, HttpServletRequest req
@@ -118,5 +134,5 @@ public class UserInteractionController {
         }   
         return "error";
     }
+     */
 }
- */

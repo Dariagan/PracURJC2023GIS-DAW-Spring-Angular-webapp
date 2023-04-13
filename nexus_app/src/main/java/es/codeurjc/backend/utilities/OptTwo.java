@@ -24,7 +24,11 @@ public class OptTwo<T> {
     }
 
     public boolean isEmpty() {
-        return m.getFirst().isEmpty() && m.getSecond().isEmpty();
+        return !isLeft() && !isRight();
+    }
+
+    public boolean isFull() {
+        return isLeft() && isRight();
     }
 
     public Optional<T> getOptLeft() {

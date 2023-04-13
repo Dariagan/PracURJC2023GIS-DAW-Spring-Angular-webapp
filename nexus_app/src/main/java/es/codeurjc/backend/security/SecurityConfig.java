@@ -20,11 +20,13 @@ public class SecurityConfig
     // TODO define all endpoints
     private final String[] publicEndpoints = {
         "/api/auth/**",
-        "/api/ex/public-str"
+        "/api/ex/public-str",
+        "/api/user"
     };
     
     private final String[] userEndpoints = {
-        "/api/ex/user-str"
+        "/api/ex/user-str",
+        "/api/ex/name"
     };
     
     private final String[] adminEndpoints = {

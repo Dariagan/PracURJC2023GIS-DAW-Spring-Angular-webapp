@@ -160,7 +160,7 @@ public class Tweet implements Comparable<Tweet>
 
     public List<Tweet> getChildren() {return children;}
 
-    /* FIXME
+    /* NOTE this business logic should be deoupled to a controller
     public void reply(Tweet tweet, TweetRepository tweetRepository) {
         assert tweet != this;
         children.add(tweet);

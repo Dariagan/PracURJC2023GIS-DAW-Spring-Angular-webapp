@@ -33,6 +33,10 @@ public final class UserService implements EntityService<User>
             .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
     }
 
+    public OptTwo<User> getUserBy(String user1, String user2) {
+        return OptTwo.of(getUserBy(user1), getUserBy(user2));
+    }
+
     public List<User> findAll(Pageable pageable)
     {
         return userRepository.findAll(pageable).getContent();
@@ -99,6 +103,11 @@ public final class UserService implements EntityService<User>
         return this;
     }
 
+    public UserService save(OptTwo<User> users){
+        users.forEach(userRepository::save);
+        return this;
+    }
+
     public UserService delete(User user)
     {
         userRepository.delete(user);
@@ -115,14 +124,14 @@ public final class UserService implements EntityService<User>
         return users.isLeft();
     }
 
-    public static boolean isSelfAction(OptTwo<User> users)
-    {
+    private static boolean isSelfAction(OptTwo<User> users){
         return users.getRight().equals(users.getLeft());
     }
 
-    public static boolean urlUserExistsAndNotSelfAction(OptTwo<User> users)
+    public static boolean selfAction(OptTwo<User> users)
     {
-        return urlUserExists(users) || !isSelfAction(users);
+        if (users.isEmpty()) return false;
+        return isSelfAction(users);
     }
 
     public static boolean isVisitorAdmin(OptTwo<User> users)
