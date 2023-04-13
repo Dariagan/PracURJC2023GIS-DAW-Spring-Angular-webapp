@@ -19,8 +19,8 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     Optional<Tweet> findById(long id);
     List<Tweet> findFirst10ByAuthor(User author);
     List<Tweet> findAllByAuthor(User author);
+    Page<Tweet> findAllByAuthor(User author, Pageable pageable);
 
-    /*
     // query made by group 13-A
     @Query("SELECT t FROM UserTable u " +
     "JOIN u.following f JOIN f.tweets t WHERE u = :user " +
@@ -31,15 +31,12 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
 
     // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.banned = false " +
-    "AND t.author NOT IN (SELECT bu FROM UserTable u2 JOIN u2.blocked bu WHERE u = :user) ")
+    "AND t.author NOT IN (SEL    Page<Tweet> findAllByAuthor(User author, Pageable pageable);ECT bu FROM UserTable u2 JOIN u2.blocked bu WHERE u = :user) ")
     Page<Tweet> findAll(User user, Pageable pageable);
 
     // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.banned = false")
     Page<Tweet> findAll(Pageable pageable);
-
-
-    Page<Tweet> findAllByAuthor(User author, Pageable pageable);
 
     // 13-A
     @Query("SELECT t FROM Tweet t WHERE t.author.username = :username AND t.author.banned = false")
@@ -65,5 +62,4 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     "WHERE EXISTS (SELECT tag FROM t.tags tag WHERE tag IN :tags) " +
     "AND t.author.banned = false")
     List<Tweet> findTweetsByTags(Set<String> tags, Pageable pageable);
-     */
 }

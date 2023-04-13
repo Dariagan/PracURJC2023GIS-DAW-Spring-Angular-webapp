@@ -3,6 +3,7 @@ package es.codeurjc.backend.service;
 import es.codeurjc.backend.model.Tweet;
 import es.codeurjc.backend.model.User;
 
+import es.codeurjc.backend.repository.TweetRepository;
 import es.codeurjc.backend.utilities.OptPair;
 import io.vavr.control.Try;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +19,6 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 // Programmed entirely by group 13-A
-/* FIXME
 @Service
 public final class TweetService implements EntityService<Tweet>
 {
@@ -144,4 +144,3 @@ public final class TweetService implements EntityService<Tweet>
     }	
    
 }
-*/

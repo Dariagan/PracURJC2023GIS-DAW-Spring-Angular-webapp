@@ -199,11 +199,6 @@ public class User implements UserDetails
 
     public void removeAdmin() { role = Role.USER; }
 
-    public Set<User> getFollowers(UserService userService)
-    {
-        return userService.getFollowers(this);
-    }
-
     public Set<User> getFollowing() { return following; }
 
     // FIXME the next few codeblocks can produce null pointer exceptions.
