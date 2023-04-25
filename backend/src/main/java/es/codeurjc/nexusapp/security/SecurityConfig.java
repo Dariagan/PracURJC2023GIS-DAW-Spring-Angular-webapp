@@ -19,8 +19,8 @@ import es.codeurjc.nexusapp.model.Role;
 public class SecurityConfig
 {
     // TODO define all endpoints
-    private final String[] publicEndpoints = {
-        "**",
+    private final String[] PUBLIC_ENDPOINTS = {
+        "**",//FIXME added this bc otherwise css GET requests get blocked
         "/api/auth/**",
         "/api/ex/public-str",
         "/api/**",//FIXME
@@ -31,12 +31,12 @@ public class SecurityConfig
         "/u/**"
     };
     
-    private final String[] userEndpoints = {
+    private final String[] USER_ENDPOINTS = {
         "/api/ex/user-str",
         "/api/ex/name"
     };
     
-    private final String[] adminEndpoints = {
+    private final String[] ADMIN_ENDPOINTS = {
         "/api/ex/admin-str"
     };
     
@@ -49,11 +49,11 @@ public class SecurityConfig
         http.csrf()
             .disable()
             .authorizeHttpRequests()
-            .antMatchers(publicEndpoints)
+            .antMatchers(PUBLIC_ENDPOINTS)
             .permitAll()
-            .antMatchers(userEndpoints)
+            .antMatchers(USER_ENDPOINTS)
             .hasAnyAuthority(Role.USER.toString(), Role.ADMIN.toString())
-            .antMatchers(adminEndpoints)
+            .antMatchers(ADMIN_ENDPOINTS)
             .hasAuthority(Role.ADMIN.toString())
             .anyRequest().authenticated()
             .and()
