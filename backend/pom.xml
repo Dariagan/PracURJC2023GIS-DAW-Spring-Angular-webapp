@@ -150,7 +150,7 @@
 					<outputDir>${project.basedir}/api-docs</outputDir>
 				</configuration>
 			</plugin>
-			<!--<plugin>
+			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<version>5.3.0</version>
@@ -166,7 +166,7 @@
 						</configuration>
 					</execution>
 				
-			</plugin>-->
+			</plugin>
 			<plugin>
 				<groupId>com.coderplus.maven.plugins</groupId>
 				<artifactId>copy-rename-maven-plugin</artifactId>

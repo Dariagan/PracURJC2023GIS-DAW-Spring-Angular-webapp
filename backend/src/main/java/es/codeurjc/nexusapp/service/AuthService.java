@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,8 +60,8 @@ public class AuthService
     public ResponseEntity<?> auth(String username, String password)
     {
         Optional<User> user = userService.getUserBy(username);
-        if (user.isEmpty()) return ResponseBuilder.badReq("No such user");
-        
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+
         Try<Authentication> auth = Try.of(() -> authManager.authenticate(
             new UsernamePasswordAuthenticationToken(username, password)
         ));
@@ -67,8 +69,11 @@ public class AuthService
         if (auth.isFailure()) return ResponseBuilder.badReq("Wrong credentials");
         
         String jwt = JwtService.generateToken(user.get());
+
+        HttpHeaders responseHeaders = new HttpHeaders();
+		responseHeaders.add(HttpHeaders.SET_COOKIE, jwt);
         
         return ResponseEntity.ok(new AuthResponse(jwt));
     }
     
-}
+}   

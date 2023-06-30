@@ -1,6 +1,6 @@
 import { Component, ElementRef, Injectable } from '@angular/core';
-import { NexuschiComponent } from '../nexuschi/nexuschi.component';
-import { HttpClient } from '@angular/common/http';
+import { LoginService } from 'app/services/login.service';
+
 
 @Component({
   selector: 'app-login',
@@ -10,15 +10,16 @@ import { HttpClient } from '@angular/common/http';
 @Injectable({providedIn: 'root'})
 export class LoginComponent {
 
-  @Input()
-  title: string
+  constructor(private loginService: LoginService){}
 
-  constructor(private httpClient: HttpClient){
+  logIn(event: any, username: string, password: string) {
 
-    @ViewChild('titleInput') titleInput: ElementRef;
+    event.preventDefault();
 
-    this.titleINput.nativeElement.vale
+    this.loginService.logIn(username, password);
+  }
 
-    
+  logOut() {
+    this.loginService.logOut();
   }
 }

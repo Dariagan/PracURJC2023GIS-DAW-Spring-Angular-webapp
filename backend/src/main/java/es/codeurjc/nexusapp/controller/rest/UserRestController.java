@@ -382,6 +382,7 @@ public class UserRestController {
     public ResponseEntity<User> getLoggedUser(HttpServletRequest request) 
     {
         Optional<User> userOpt = userService.getUserBy(request);
+        System.out.println(request.getUserPrincipal().getName());
         return userOpt
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
