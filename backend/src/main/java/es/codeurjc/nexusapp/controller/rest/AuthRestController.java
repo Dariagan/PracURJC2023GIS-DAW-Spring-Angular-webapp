@@ -60,9 +60,11 @@ public class AuthRestController {
         })
     @PostMapping("/login")
     public ResponseEntity<?> logIn(
+        @CookieValue(name = "accessToken", required = false) String accessToken,
+		@CookieValue(name = "refreshToken", required = false) String refreshToken,
         @RequestBody LoginRequest loginRequest
     ) {
-        return authService.auth(loginRequest.username(), loginRequest.password());
+        return authService.login(loginRequest, accessToken, refreshToken);
     }
 
     @Operation(summary = "Log out of current session")

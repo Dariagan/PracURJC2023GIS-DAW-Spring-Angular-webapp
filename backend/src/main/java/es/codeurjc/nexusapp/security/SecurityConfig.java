@@ -40,7 +40,7 @@ public class SecurityConfig
         "/api/ex/admin-str"
     };
     
-    private final JwtAuthFilter jwtAuthFilter;
+    private final JwtRequestFilter jwtRequestFilter;
     private final AuthenticationProvider authProvider;
 
     @Bean
@@ -61,7 +61,7 @@ public class SecurityConfig
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authenticationProvider(authProvider)
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
