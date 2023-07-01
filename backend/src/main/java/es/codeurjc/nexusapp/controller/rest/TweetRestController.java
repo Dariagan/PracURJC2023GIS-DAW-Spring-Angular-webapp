@@ -12,6 +12,9 @@ import java.util.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
@@ -231,19 +234,20 @@ public class TweetRestController {
         )
     })
     @PostMapping("/{id}/likes")
-    public ResponseEntity<Tweet> likeTweet(@PathVariable String id, @RequestBody User user) 
+    public ResponseEntity<Tweet> likeTweet(@PathVariable String id, @RequestBody String username) 
     {
         try 
         {
             Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
+            Optional<User> userOpt = userService.getUserBy(username);
 
-            if (tweetOpt.isPresent())
+            if (tweetOpt.isPresent() && userOpt.isPresent())
             {
                 Tweet tweet = tweetOpt.get();
-                tweet.getLikes().add(user);
+                tweet.getLikes().add(userOpt.get());
                 tweetService.save(tweet);
                 URI location = fromCurrentRequest().path("/{id}/likes/{username}")
-                    .buildAndExpand(tweet.getId(), user.getUsername()).toUri();
+                    .buildAndExpand(tweet.getId(), username).toUri();
 
                 return ResponseEntity.created(location).body(tweet);
             } 
@@ -343,4 +347,71 @@ public class TweetRestController {
 
         return greg.generateResponseEntity(id, page, size, user, new ReportersQuerier(tweetService));
     }
+
+    @Operation(summary = "POST reporting user to tweet's reportlist")
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "201",
+            description = "Created",
+            content = {@Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = User.class)
+            )}
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Tweet id is not integer",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403", description = "Forbidden",
+            content = @Content
+        )
+    })
+    @PostMapping("/{id}/reporters")
+    public ResponseEntity<Tweet> reportTweet(@PathVariable String id, @RequestBody String username) 
+    {
+        try 
+        {
+            Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
+            Optional<User> userOpt = userService.getUserBy(username);
+
+            if (tweetOpt.isPresent() && userOpt.isPresent())
+            {
+                Tweet tweet = tweetOpt.get();
+                tweet.getReporters().add(userOpt.get());
+                tweetService.save(tweet);
+                URI location = fromCurrentRequest().path("/{id}/reporters/{username}")
+                    .buildAndExpand(tweet.getId(), username).toUri();
+
+                return ResponseEntity.created(location).body(tweet);
+            } 
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        catch (NumberFormatException e)
+        {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        catch (EmptyResultDataAccessException e) 
+        {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}/image")
+	public ResponseEntity<Object> downloadImage(@PathVariable String id) throws SQLException {
+
+		Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
+
+		if (tweetOpt.isPresent() && tweetOpt.get().hasMedia()) {
+
+			Resource file = new InputStreamResource(tweetOpt.get().getMedia().getBinaryStream());
+
+			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+					.contentLength(tweetOpt.get().getMedia().length()).body(file);
+
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 }

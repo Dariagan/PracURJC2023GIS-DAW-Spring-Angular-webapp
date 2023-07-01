@@ -1,0 +1,107 @@
+<div class="profileanon-twit">
+  <div class="profileanon-op1">
+	<div class="extraimg">
+    <ng-container *ngIf="!userImageError; else defaultPic">
+      <img
+      [src]="getUserImageURL()"
+      class="profileanon-img1"
+      (error)="handleUserImageError()"
+      />
+    </ng-container>
+    <ng-template #defaultPic>
+      <img
+      src="/assets/anonpfp.jpg"
+      alt="imgI135"
+      class="profileanon-img1"
+      />
+    </ng-template>
+	</div>
+	<div class="profileanon-nameanddate1">
+	  <span class="profileanon-text012">
+	        {{tweet?.date}}
+	  </span>
+    <a *ngIf="!authorBanned"  [routerLink]="['/u/', tweet?.author?.username]" class="profileanon-text014">
+        {{tweet?.author?.username}}		
+    </a>
+    <span *ngIf="authorBanned" class="profileanon-text014">
+        [banned]
+    </span>
+	</div>
+
+    <div class="profileanon-interactions1" *ngIf="!authorBanned">
+        <span class="profileanon-text016">{{tweet?.likes?.length}}</span>
+
+        <img
+            (click)="like()"
+            src="/assets/tweet/heart.svg"
+            alt="IconsaxLinearheartI135"
+            class="interaction-icon"
+        />
+
+        <span class="profileanon-text018">0</span>
+
+        <img
+            (click)="share()"
+            src="/assets/tweet/share.svg"
+            alt="IconsaxLinearrepeatI135"
+            class="interaction-icon"
+        />
+
+        <span class="profileanon-text020">0</span>
+        
+        <img
+          (click)="reply()"
+          src="/assets/tweet/reply.svg"
+          alt="IconsaxLinearmessageI135"
+          class="profileanon-iconsax-linearmessage1"
+        />
+        
+
+        <ng-container *ngIf="(!adminView || tweet?.reporters?.length == 0) && !ownTweet; else reported">
+            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">report</span>  
+            <img
+                (click)="report()"
+                src="/assets/tweet/report.png"
+                alt="report"
+                class="profileanon-iconsax-linearmessage1"
+            />
+        </ng-container>
+        <ng-template #reported>
+            <span style="margin-left: 15px" class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
+            <img
+                (click)="delete()"
+                src="/assets/tweet/delete.png"
+                alt="delete"
+                class="profileanon-iconsax-linearmessage1"
+            />
+        </ng-template>
+    </div>
+
+  </div>
+  <div class="profileanon-post1">
+    <div class="profileanon-content1">
+      <span *ngIf="!authorBanned" class="profileanon-text022">
+      <ng-container>
+        {{tweet?.text}}
+      </ng-container>
+      <ng-container *ngIf="authorBanned">
+        This user has been banned.
+        </ng-container>
+      </span>
+    </div>
+  </div>
+
+  <div *ngIf="!authorBanned && !tweetMediaError" class="profileanon-img2">
+    <div class="profileanon-img3">
+      <span >
+      <img
+        [src]="getTweetMediaURL()"
+        class="profileanon-i-m-a-g-e95537386p11"
+        (error)="handleTweetMediaError()"
+      />
+      </span>
+    </div>                        
+    <div class="profileanon-thread2"></div>
+  </div>
+
+</div>

@@ -42,16 +42,15 @@
   </head>
 
   <body>
-
-        <app-nav>
-
-        </app-nav>
+      <app-nav></app-nav>
 
       <div class="feedanon-container">
         <div class="feedanon-feedanon">
           <div class="feedanon-twits">
             <div class="feedanon-container1" id="posts-container">
-                
+              <ng-container *ngFor="let tweet of displayedTweets">
+                <app-tweet [tweet]="tweet"></app-tweet>
+              </ng-container>
             </div>
             <span
                 class="feedanon-text048"

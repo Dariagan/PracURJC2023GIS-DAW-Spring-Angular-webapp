@@ -12,14 +12,21 @@ const BASE_URL = '/api/auth';
 export class LoginService {
 
     logged: boolean = false;
-    user?: User;
+    private user?: User;
 
     constructor(private httpClient: HttpClient) {
         this.reqIsLogged();
     }
 
-    reqIsLogged() {
+    getUser(): User | undefined {
+        return this.user;
+    }
+    
+    isLoggedIn(): boolean {
+        return this.logged;
+    }
 
+    reqIsLogged() {
         this.httpClient.get('/api/users/me', { withCredentials: true }).subscribe(
             response => {
                 this.user = response as User;
@@ -31,7 +38,6 @@ export class LoginService {
                 }
             }
         );
-
     }
 
     logIn(username: string, password: string): Observable<any> {

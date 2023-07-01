@@ -1,6 +1,9 @@
 export interface User {
     username: string;
-    email: string;
     name: string;
+    email: string;
+    description: string;
+    signUpDate: Date;
     role: string;
+    tweets: [];
 }

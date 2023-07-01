@@ -1,0 +1,230 @@
+  .profileanon-twit {
+    height: 147px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-self: stretch;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: transparent;
+    margin-bottom: 10px;
+    flex-direction: column;
+  }
+  .profileanon-op1 {
+    width: 569px;
+    height: 55px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-self: stretch;
+    align-items: flex-start;
+    border-color: transparent;
+    margin-bottom: 0px;
+  }
+  .profileanon-img1, .extraimg {
+    border-radius: 50%;
+    height: 100%;
+    width: auto;
+    left: 0px;
+    top: 0px;
+}
+  .profileanon-nameanddate1 {
+    top: 0px;
+    left: 67px;
+    width: 148px;
+    height: 55px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }
+  .profileanon-text012 {
+    top: 25px;
+    color: rgba(224, 211, 222, 1);
+    width: 148px;
+    height: auto;
+    position: absolute;
+    font-size: 12px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .profileanon-text014 {
+    top: 10px;
+    color: rgba(255, 255, 255, 1);
+    width: 148px;
+    height: auto;
+    position: absolute;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .profileanon-interactions1 {
+    top: 19px;
+    left: 280px;
+    width: fit-content;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    border-color: transparent;
+    justify-content: center;
+  }
+  .profileanon-text016 {
+    color: rgba(215, 38, 61, 1);
+    height: auto;
+    font-size: 12px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 15px;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .interaction-icon {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    margin-right: 15px;
+  }
+  .profileanon-text018 {
+    color: rgba(116, 179, 206, 1);
+    height: auto;
+    font-size: 12px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 15px;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .profileanon-text020 {
+    color: rgba(224, 211, 222, 1);
+    height: auto;
+    font-size: 12px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 15px;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .profileanon-iconsax-linearmessage1 {
+    width: 18px;
+    height: 18px;
+    position: relative;
+  }
+  .profileanon-content1 {
+    top: 0px;
+    left: 56px;
+    width: 513px;
+    display: flex;
+    padding: 10px 20px;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+    border-radius: 20px;
+    flex-direction: column;
+    justify-content: center;
+    background-image: linear-gradient(90deg, rgba(83, 76, 134, 0.44999998807907104) 0%, rgba(30, 26, 59, 1) 100%);
+  }
+  .profileanon-text022 {
+    color: rgba(255, 255, 255, 1);
+    height: auto;
+    font-size: 15px;
+    align-self: stretch;
+    font-style: Medium;
+    text-align: left;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .profileanon-img2 {
+    width: 569px;
+    height: 368px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-self: stretch;
+    align-items: flex-start;
+    border-color: transparent;
+  }
+  .profileanon-img3 {
+    top: 17px;
+    left: 55.5px;
+    width: 488px;
+    height: 351px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+    border-radius: 20px;
+  }
+  .profileanon-post1 {
+    width: 569px;
+    height: 92px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-self: stretch;
+    align-items: flex-start;
+    border-color: transparent;
+    margin-bottom: 0px;
+  }
+  .profileanon-i-m-a-g-e95537386p11 {
+    top: 0px;
+    left: 0px;
+    width: 488px;
+    height: 368px;
+    position: absolute;
+    border-color: transparent;
+  }
+  .profileanon-thread2 {
+    top: 0px;
+    left: 0px;
+    width: 55px;
+    height: 368px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }

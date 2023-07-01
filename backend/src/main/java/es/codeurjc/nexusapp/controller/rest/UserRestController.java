@@ -2,6 +2,7 @@ package es.codeurjc.nexusapp.controller.rest;
 
 import java.io.IOException;
 import java.net.URI;
+import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -12,11 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +44,7 @@ import es.codeurjc.nexusapp.utilities.queriers.FollowingQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.TweetQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.UserQuerier;
 import es.codeurjc.nexusapp.utilities.responseentity.GetResponseEntityGenerator;
+import es.codeurjc.nexusapp.utilities.responseentity.ResourcesBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -387,5 +387,21 @@ public class UserRestController {
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/{username}/image")
+	public ResponseEntity<Resource> downloadImage(@PathVariable String username) 
+    {
+		Optional<User> user = userService.getUserBy(username);
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+
+        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getProfilePicture());
+        if (profilePicture.isEmpty()) return ResponseEntity.notFound().build();
+
+        return ResourcesBuilder
+            .tryBuildImgResponse(profilePicture)
+            .getOrElse(ResponseEntity.internalServerError().build());
+	}
+
+
 
 }
