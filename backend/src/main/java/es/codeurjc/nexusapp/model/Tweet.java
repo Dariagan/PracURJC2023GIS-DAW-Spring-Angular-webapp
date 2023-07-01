@@ -27,13 +27,15 @@ import lombok.Setter;
 @Entity(name = "Tweet")
 public class Tweet implements Comparable<Tweet>
 {    
-    public interface AuthorView extends User.BasicView{}
-    public interface BasicView {}
-    public interface LikesView extends User.BasicView{}
-    public interface ReportersView extends User.UsernameView{}
-    public interface FullView extends Tweet.AuthorView, Tweet.BasicView, Tweet.LikesView, Tweet.ReportersView {}
+    public interface AuthorView extends User.BasicView {}
+    public interface TweetIdentifyingView {}
+    public interface BasicView extends TweetIdentifyingView{} 
+    public interface UserListsView extends User.UsernameView{}
 
-    @JsonView(BasicView.class)
+    public interface FullView extends Tweet.AuthorView, BasicView, UserListsView  {
+  
+    }
+    @JsonView(TweetIdentifyingView.class)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter private long id;
@@ -45,7 +47,7 @@ public class Tweet implements Comparable<Tweet>
     @JsonView(BasicView.class)
     @Getter private LocalDateTime date;
 
-    @JsonView(ReportersView.class)
+    @JsonView(UserListsView.class)
     @ManyToMany
     @Getter private Set<User> reporters = new HashSet<>();
 
@@ -62,19 +64,21 @@ public class Tweet implements Comparable<Tweet>
     @ElementCollection(fetch = FetchType.EAGER)
     @Getter private Set<String> tags = new HashSet<String>();
 
-    @JsonView(LikesView.class)
+    @JsonView(UserListsView.class) // Update view to LikesView
     @Nullable
     @ManyToMany
-    @Getter private Set<User> likes  = new HashSet<>();
+    @Getter private Set<User> likes = new HashSet<>();
 
+    @JsonView(TweetIdentifyingView.class) // Update view to ReportersView
     @JsonIgnore
     @Nullable
     @OneToMany
     @Getter private List<Tweet> children = new ArrayList<>();
 
+    @JsonView(UserListsView.class) // Update view to SharesView
     @JsonIgnore
     @Nullable
-    @OneToMany(cascade = CascadeType.ALL)  
+    @OneToMany(cascade = CascadeType.ALL)
     @Getter private Set<Tweet> shares = new HashSet<>();
 
     public static class Builder

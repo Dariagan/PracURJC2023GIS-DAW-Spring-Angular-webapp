@@ -5,25 +5,7 @@
 	--right: 189px;
 }
 
-.feedanon-twits {
-  top: 167px;
-  left: 300px;
-  width: 615px;
-  left: calc(50% - var(--thread));
-  display: flex;
-  padding: 0 24px;
-  overflow: hidden;
-  position: absolute;
-  align-items: center;
-  border-color: rgba(83, 76, 134, 1);
-  border-style: dashed;
-  border-width: 2px;
-  border-radius: 50px;
-  flex-direction: column;
-  justify-content: center;
-  background-color: rgba(30, 26, 59, 1);
-  padding-bottom: 40px;
-}
+
 
 /* both left components */
 .feedanon-frame30 {
@@ -70,6 +52,26 @@
   border-width: 0 0 2px 0;
   border-radius: 25px;
   background-color: rgba(30, 26, 59, 1);
+}
+
+.feedanon-twits {
+  top: 167px;
+  left: 300px;
+  width: 615px;
+  left: calc(50% - var(--thread));
+  display: flex;
+  padding: 0 24px;
+  overflow: hidden;
+  position: absolute;
+  align-items: center;
+  border-color: rgba(83, 76, 134, 1);
+  border-style: dashed;
+  border-width: 2px;
+  border-radius: 50px;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(30, 26, 59, 1);
+  padding-bottom: 40px;
 }
 
 @media only screen and (max-width: 1440px) {

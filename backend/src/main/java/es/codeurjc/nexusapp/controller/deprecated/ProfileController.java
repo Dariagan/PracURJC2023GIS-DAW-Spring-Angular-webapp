@@ -63,7 +63,7 @@ public class ProfileController {
                 .of(() -> loggedUserOpt.get().getFollowing().contains(profileUser))
                 .getOrElse(false);
 
-            modelProfile(model, UserService.isOwnResource(username, loggedUserOpt));
+            modelProfile(model, UserService.isAllowed(username, loggedUserOpt));
 
             return "profile";
         } else 
@@ -76,7 +76,7 @@ public class ProfileController {
 		Optional<User> user = userService.getUserBy(username);
         if (user.isEmpty()) return getAnonImage();
 
-        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getProfilePicture());
+        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getImage());
         if (profilePicture.isEmpty()) return getAnonImage();
 
         return ResourcesBuilder
@@ -93,7 +93,7 @@ public class ProfileController {
     @GetMapping("/u/{username}/write")
     public String startWritingTweet(@PathVariable String username, Model model) 
     {
-        if (UserService.isOwnResource(username, loggedUserOpt)) 
+        if (UserService.isAllowed(username, loggedUserOpt)) 
         {
             model.addAttribute("posting", true);
             modelProfile(model, true);
@@ -106,7 +106,7 @@ public class ProfileController {
     public String postTweet(Model model, @PathVariable String username, 
     @RequestParam String text, @RequestParam MultipartFile image) 
     {
-        if (UserService.isOwnResource(username, loggedUserOpt)) 
+        if (UserService.isAllowed(username, loggedUserOpt)) 
         {
             Tweet.Builder builder = 
             new Tweet.Builder()
@@ -132,11 +132,11 @@ public class ProfileController {
     @PostMapping("/u/{username}/profilepicture/update")
     public String uploadProfilePicture(@RequestParam MultipartFile image, @PathVariable String username)
     {     
-        if (UserService.isOwnResource(username, loggedUserOpt))
+        if (UserService.isAllowed(username, loggedUserOpt))
         {
             if (!image.isEmpty()) 
             {
-                Try.run(() -> profileUser.setProfilePicture(
+                Try.run(() -> profileUser.setImage(
                     BlobProxy.generateProxy(image.getInputStream(), image.getSize())
                 ));
 
@@ -150,9 +150,9 @@ public class ProfileController {
     @RequestMapping("/u/{username}/profilepicture/remove")
     public String removeProfilePicture(@PathVariable String username) 
     {
-        if (UserService.isOwnResource(username, loggedUserOpt)) 
+        if (UserService.isAllowed(username, loggedUserOpt)) 
         {
-            profileUser.setProfilePicture(null);
+            profileUser.setImage(null);
             userService.save(profileUser);
             return "profile";
         } 

@@ -11,21 +11,24 @@ import { TweetService } from 'app/services/tweet.service';
 })
 export class FeedComponent {
 
-  displayedTweets?: Tweet[];
+  retrievedTweets:Tweet[] = [];
 
-  currentUser?:User;
+  currentUser?:User = this.loginService.getUser();
 
-  constructor(loginService: LoginService, tweetService: TweetService){
+  constructor(private loginService: LoginService, private tweetService: TweetService){ 
+    
+    this.loadInMoreTweets(0)
+  }
 
-
+  loadInMoreTweets(page: number){ 
     if (this.currentUser)
-      tweetService.getRecommendedTweetsForUser(this.currentUser.name, 0, 10).subscribe(
-        tweets => this.displayedTweets = tweets,
+      this.tweetService.getRecommendedTweetsForUser(this.currentUser.username, page, 10).subscribe(
+        newTweets => this.retrievedTweets = this.retrievedTweets.concat(newTweets),
         error => console.log(error) 
       );
     else
-      tweetService.getTweetsForAnon(0, 10).subscribe(
-        tweets => this.displayedTweets = tweets,
+      this.tweetService.getTweetsForAnon(page, 10).subscribe(
+        newTweets => this.retrievedTweets = this.retrievedTweets.concat(newTweets),
         error => console.log(error) 
       )
   }

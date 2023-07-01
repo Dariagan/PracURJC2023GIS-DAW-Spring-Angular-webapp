@@ -27,11 +27,9 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import ch.qos.logback.core.joran.conditional.ElseAction;
 import es.codeurjc.nexusapp.model.Tweet;
 import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.service.TweetService;
@@ -189,7 +187,7 @@ public class UserRestController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isAllowed(username, loggedUser)) 
         {
             userService.save(loggedUser.get()).save(followed);
             URI location = fromCurrentRequest().path("/{followeduser}")
@@ -219,7 +217,7 @@ public class UserRestController {
 
         if (loggedUserOpt.isPresent() && unfollowedUserOpt.isPresent())
             
-            if (UserService.isOwnResource(username, loggedUserOpt)) 
+            if (UserService.isAllowed(username, loggedUserOpt)) 
             {
                 loggedUserOpt.get().getFollowing().remove(unfollowedUserOpt.get());
                 userService.save(loggedUserOpt.get());
@@ -272,7 +270,7 @@ public class UserRestController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isAllowed(username, loggedUser)) 
         {
             userService.save(loggedUser.get()).save(blocked);
             URI location = fromCurrentRequest().path("/{blockeduser}")
@@ -310,7 +308,7 @@ public class UserRestController {
 
         if (loggedUserOpt.isPresent() && unblockedUserOpt.isPresent())
             
-            if (UserService.isOwnResource(username, loggedUserOpt)) 
+            if (UserService.isAllowed(username, loggedUserOpt)) 
             {
                 loggedUserOpt.get().getBlocked().remove(unblockedUserOpt.get());
                 userService.save(loggedUserOpt.get());
@@ -394,7 +392,7 @@ public class UserRestController {
 		Optional<User> user = userService.getUserBy(username);
         if (user.isEmpty()) return ResponseEntity.notFound().build();
 
-        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getProfilePicture());
+        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getImage());
         if (profilePicture.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResourcesBuilder

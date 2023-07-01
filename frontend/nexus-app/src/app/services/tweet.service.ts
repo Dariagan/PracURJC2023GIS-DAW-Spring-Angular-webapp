@@ -11,6 +11,13 @@ export class TweetService {
 
   constructor(private httpClient: HttpClient) { }
 
+  getTweet(id: number): Observable<Tweet> {
+    const url = "/api/tweets/" + id;
+    return this.httpClient.get<Tweet>(url).pipe(
+      catchError(error => this.handleError<Tweet>(error))
+    );
+  }
+
   getUserTweets(user: string, page: number, size: number): Observable<Tweet[]> {
     let url = "/api/users/" + user + "/tweets?page=" + page + "&size=" + size;
     return this.httpClient.get<Tweet[]>(url).pipe(
@@ -35,23 +42,42 @@ export class TweetService {
   }
 
   likeTweet(tweetId: number, username: string): Observable<any> {
-    let url = `/api/tweets/${tweetId}/likes`;
-    let object = { "username": username }
-    let httpOptions = {
+    const url = `/api/tweets/${tweetId}/likes`;
+    const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-    }
-    return this.httpClient.post(url, object, httpOptions).pipe(
+    };
+    const requestBody = { "text": username };
+    return this.httpClient.post(url, requestBody, httpOptions).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
+  unlikeTweet(tweetId: number, username: string): Observable<any> {
+    const url = `/api/tweets/${tweetId}/likes/${username}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    };
+    return this.httpClient.delete(url, httpOptions).pipe(
       catchError(error => this.handleError<any>(error))
     );
   }
 
   reportTweet(tweetId: number, username: string): Observable<any> {
-    let url = `/api/tweets/${tweetId}/reports`;
-    let object = { "username": username }
-    let httpOptions = {
+    const url = `/api/tweets/${tweetId}/reports`;
+    const requestBody = { "text": username }
+    const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }
-    return this.httpClient.post(url, object, httpOptions).pipe(
+    return this.httpClient.post(url, requestBody, httpOptions).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  } 
+
+  deleteTweet(tweetId: number, username: string): Observable<any> {
+    const url = `/api/tweets/${tweetId}`;
+    const httpOptions = {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }
+    return this.httpClient.delete(url, httpOptions).pipe(
       catchError(error => this.handleError<any>(error))
     );
   } 

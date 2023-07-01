@@ -145,9 +145,9 @@ public final class UserService implements EntityService<User>
         return userOpt.isPresent() && userOpt.get().isAdmin();
     }
 
-    public static boolean isOwnResource(String resourceUsername, Optional<User> loggedUser)
+    public static boolean isAllowed(String ownerUsername, Optional<User> loggedUser)
     {
-        return loggedUser.isPresent() && loggedUser.get().getUsername().equals(resourceUsername);
+        return loggedUser.isPresent() && loggedUser.get().getUsername().equals(ownerUsername);
     }
 
     public static String redirectToReferer(HttpServletRequest req)

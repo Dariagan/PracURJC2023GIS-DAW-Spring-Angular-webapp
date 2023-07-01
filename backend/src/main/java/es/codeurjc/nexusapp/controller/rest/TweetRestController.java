@@ -1,15 +1,13 @@
 package es.codeurjc.nexusapp.controller.rest;
 
 import java.net.URI;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -36,12 +34,13 @@ import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.service.TweetService;
 import es.codeurjc.nexusapp.service.UserService;
 import es.codeurjc.nexusapp.utilities.PageableUtil;
+import es.codeurjc.nexusapp.utilities.dtos.JsonString;
+import es.codeurjc.nexusapp.utilities.dtos.TweetDto;
 import es.codeurjc.nexusapp.utilities.queriers.LikesQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.ReportersQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.TweetQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.UserQuerier;
 import es.codeurjc.nexusapp.utilities.responseentity.GetResponseEntityGenerator;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
@@ -68,16 +67,15 @@ public class TweetRestController {
         ),
         @ApiResponse(responseCode = "400", description = "Id is not an integer", content = @Content),
         @ApiResponse(responseCode = "404", description = "Not found", content = @Content)})
-    @JsonView(Tweet.FullView.class)
     @GetMapping("/{id}")
-    public ResponseEntity<Tweet> getTweetById(@PathVariable String id) 
+    public ResponseEntity<TweetDto> getTweetById(@PathVariable long id) 
     {
         try
         {
             Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
             
             if (tweetOpt.isPresent()) 
-                return new ResponseEntity<>(tweetOpt.get(), HttpStatus.OK);
+                return new ResponseEntity<>(new TweetDto(tweetOpt.get()), HttpStatus.OK);
             else 
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } 
@@ -124,11 +122,10 @@ public class TweetRestController {
             @ApiResponse(responseCode = "400", description = "Invalid id given", content = @Content),
             @ApiResponse(responseCode = "404",description = "Not found",content = @Content)})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Tweet> deleteTweet(@RequestParam String id, HttpServletRequest request) 
+    public ResponseEntity<Tweet> deleteTweet(@RequestParam long id, HttpServletRequest request) 
     {
         Optional <User> userOpt = userService.getUserBy(request);
-        try 
-        {
+        try {
             Optional <Tweet> tweetOpt = tweetService.getTweetBy(id);
 
             if(TweetService.isAllowedToDelete(tweetOpt.get(), userOpt)) 
@@ -140,12 +137,9 @@ public class TweetRestController {
                 }
                 else return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             } 
-            else return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            else return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         } 
-        catch (NumberFormatException e)
-        {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        catch (NumberFormatException e){return ResponseEntity.badRequest().build();}
     }
     
     @Operation(summary = "Get tweets from pageable params")
@@ -164,18 +158,23 @@ public class TweetRestController {
             content = @Content
         )
     }) 
-    @JsonView(Tweet.FullView.class)
     @GetMapping("")
-    public ResponseEntity<List<Tweet>> getAll(
+    public ResponseEntity<List<TweetDto>> getAll(
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction) 
     {   
-        return new ResponseEntity<>(
-            tweetService
+        List<Tweet> foundTweets = tweetService
             .getAll(PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
-            .getContent(), 
+            .getContent();
+
+        ArrayList<TweetDto> dtos = new ArrayList<>();
+        for (Tweet tweet: foundTweets)    
+            dtos.add(new TweetDto(tweet));
+
+        return new ResponseEntity<>(
+            dtos, 
             HttpStatus.OK
             );
     }
@@ -203,14 +202,14 @@ public class TweetRestController {
     })
     @JsonView(User.UsernameView.class)
     @GetMapping("/{id}/likes")
-    public ResponseEntity<Object> getLikesByTweetId(@PathVariable String id,
+    public ResponseEntity<Object> getLikesByTweetId(@PathVariable long id,
         @RequestParam(value = "page", defaultValue = "0") int page,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam Optional<String> user) 
     {
         var reg = new GetResponseEntityGenerator<Tweet, User>(new TweetQuerier(tweetService), new UserQuerier(userService));
 
-        return reg.generateResponseEntity(id, page, size, Optional.empty(), new LikesQuerier(tweetService));
+        return reg.generateResponseEntity(String.valueOf(id), page, size, Optional.empty(), new LikesQuerier(tweetService));
     }
 
     @Operation(summary = "POST liking user to tweet's likelist")
@@ -234,24 +233,27 @@ public class TweetRestController {
         )
     })
     @PostMapping("/{id}/likes")
-    public ResponseEntity<Tweet> likeTweet(@PathVariable String id, @RequestBody String username) 
+    public ResponseEntity<Tweet> likeTweet(@RequestBody JsonString username, @PathVariable long id,  HttpServletRequest req) 
     {
         try 
-        {
+        {   
             Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
-            Optional<User> userOpt = userService.getUserBy(username);
-
+            Optional<User> userOpt = userService.getUserBy(username.toString());
             if (tweetOpt.isPresent() && userOpt.isPresent())
             {
-                Tweet tweet = tweetOpt.get();
-                tweet.getLikes().add(userOpt.get());
-                tweetService.save(tweet);
-                URI location = fromCurrentRequest().path("/{id}/likes/{username}")
-                    .buildAndExpand(tweet.getId(), username).toUri();
+                if (UserService.isAllowed(username.toString(), userService.getUserBy(req)))
+                {
+                    Tweet tweet = tweetOpt.get();
+                    tweet.getLikes().add(userOpt.get());
+                    tweetService.save(tweet);
+                    URI location = fromCurrentRequest().path("/{id}/likes/{username}")
+                        .buildAndExpand(tweet.getId(), username).toUri();
 
-                return ResponseEntity.created(location).body(tweet);
+                    return ResponseEntity.created(location).body(tweet);
+                }
+                else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
             } 
-            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);        
         }
         catch (NumberFormatException e)
         {
@@ -287,7 +289,7 @@ public class TweetRestController {
     @DeleteMapping("/{id}/likes/{username}")
     public ResponseEntity<Tweet> unlikeTweet(
         HttpServletRequest request,
-        @PathVariable String id,
+        @PathVariable long id,
         @PathVariable String username) 
     {
         Optional<User> userOpt = userService.getUserBy(request);
@@ -297,7 +299,7 @@ public class TweetRestController {
 
             if (tweetOpt.isPresent() && userOpt.isPresent())
             {
-                if (UserService.isOwnResource(username, userOpt))
+                if (UserService.isAllowed(username, userOpt))
                 {
                     Tweet tweet = tweetOpt.get();
                     tweet.getLikes().remove(userOpt.get());
@@ -308,10 +310,7 @@ public class TweetRestController {
             } 
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        catch (NumberFormatException e)
-        {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        catch (NumberFormatException e){return new ResponseEntity<>(HttpStatus.BAD_REQUEST);}
     }
 
     @Operation(summary = "Get reporters of a tweet by tweet id")
@@ -336,16 +335,16 @@ public class TweetRestController {
         )
     })
     @JsonView(User.UsernameView.class)
-    @GetMapping("/{id}/reporters")
+    @GetMapping("/{id}/reports")
     public ResponseEntity<Object> getReportersByTweetId(
-        @PathVariable String id,
+        @PathVariable long id,
         @RequestParam(value = "page", defaultValue = "0") int page,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam Optional<String> user) 
     {
         var greg = new GetResponseEntityGenerator<Tweet, User>(new TweetQuerier(tweetService), new UserQuerier(userService));
 
-        return greg.generateResponseEntity(id, page, size, user, new ReportersQuerier(tweetService));
+        return greg.generateResponseEntity(String.valueOf(id), page, size, user, new ReportersQuerier(tweetService));
     }
 
     @Operation(summary = "POST reporting user to tweet's reportlist")
@@ -368,50 +367,44 @@ public class TweetRestController {
             content = @Content
         )
     })
-    @PostMapping("/{id}/reporters")
-    public ResponseEntity<Tweet> reportTweet(@PathVariable String id, @RequestBody String username) 
+    @PostMapping("/{id}/reports")
+    public ResponseEntity<Tweet> reportTweet(@PathVariable long id, HttpServletRequest request) 
     {
         try 
         {
             Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
-            Optional<User> userOpt = userService.getUserBy(username);
+            Optional<User> userOpt = userService.getUserBy(request);
 
-            if (tweetOpt.isPresent() && userOpt.isPresent())
-            {
-                Tweet tweet = tweetOpt.get();
-                tweet.getReporters().add(userOpt.get());
-                tweetService.save(tweet);
-                URI location = fromCurrentRequest().path("/{id}/reporters/{username}")
-                    .buildAndExpand(tweet.getId(), username).toUri();
+            if (userOpt.isPresent())
+                if (tweetOpt.isPresent())
+                {
+                    Tweet tweet = tweetOpt.get();
+                    tweet.getReporters().add(userOpt.get());
+                    tweetService.save(tweet);
+                    URI location = fromCurrentRequest().path("/{id}/reports/{username}")
+                        .buildAndExpand(tweet.getId(), userOpt.get()).toUri();
 
-                return ResponseEntity.created(location).body(tweet);
-            } 
-            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                    return ResponseEntity.created(location).body(tweet);
+                
+                } else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        catch (NumberFormatException e)
-        {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        catch (EmptyResultDataAccessException e) 
-        {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        catch (NumberFormatException e){return new ResponseEntity<>(HttpStatus.BAD_REQUEST);}
+        catch (EmptyResultDataAccessException e) {return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);}
     }
 
     @GetMapping("/{id}/image")
-	public ResponseEntity<Object> downloadImage(@PathVariable String id) throws SQLException {
+	public ResponseEntity<Object> downloadImage(@PathVariable long id) throws SQLException {
 
 		Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
 
-		if (tweetOpt.isPresent() && tweetOpt.get().hasMedia()) {
-
+		if (tweetOpt.isPresent() && tweetOpt.get().hasMedia()) 
+        {
 			Resource file = new InputStreamResource(tweetOpt.get().getMedia().getBinaryStream());
 
 			return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
 					.contentLength(tweetOpt.get().getMedia().length()).body(file);
 
-		} else {
-			return ResponseEntity.notFound().build();
-		}
+		} else return ResponseEntity.notFound().build();
 	}
 }

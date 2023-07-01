@@ -12,6 +12,7 @@ import { FeedComponent } from './components/feed/feed.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { TweetComponent } from './components/tweet/tweet.component';
+import { ThreadComponent } from './components/thread/thread.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { TweetComponent } from './components/tweet/tweet.component';
     ProfileComponent,
     SignUpComponent,
     TweetComponent,
+    ThreadComponent,
   ],
   imports: [
     BrowserModule,

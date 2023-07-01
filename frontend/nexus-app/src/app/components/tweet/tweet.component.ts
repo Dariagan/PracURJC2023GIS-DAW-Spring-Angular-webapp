@@ -18,14 +18,13 @@ export class TweetComponent {
   tweet?: Tweet;
 
   authorBanned:boolean = this.tweet?.author.role == 'BANNED';
-  
-  adminView:boolean = this.tweet?.author.role === 'ADMIN';
+  viewerIsAdmin:boolean = this.tweet?.author.role === 'ADMIN';
 
-  tweetMediaError:boolean = false;
-  userImageError:boolean = false;
+  displayTweetMedia?:boolean = this.tweet?.hasMedia;
+  displayUserImage?:boolean = this.tweet?.author.hasImage;
 
   viewingUser?:User = this.loginService.getUser();
-  ownTweet:boolean = this.viewingUser != undefined && this.tweet?.author == this.viewingUser;
+  ownTweet:boolean = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;
 
   constructor(private loginService:LoginService, private tweetService:TweetService, private userService:UserService, private router: Router){
     
@@ -46,40 +45,51 @@ export class TweetComponent {
   }
 
   handleTweetMediaError(){
-    this.tweetMediaError = true;
+    this.displayTweetMedia = false;
    }
-
   handleUserImageError(){
-    this.userImageError = true;
+    this.displayUserImage = false;
   }
 
   like() {
     if(this.viewingUser && !this.ownTweet && this.tweet){
-      this.tweetService.likeTweet(this.tweet.id, this.viewingUser.username)
+      const i: number = this.tweet.likes.indexOf(this.viewingUser.username);
+      if (i !== -1){
+        this.tweet.likes.splice(i, 1);
+        this.tweetService.unlikeTweet(this.tweet.id, this.viewingUser.username).subscribe();
+      }else{
+        this.tweet.likes.push(this.viewingUser.username)
+        this.tweetService.likeTweet(this.tweet.id, this.viewingUser.username).subscribe();
+      }
     }else{
       this.router.navigateByUrl(`login`);
     }
-  }
-
-  //TODO
-  share() {
-  }
-
-  //TODO
-  reply(){
   }
 
   report() {
-    if(this.viewingUser && !this.ownTweet && this.tweet){
-      this.tweetService.reportTweet(this.tweet.id, this.viewingUser.username)
+    console.log("sadsd")
+    if(this.viewingUser){
+      if(this.tweet && !this.ownTweet && !this.tweet.reporters.includes(this.viewingUser.username)){
+        this.tweet.reporters.push(this.viewingUser.username)
+        this.tweetService.reportTweet(this.tweet.id, this.viewingUser.username).subscribe();
+      }
     }else{
       this.router.navigateByUrl(`login`);
     }
   }
 
+
+  share() {
+  }
+  reply(){
+  }
+
+  
+
   delete() {
-    // Emit an event with the tweet ID
-    // Example: this.deleteTweet.emit(tweetId);
+    if(this.tweet && this.viewingUser && this.viewerIsAdmin){
+      this.tweetService.deleteTweet(this.tweet.id, this.viewingUser.username).subscribe
+    }
   }
 
 

@@ -1,32 +1,32 @@
 <div class="profileanon-twit">
   <div class="profileanon-op1">
-	<div class="extraimg">
-    <ng-container *ngIf="!userImageError; else defaultPic">
-      <img
-      [src]="getUserImageURL()"
-      class="profileanon-img1"
-      (error)="handleUserImageError()"
-      />
-    </ng-container>
-    <ng-template #defaultPic>
-      <img
-      src="/assets/anonpfp.jpg"
-      alt="imgI135"
-      class="profileanon-img1"
-      />
-    </ng-template>
-	</div>
-	<div class="profileanon-nameanddate1">
-	  <span class="profileanon-text012">
-	        {{tweet?.date}}
-	  </span>
-    <a *ngIf="!authorBanned"  [routerLink]="['/u/', tweet?.author?.username]" class="profileanon-text014">
-        {{tweet?.author?.username}}		
-    </a>
-    <span *ngIf="authorBanned" class="profileanon-text014">
-        [banned]
-    </span>
-	</div>
+    <div class="extraimg">
+      <ng-container *ngIf="displayUserImage; else defaultPic">
+        <img
+        [src]="getUserImageURL()"
+        class="profileanon-img1"
+        (error)="handleUserImageError()"
+        />
+      </ng-container>
+      <ng-template #defaultPic>
+        <img
+        src="/assets/anonpfp.jpg"
+        alt="imgI135"
+        class="profileanon-img1"
+        />
+      </ng-template>
+    </div>
+    <div class="profileanon-nameanddate1">
+      <span class="profileanon-text012">
+            {{tweet?.date}}
+      </span>
+      <a *ngIf="!authorBanned"  [routerLink]="['/u/', tweet?.author?.username]" class="profileanon-text014">
+          {{tweet?.author?.username}}		
+      </a>
+      <span *ngIf="authorBanned" class="profileanon-text014">
+          [banned]
+      </span>
+    </div>
 
     <div class="profileanon-interactions1" *ngIf="!authorBanned">
         <span class="profileanon-text016">{{tweet?.likes?.length}}</span>
@@ -57,18 +57,31 @@
         />
         
 
-        <ng-container *ngIf="(!adminView || tweet?.reporters?.length == 0) && !ownTweet; else reported">
-            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">report</span>  
+        <div *ngIf="!viewerIsAdmin && !ownTweet; else removeable" (click)="report()">
+          <ng-container *ngIf="viewingUser && !tweet?.reporters?.includes(viewingUser.username); else alreadyReported">
+            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">
+              report
+            </span>
             <img
-                (click)="report()"
-                src="/assets/tweet/report.png"
-                alt="report"
-                class="profileanon-iconsax-linearmessage1"
-            />
-        </ng-container>
-        <ng-template #reported>
+              src="/assets/tweet/report.png"
+              alt="report"
+              class="profileanon-iconsax-linearmessage1"
+          />
+          </ng-container>
+          <ng-template #alreadyReported>
+            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">
+              reported.
+            </span>
+          </ng-template>  
+        </div>
+        <ng-template #removeable>
+          <ng-container *ngIf="!viewerIsAdmin; else adminRemoveable">
+            <span style="margin-left: 15px" class="profileanon-text020">delete</span>  
+          </ng-container>
+          <ng-template #adminRemoveable>
             <span style="margin-left: 15px" class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
-            <img
+          </ng-template>
+          <img
                 (click)="delete()"
                 src="/assets/tweet/delete.png"
                 alt="delete"
@@ -80,26 +93,24 @@
   </div>
   <div class="profileanon-post1">
     <div class="profileanon-content1">
-      <span *ngIf="!authorBanned" class="profileanon-text022">
-      <ng-container>
-        {{tweet?.text}}
-      </ng-container>
-      <ng-container *ngIf="authorBanned">
-        This user has been banned.
+      <span class="profileanon-text022">
+        <ng-container *ngIf="!authorBanned">
+          {{tweet?.text}}
+        </ng-container>
+        <ng-container *ngIf="authorBanned">
+          This user has been banned.
         </ng-container>
       </span>
     </div>
   </div>
 
-  <div *ngIf="!authorBanned && !tweetMediaError" class="profileanon-img2">
+  <div *ngIf="!authorBanned && displayTweetMedia" class="profileanon-img2">
     <div class="profileanon-img3">
-      <span >
       <img
         [src]="getTweetMediaURL()"
         class="profileanon-i-m-a-g-e95537386p11"
         (error)="handleTweetMediaError()"
       />
-      </span>
     </div>                        
     <div class="profileanon-thread2"></div>
   </div>

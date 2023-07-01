@@ -3,6 +3,7 @@ export interface User {
     name: string;
     email: string;
     description: string;
+    hasImage:boolean;
     signUpDate: Date;
     role: string;
     tweets: [];

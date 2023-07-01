@@ -71,7 +71,7 @@ public class User implements UserDetails
     @Nullable
     @Lob
     @JsonIgnore
-    @Getter @Setter private Blob profilePicture;
+    @Getter @Setter private Blob image;
 
     @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
@@ -155,7 +155,7 @@ public class User implements UserDetails
         this.encodedPassword = encodedPassword;
         this.name = name;
         this.description = description;
-        this.profilePicture = null;
+        this.image = null;
 
         if (admin) this.role = Role.ADMIN;
         else this.role = Role.USER;
@@ -165,7 +165,7 @@ public class User implements UserDetails
     public void unban() { role = Role.USER; }
     public boolean isBanned() { return role == Role.BANNED; }
 
-    public boolean hasProfilePicture() {return profilePicture != null;}
+    public boolean hasImage() {return image != null;}
 
     public boolean isAdmin() { return role == Role.ADMIN; }
     public void setAdmin() { role = Role.ADMIN; }
