@@ -103,6 +103,13 @@ public final class UserService implements EntityService<User>
         return this;
     }
 
+    public UserService flush()
+    {
+        userRepository.flush();
+        return this;
+    }
+
+
     public UserService save(OptTwo<User> users){
         users.forEach(userRepository::save);
         return this;
@@ -111,6 +118,7 @@ public final class UserService implements EntityService<User>
     public UserService delete(User user)
     {
         userRepository.delete(user);
+        userRepository.flush();
         return this;
     }
 
@@ -145,7 +153,7 @@ public final class UserService implements EntityService<User>
         return userOpt.isPresent() && userOpt.get().isAdmin();
     }
 
-    public static boolean isAllowed(String ownerUsername, Optional<User> loggedUser)
+    public static boolean isOwnResource(String ownerUsername, Optional<User> loggedUser)
     {
         return loggedUser.isPresent() && loggedUser.get().getUsername().equals(ownerUsername);
     }

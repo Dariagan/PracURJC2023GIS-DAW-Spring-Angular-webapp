@@ -107,6 +107,7 @@
     height: 18px;
     position: relative;
     margin-right: 15px;
+    cursor: pointer;
   }
   .profileanon-text018 {
     color: rgba(116, 179, 206, 1);

@@ -58,7 +58,7 @@ public class Tweet implements Comparable<Tweet>
     @Nullable
     @Lob
     @JsonIgnore
-    @Getter private Blob media;
+    @Getter @Setter private Blob media;
 
     @JsonView(BasicView.class)
     @ElementCollection(fetch = FetchType.EAGER)

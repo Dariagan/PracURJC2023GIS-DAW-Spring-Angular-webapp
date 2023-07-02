@@ -83,8 +83,10 @@ public final class TweetService implements EntityService<Tweet>
 
     public void delete(Optional<Tweet> tweet) 
     {
-        if (tweet.isPresent() && readIfPostShouldGetDeleted(tweet.get().getId()))
+        if (tweet.isPresent() && readIfPostShouldGetDeleted(tweet.get().getId())){
             tweetRepository.delete(tweet.get());
+            tweetRepository.flush();
+        }
     }
 
     public Page<Tweet> getFollowedUsersTweets(Optional<User> userOpt, Pageable pageable)
@@ -152,6 +154,7 @@ public final class TweetService implements EntityService<Tweet>
     public TweetService delete(Tweet tweet)
     {
         tweetRepository.delete(tweet);
+        tweetRepository.flush();
         return this;
     }	
    

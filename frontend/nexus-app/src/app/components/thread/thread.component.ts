@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-thread',
@@ -8,20 +9,29 @@ import { Tweet } from 'app/models/tweet.model';
 })
 export class ThreadComponent {
 
+  displayedTweets: Tweet[] = [];
+
   @Input()
-  displayedTweets!: Tweet[];
+  tweetRetrievalMethod!: (page: number, size: number) => Observable<Tweet[]>;
 
-  page:number = 0;
-
-  @Output()
-  moreTweetsClicked = new EventEmitter<number>();
+  page: number = 0;
+  size: number = 10;
 
   constructor(){
-  
   }
 
+  ngOnInit(): void {
+    this.showMoreTweets()
+  }
+  
   showMoreTweets(){
+    this.tweetRetrievalMethod(this.page, this.size).subscribe(
+      newTweets => this.displayedTweets = this.displayedTweets.concat(newTweets)
+    )
     this.page++;
-    this.moreTweetsClicked.emit(this.page);
+  }
+
+  removeTweetFromList(id: number){
+    this.displayedTweets = this.displayedTweets.filter(tweet => tweet.id !== id);
   }
 }

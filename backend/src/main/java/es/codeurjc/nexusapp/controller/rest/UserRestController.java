@@ -22,11 +22,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -35,6 +37,7 @@ import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.service.TweetService;
 import es.codeurjc.nexusapp.service.UserService;
 import es.codeurjc.nexusapp.utilities.PageableUtil;
+import es.codeurjc.nexusapp.utilities.dtos.UserDto;
 import es.codeurjc.nexusapp.utilities.queriers.AuthorTweetsQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.BlockQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.FollowedUsersTweetsQuerier;
@@ -46,10 +49,9 @@ import es.codeurjc.nexusapp.utilities.responseentity.ResourcesBuilder;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
+import io.vavr.control.Try;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 
@@ -73,13 +75,12 @@ public class UserRestController {
         ),
         @ApiResponse(
             responseCode = "404", description = "Not found", content = @Content)})
-    @JsonView(User.FullView.class)
     @GetMapping("/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
         Optional<User> userOpt = userService.getUserBy(username);
         if (userOpt.isPresent()) 
         {
-            return new ResponseEntity<>(userOpt.get(), HttpStatus.OK);
+            return new ResponseEntity<>(new UserDto(userOpt.get()), HttpStatus.OK);
         } 
         else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -187,7 +188,7 @@ public class UserRestController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        if (UserService.isAllowed(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUser)) 
         {
             userService.save(loggedUser.get()).save(followed);
             URI location = fromCurrentRequest().path("/{followeduser}")
@@ -209,23 +210,20 @@ public class UserRestController {
     @DeleteMapping("/{username}/blocked/{unfollowed}")
     public ResponseEntity<User> unfollowUser(
         HttpServletRequest request, 
-        @PathVariable String username,
         @PathVariable String unblocked) 
     {
         Optional<User> loggedUserOpt = userService.getUserBy(request);
         Optional<User> unfollowedUserOpt = userService.getUserBy(unblocked);
 
-        if (loggedUserOpt.isPresent() && unfollowedUserOpt.isPresent())
-            
-            if (UserService.isAllowed(username, loggedUserOpt)) 
+        if (loggedUserOpt.isPresent())
+            if (unfollowedUserOpt.isPresent() && 
+            loggedUserOpt.get().getFollowing().remove(unfollowedUserOpt.get())) 
             {
-                loggedUserOpt.get().getFollowing().remove(unfollowedUserOpt.get());
                 userService.save(loggedUserOpt.get());
                 return new ResponseEntity<>(null, HttpStatus.OK);
             } 
-            else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
-        else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @Operation(summary = "GET blocklist of pathvariable username")
@@ -270,7 +268,7 @@ public class UserRestController {
     {
         Optional<User> loggedUser = userService.getUserBy(request);
 
-        if (UserService.isAllowed(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUser)) 
         {
             userService.save(loggedUser.get()).save(blocked);
             URI location = fromCurrentRequest().path("/{blockeduser}")
@@ -308,7 +306,7 @@ public class UserRestController {
 
         if (loggedUserOpt.isPresent() && unblockedUserOpt.isPresent())
             
-            if (UserService.isAllowed(username, loggedUserOpt)) 
+            if (UserService.isOwnResource(username, loggedUserOpt)) 
             {
                 loggedUserOpt.get().getBlocked().remove(unblockedUserOpt.get());
                 userService.save(loggedUserOpt.get());
@@ -375,15 +373,15 @@ public class UserRestController {
         ),
         @ApiResponse(
             responseCode = "404", description = "User not found", content = @Content)})
-    @JsonView(User.FullView.class)
     @GetMapping("/me")
-    public ResponseEntity<User> getLoggedUser(HttpServletRequest request) 
+    public ResponseEntity<UserDto> getLoggedUser(HttpServletRequest request) 
     {
-        Optional<User> userOpt = userService.getUserBy(request);
-        System.out.println(request.getUserPrincipal().getName());
-        return userOpt
-            .map(ResponseEntity::ok)
-            .orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<User> userOpt = userService.getUserBy(request);        
+        
+        if (userOpt.isPresent())
+            return new ResponseEntity<>(new UserDto(userOpt.get()), HttpStatus.OK); 
+        else
+            return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{username}/image")
@@ -392,14 +390,37 @@ public class UserRestController {
 		Optional<User> user = userService.getUserBy(username);
         if (user.isEmpty()) return ResponseEntity.notFound().build();
 
-        Optional<Blob> profilePicture = Optional.ofNullable(user.get().getImage());
-        if (profilePicture.isEmpty()) return ResponseEntity.notFound().build();
+        Optional<Blob> image = Optional.ofNullable(user.get().getImage());
+        if (image.isEmpty()) return ResponseEntity.notFound().build();
 
         return ResourcesBuilder
-            .tryBuildImgResponse(profilePicture)
+            .tryBuildImgResponse(image)
             .getOrElse(ResponseEntity.internalServerError().build());
 	}
 
+    @PostMapping("/{username}/image")
+	public ResponseEntity<Object> uploadImage(@PathVariable String username, @RequestBody MultipartFile imageFile, HttpServletRequest request)
+    {
+		Optional<User> user = userService.getUserBy(username);
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
 
+        if(UserService.isOwnResource(username, user)){
+
+            URI location = fromCurrentRequest().build().toUri();
+
+            if (!imageFile.isEmpty()) 
+            {
+                try {
+                    user.get().setImage(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
+                    userService.save(user.get());
+
+                    return ResponseEntity.created(location).build();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return new ResponseEntity<Object>(location, null, HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }	return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+        } else return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
+	}
 
 }

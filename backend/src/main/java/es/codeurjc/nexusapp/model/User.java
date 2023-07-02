@@ -71,7 +71,16 @@ public class User implements UserDetails
     @Nullable
     @Lob
     @JsonIgnore
-    @Getter @Setter private Blob image;
+    private Blob image;
+    
+    
+
+    public Blob getImage() {
+        return image;
+    }
+    public void setImage(Blob image) {
+        this.image = image;
+    }
 
     @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
@@ -81,6 +90,8 @@ public class User implements UserDetails
     @Nullable
     @ManyToMany
     @Getter private Set<User> following = new HashSet<>();
+
+    //PREGUNTAR CHATGPT COMO PONER LOS FOLLOWERS SIN Q HAYA DUPLICACIONES EN LA BD
 
     @JsonIgnore
     @Nullable

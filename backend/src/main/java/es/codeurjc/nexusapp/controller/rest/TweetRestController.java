@@ -1,5 +1,6 @@
 package es.codeurjc.nexusapp.controller.rest;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
-
+import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -26,6 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
@@ -122,7 +124,7 @@ public class TweetRestController {
             @ApiResponse(responseCode = "400", description = "Invalid id given", content = @Content),
             @ApiResponse(responseCode = "404",description = "Not found",content = @Content)})
     @DeleteMapping("/{id}")
-    public ResponseEntity<Tweet> deleteTweet(@RequestParam long id, HttpServletRequest request) 
+    public ResponseEntity<Tweet> deleteTweet(@PathVariable long id, HttpServletRequest request) 
     {
         Optional <User> userOpt = userService.getUserBy(request);
         try {
@@ -241,7 +243,7 @@ public class TweetRestController {
             Optional<User> userOpt = userService.getUserBy(username.toString());
             if (tweetOpt.isPresent() && userOpt.isPresent())
             {
-                if (UserService.isAllowed(username.toString(), userService.getUserBy(req)))
+                if (UserService.isOwnResource(username.toString(), userService.getUserBy(req)))
                 {
                     Tweet tweet = tweetOpt.get();
                     tweet.getLikes().add(userOpt.get());
@@ -299,7 +301,7 @@ public class TweetRestController {
 
             if (tweetOpt.isPresent() && userOpt.isPresent())
             {
-                if (UserService.isAllowed(username, userOpt))
+                if (UserService.isOwnResource(username, userOpt))
                 {
                     Tweet tweet = tweetOpt.get();
                     tweet.getLikes().remove(userOpt.get());
@@ -406,5 +408,20 @@ public class TweetRestController {
 					.contentLength(tweetOpt.get().getMedia().length()).body(file);
 
 		} else return ResponseEntity.notFound().build();
+	}
+
+    @PostMapping("/{id}/image")
+	public ResponseEntity<Object> uploadImage(@PathVariable long id, @RequestBody MultipartFile imageFile)
+			throws IOException {
+
+		Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
+        if (tweetOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        URI location = fromCurrentRequest().build().toUri();
+
+		tweetOpt.get().setMedia(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
+		tweetService.save(tweetOpt.get());
+
+		return ResponseEntity.created(location).build();
 	}
 }

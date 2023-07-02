@@ -63,7 +63,7 @@ public class ProfileController {
                 .of(() -> loggedUserOpt.get().getFollowing().contains(profileUser))
                 .getOrElse(false);
 
-            modelProfile(model, UserService.isAllowed(username, loggedUserOpt));
+            modelProfile(model, UserService.isOwnResource(username, loggedUserOpt));
 
             return "profile";
         } else 
@@ -93,7 +93,7 @@ public class ProfileController {
     @GetMapping("/u/{username}/write")
     public String startWritingTweet(@PathVariable String username, Model model) 
     {
-        if (UserService.isAllowed(username, loggedUserOpt)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
             model.addAttribute("posting", true);
             modelProfile(model, true);
@@ -106,7 +106,7 @@ public class ProfileController {
     public String postTweet(Model model, @PathVariable String username, 
     @RequestParam String text, @RequestParam MultipartFile image) 
     {
-        if (UserService.isAllowed(username, loggedUserOpt)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
             Tweet.Builder builder = 
             new Tweet.Builder()
@@ -132,7 +132,7 @@ public class ProfileController {
     @PostMapping("/u/{username}/profilepicture/update")
     public String uploadProfilePicture(@RequestParam MultipartFile image, @PathVariable String username)
     {     
-        if (UserService.isAllowed(username, loggedUserOpt))
+        if (UserService.isOwnResource(username, loggedUserOpt))
         {
             if (!image.isEmpty()) 
             {
@@ -150,7 +150,7 @@ public class ProfileController {
     @RequestMapping("/u/{username}/profilepicture/remove")
     public String removeProfilePicture(@PathVariable String username) 
     {
-        if (UserService.isAllowed(username, loggedUserOpt)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
             profileUser.setImage(null);
             userService.save(profileUser);

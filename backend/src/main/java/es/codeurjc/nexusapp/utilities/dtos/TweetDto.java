@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import es.codeurjc.nexusapp.model.Tweet;
 import es.codeurjc.nexusapp.model.User;
 import lombok.Getter;

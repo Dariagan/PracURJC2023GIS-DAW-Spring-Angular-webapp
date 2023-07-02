@@ -3,6 +3,7 @@ import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
 import { LoginService } from 'app/services/login.service';
 import { TweetService } from 'app/services/tweet.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-feed',
@@ -13,25 +14,13 @@ export class FeedComponent {
 
   retrievedTweets:Tweet[] = [];
 
-  currentUser?:User = this.loginService.getUser();
+  viewingUser?:User = this.loginService.getUser();
+
+  getTweetsMethod: (page: number, size: number) => Observable<Tweet[]>;
 
   constructor(private loginService: LoginService, private tweetService: TweetService){ 
-    
-    this.loadInMoreTweets(0)
+    this.getTweetsMethod = this.viewingUser
+      ? (page: number) => this.tweetService.getRecommendedTweetsForUser(this.viewingUser!.username, page, 10)
+      : (page: number) => this.tweetService.getTweetsForAnon(page, 10);
   }
-
-  loadInMoreTweets(page: number){ 
-    if (this.currentUser)
-      this.tweetService.getRecommendedTweetsForUser(this.currentUser.username, page, 10).subscribe(
-        newTweets => this.retrievedTweets = this.retrievedTweets.concat(newTweets),
-        error => console.log(error) 
-      );
-    else
-      this.tweetService.getTweetsForAnon(page, 10).subscribe(
-        newTweets => this.retrievedTweets = this.retrievedTweets.concat(newTweets),
-        error => console.log(error) 
-      )
-  }
-
-
 }

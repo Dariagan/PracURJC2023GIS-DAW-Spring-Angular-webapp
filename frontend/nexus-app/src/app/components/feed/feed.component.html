@@ -40,12 +40,12 @@
 
   <body>
       <app-nav>
-        <app-nav-button [url]="'/u/'+currentUser?.username" [buttonText]="'Profile'"></app-nav-button>
+        <app-nav-button [url]="'/u/'+viewingUser?.username" [buttonText]="'Profile'"></app-nav-button>
         <app-nav-button [url]="'/logout'" [buttonText]="'Log out'"></app-nav-button>
       </app-nav>
       <div class="feedanon-container">
         <div class="feedanon-feedanon">
-          <app-thread [displayedTweets]="retrievedTweets" (moreTweetsClicked)="loadInMoreTweets($event)">
+          <app-thread [tweetRetrievalMethod]="getTweetsMethod">
           </app-thread>
           <div class="feedanon-trending">
             <span class="feedanon-text050"><span>Trending</span></span>

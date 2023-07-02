@@ -1,31 +1,14 @@
 <div class="profileanon-twit">
   <div class="profileanon-op1">
-    <div class="extraimg">
-      <ng-container *ngIf="displayUserImage; else defaultPic">
-        <img
-        [src]="getUserImageURL()"
-        class="profileanon-img1"
-        (error)="handleUserImageError()"
-        />
-      </ng-container>
-      <ng-template #defaultPic>
-        <img
-        src="/assets/anonpfp.jpg"
-        alt="imgI135"
-        class="profileanon-img1"
-        />
-      </ng-template>
-    </div>
+    <app-user-image [user]="tweet?.author" (imageError)="handleUserImageError()" [banned]="authorBanned" [blocked]="blocked" [class]="'tweet'">
+    </app-user-image>
     <div class="profileanon-nameanddate1">
       <span class="profileanon-text012">
             {{tweet?.date}}
       </span>
-      <a *ngIf="!authorBanned"  [routerLink]="['/u/', tweet?.author?.username]" class="profileanon-text014">
-          {{tweet?.author?.username}}		
-      </a>
-      <span *ngIf="authorBanned" class="profileanon-text014">
-          [banned]
-      </span>
+      <app-username-hyperlink [user]="tweet?.author" [blocked]="false" [cssClass]="'tweet'">
+
+      </app-username-hyperlink>
     </div>
 
     <div class="profileanon-interactions1" *ngIf="!authorBanned">
@@ -53,19 +36,19 @@
           (click)="reply()"
           src="/assets/tweet/reply.svg"
           alt="IconsaxLinearmessageI135"
-          class="profileanon-iconsax-linearmessage1"
+          class="interaction-icon"
         />
         
 
         <div *ngIf="!viewerIsAdmin && !ownTweet; else removeable" (click)="report()">
           <ng-container *ngIf="viewingUser && !tweet?.reporters?.includes(viewingUser.username); else alreadyReported">
-            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">
+            <span style="margin-left: 15px; margin-bottom: 5px; cursor: pointer;" class="profileanon-text020">
               report
             </span>
             <img
               src="/assets/tweet/report.png"
               alt="report"
-              class="profileanon-iconsax-linearmessage1"
+              class="interaction-icon"
           />
           </ng-container>
           <ng-template #alreadyReported>

@@ -72,7 +72,8 @@ export class TweetService {
     );
   } 
 
-  deleteTweet(tweetId: number, username: string): Observable<any> {
+  deleteTweet(tweetId: number): Observable<any> {
+    console.log("asd")
     const url = `/api/tweets/${tweetId}`;
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

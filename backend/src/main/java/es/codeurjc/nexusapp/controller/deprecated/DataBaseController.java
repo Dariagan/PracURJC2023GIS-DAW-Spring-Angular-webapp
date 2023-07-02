@@ -36,10 +36,10 @@ public class DataBaseController {
             .setAdmin();
         
         User userA = builder.build();
-        User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().build();
-        User userC = builder.setUsername("c").setEmail("c@c.com").build();
-        User userD = builder.setUsername("d").setEmail("d@d.com").build();
-        User userE = builder.setUsername("e").setEmail("e@e.com").build();
+        User userB = builder.setUsername("b").setEmail("b@b.com").setBasicUser().setDescription("hola soy b").build();
+        User userC = builder.setUsername("c").setEmail("c@c.com").setDescription("hola soy c").build();
+        User userD = builder.setUsername("d").setEmail("d@d.com").setDescription("hola soy d").build();
+        User userE = builder.setUsername("e").setEmail("e@e.com").setDescription("hola soy e").build();
         
         userService.save(userA).save(userB).save(userC).save(userD).save(userE);
 
@@ -82,9 +82,9 @@ public class DataBaseController {
 
         tweetBuilder.setAuthor(userB);
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 50; i++)
         {
-            tweetService.save(tweetBuilder.setText("tweet " + i).build());
+            tweetService.save(tweetBuilder.setText("tweet " + (i + 4)).build());
             if (i == 6)
                 tweetBuilder.clearTags().addTag("sports").setAuthor(userC);
             if (i == 10)

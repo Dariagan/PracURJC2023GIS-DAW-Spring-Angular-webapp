@@ -1,7 +1,7 @@
 <div class="feedanon-twits">
     <div class="feedanon-container1" id="posts-container">
         <ng-container *ngFor="let tweet of displayedTweets">
-        <app-tweet [tweet]="tweet"></app-tweet>
+            <app-tweet [tweet]="tweet" (deleted)="removeTweetFromList($event)"></app-tweet>
         </ng-container>
     </div>
     <span

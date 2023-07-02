@@ -1,3 +1,5 @@
+import { Tweet } from "./tweet.model";
+
 export interface User {
     username: string;
     name: string;
@@ -6,5 +8,8 @@ export interface User {
     hasImage:boolean;
     signUpDate: Date;
     role: string;
-    tweets: [];
+    tweets: Tweet[];
+    blocked: string[];
+    following: string[];
+    followers: string[];
 }
