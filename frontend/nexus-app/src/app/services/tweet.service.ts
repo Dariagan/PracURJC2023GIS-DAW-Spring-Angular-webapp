@@ -25,6 +25,23 @@ export class TweetService {
     );
   }
 
+  postTweet(tweetText: string, image?: File, tags?: Set<string>): Observable<Tweet> {
+    const formData = new FormData();
+    formData.append('tweetText', tweetText);
+
+    if (image) {
+      formData.append('image', image);
+    }
+    if (tags) {
+      formData.append('tags', JSON.stringify(Array.from(tags)));
+    }
+
+    return this.httpClient.post<Tweet>('/api/tweets/', formData).pipe(
+      catchError(error => this.handleError<Tweet>(error))
+    );
+  }
+
+
   getRecommendedTweetsForUser(user: string, page: number, size: number): Observable<Tweet[]> {
     
     let url = "/api/users/" + user + "/following/tweets?page=" + page + "&size=" + size;

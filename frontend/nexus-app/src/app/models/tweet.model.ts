@@ -7,6 +7,7 @@ export interface Tweet{
     date:Date;
     hasMedia:boolean;
     likes:string[];
+    tags:string[];
     shares:number[];
     reporters:string[];
     children:number[];

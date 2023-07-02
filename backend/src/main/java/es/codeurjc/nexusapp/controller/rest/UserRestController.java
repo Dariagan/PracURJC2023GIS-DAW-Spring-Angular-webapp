@@ -136,7 +136,7 @@ public class UserRestController {
         @PathVariable String username,
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
-        @RequestParam(value = "sort-by", defaultValue = "username") Optional<String> sortBy,
+        @RequestParam(value = "sort-by", defaultValue = "date") Optional<String> sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction,
         @RequestParam Optional<String> tweet) 
     {
@@ -207,13 +207,13 @@ public class UserRestController {
                     schema = @Schema(implementation = User.class))}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
         @ApiResponse(responseCode = "404", description = "Not found", content = @Content)})
-    @DeleteMapping("/{username}/blocked/{unfollowed}")
+    @DeleteMapping("/{username}/following/{unfollowed}")
     public ResponseEntity<User> unfollowUser(
         HttpServletRequest request, 
-        @PathVariable String unblocked) 
+        @PathVariable String unfollowed) 
     {
         Optional<User> loggedUserOpt = userService.getUserBy(request);
-        Optional<User> unfollowedUserOpt = userService.getUserBy(unblocked);
+        Optional<User> unfollowedUserOpt = userService.getUserBy(unfollowed);
 
         if (loggedUserOpt.isPresent())
             if (unfollowedUserOpt.isPresent() && 
@@ -226,7 +226,7 @@ public class UserRestController {
         else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @Operation(summary = "GET blocklist of pathvariable username")
+    @Operation(summary = "GET block list of pathvariable username")
     @ApiResponses(value = {
         @ApiResponse(
             responseCode = "200", description = "Found users blocked by user",
@@ -236,30 +236,35 @@ public class UserRestController {
                 )}),
         @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
     @JsonView(User.FullView.class)
-    @GetMapping("/{username}/blocked")
-    public ResponseEntity<Object> getUserBlocked(
+    @GetMapping("/{username}/blocks")
+    public ResponseEntity<Object> getUserBlocks(
         @PathVariable String username,
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "sort-by", defaultValue = "username") Optional<String> sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction,
-        @RequestParam Optional<String> user) 
+        @RequestParam Optional<String> user,//optional param user to query for (check if it is in the list)
+        HttpServletRequest request
+        )
     {
-        var greg = new GetResponseEntityGenerator<User, User>
-        (new UserQuerier(userService), new UserQuerier(userService));
+        if (UserService.isOwnResource(username, request)){
+            var greg = new GetResponseEntityGenerator<User, User>
+            (new UserQuerier(userService), new UserQuerier(userService));
 
-        return greg.generateGetResponseEntity
-        (username, page, size, sortBy, direction, user, new BlockQuerier(userService));
+            return greg.generateGetResponseEntity
+            (username, page, size, sortBy, direction, user, new BlockQuerier(userService));
+        }
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    @Operation(summary = "Post user in blocklist")
+    @Operation(summary = "POST user in block list")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Created",
             content = {@Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = User.class))}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
-    @PostMapping("/{username}/blocked")
+    @PostMapping("/{username}/blocks")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<User> blockUser(
         HttpServletRequest request, 
@@ -295,7 +300,7 @@ public class UserRestController {
             responseCode = "404",
             description = "Not found",
             content = @Content)})
-    @DeleteMapping("/{username}/blocked/{unblocked}")
+    @DeleteMapping("/{username}/blocks/{unblocked}")
     public ResponseEntity<User> unblockUser(
         HttpServletRequest request, 
         @PathVariable String username,
@@ -404,8 +409,8 @@ public class UserRestController {
 		Optional<User> user = userService.getUserBy(username);
         if (user.isEmpty()) return ResponseEntity.notFound().build();
 
-        if(UserService.isOwnResource(username, user)){
-
+        if(UserService.isOwnResource(username, user))
+        {
             URI location = fromCurrentRequest().build().toUri();
 
             if (!imageFile.isEmpty()) 

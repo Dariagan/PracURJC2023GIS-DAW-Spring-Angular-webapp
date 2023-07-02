@@ -57,6 +57,7 @@ public class GetResponseEntityGenerator <T, U> {
                     return new ResponseEntity<>(collection, HttpStatus.OK);  
                 } 
                 else 
+                
                 {
                     Collection<U> checkedCollection = 
                     checkedCollectionQuerier.doQuery(pathVariableSubjectOpt, Pageable.unpaged());

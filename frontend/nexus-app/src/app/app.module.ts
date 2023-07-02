@@ -2,10 +2,12 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { NexuschiComponent } from './components/nexuschi.component';
-import { HttpClientModule } from '@angular/common/http';
 import { NavButtonComponent } from './components/nav-button/nav-button.component';
 import { NavComponent } from './components/nav.component';
 import { FeedComponent } from './components/feed/feed.component';
@@ -19,6 +21,7 @@ import { BanButtonComponent } from './components/ban-button.component';
 import { UserImageComponent } from './components/user-image.component';
 import { RedactableTextComponent } from './components/redactable-text.component';
 import { UploadImagePromptComponent } from './components/upload-image-prompt.component';
+import { WriteTweetComponent } from './components/write-tweet.component';
 
 @NgModule({
   declarations: [
@@ -38,11 +41,13 @@ import { UploadImagePromptComponent } from './components/upload-image-prompt.com
     UserImageComponent,
     RedactableTextComponent,
     UploadImagePromptComponent,
+    WriteTweetComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

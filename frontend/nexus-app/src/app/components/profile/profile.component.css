@@ -9,6 +9,7 @@
     overflow: hidden;
     position: relative;
     align-items: flex-start;
+    
     flex-shrink: 0;
     border-color: transparent;
   }

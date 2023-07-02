@@ -157,6 +157,10 @@ public final class UserService implements EntityService<User>
     {
         return loggedUser.isPresent() && loggedUser.get().getUsername().equals(ownerUsername);
     }
+    public static boolean isOwnResource(String ownerUsername, HttpServletRequest request)
+    {
+        return ownerUsername.equals(request.getUserPrincipal().getName());
+    }
 
     public static String redirectToReferer(HttpServletRequest req)
     {

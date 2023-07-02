@@ -43,7 +43,10 @@
     </app-nav>
       <div class="profileanon-container">
         <div class="profileanon-profileanon">
-          <app-thread>
+          <app-write-tweet *ngIf="!banned && ownProfile">
+
+          </app-write-tweet>
+          <app-thread [tweetRetrievalMethod]="getTweetsMethod">
           </app-thread>
           <div class="profileanon-trending">
             <span class="profileanon-text036"><span>Trending</span></span>
@@ -132,6 +135,7 @@
                 {{user?.description}}
               </app-redactable-text>
         
+
              
               <span class="profileanon-text086">
     

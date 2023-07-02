@@ -13,9 +13,10 @@ public class UserDto {
     
     private final String username, description, role;
     private final boolean banned, hasImage;
-    private final ArrayList<String> following = new ArrayList<>(), 
-    followers  = new ArrayList<>(), 
-    blocked = new ArrayList<>();
+    private final ArrayList<String> 
+        following = new ArrayList<>(), 
+        followers  = new ArrayList<>(), 
+        blocked = new ArrayList<>();
     private final ArrayList<Long> tweets = new ArrayList<>();
 
     @JsonIgnore

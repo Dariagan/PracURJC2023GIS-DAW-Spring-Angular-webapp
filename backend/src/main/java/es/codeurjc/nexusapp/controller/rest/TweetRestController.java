@@ -3,8 +3,11 @@ package es.codeurjc.nexusapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,18 +101,34 @@ public class TweetRestController {
             )}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
     @PostMapping("/")
-    public ResponseEntity<Tweet> postTweet(@RequestBody Tweet tweet) 
+    public ResponseEntity<Tweet> postTweet(String tweetText, Optional<MultipartFile> image, Optional<Set<String>> tags, HttpServletRequest request) 
     {
-        try {
-            tweetService.save(tweet);
-            URI location = fromCurrentRequest().path("/{id}")
-                .buildAndExpand(tweet.getId()).toUri();
-            return ResponseEntity.created(location).body(tweet);
-        }
-        catch (EmptyResultDataAccessException e) 
-        {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        var userOpt = userService.getUserBy(request);
+
+        if (userOpt.isPresent()){
+            try {
+                Tweet.Builder tweetBuilder = new Tweet.Builder();
+
+                tweetBuilder.setAuthor(userOpt.get())
+                .setText(tweetText);
+
+                if (tags.isPresent())
+                    tweetBuilder.setTags(new HashSet<>(tags.get()));
+                
+                if (image.isPresent())
+                    tweetBuilder.setMedia(BlobProxy.generateProxy(image.get().getInputStream(), image.get().getSize()));
+
+                Tweet tweet = tweetBuilder.build();
+                tweetService.save(tweet);
+                URI location = fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(tweet.getId()).toUri();
+                return ResponseEntity.created(location).body(tweet);
+            }
+            catch (Exception e) 
+            {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @Operation(summary = "Delete tweet")
@@ -411,7 +430,7 @@ public class TweetRestController {
 	}
 
     @PostMapping("/{id}/image")
-	public ResponseEntity<Object> uploadImage(@PathVariable long id, @RequestBody MultipartFile imageFile)
+	public ResponseEntity<Object> uploadImage(@PathVariable long id, @RequestBody MultipartFile image)
 			throws IOException {
 
 		Optional<Tweet> tweetOpt = tweetService.getTweetBy(id);
@@ -419,7 +438,7 @@ public class TweetRestController {
 
         URI location = fromCurrentRequest().build().toUri();
 
-		tweetOpt.get().setMedia(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
+		tweetOpt.get().setMedia(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
 		tweetService.save(tweetOpt.get());
 
 		return ResponseEntity.created(location).build();
