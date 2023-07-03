@@ -1,5 +1,28 @@
-# Compilation
+#########################
+#  ANGULAR COMPILATION  #
+#########################
+# Base image to build the Angular project
+FROM node:16 AS angular
 
+# Choose container working directory where we are going to execute commands
+WORKDIR /code
+
+# Copy project dependencies from local project to compilation container directory
+COPY nexus-app/package*.json nexus-app/angular.json nexus-app/tsconfig*.json  /code/
+
+# Execute command in compilation container to download project dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy project source from local project to compilation container directory
+COPY nexus-app/src /code/src
+
+# Compile project using already downloaded libraries configurating the base href
+RUN npm run build -- --configuration production --base-href=/new/
+
+
+#########################
+# COMPILATION CONTAINER #
+#########################
 FROM maven:3.8.5-openjdk-17 as builder
 
 WORKDIR /project
@@ -7,16 +30,19 @@ WORKDIR /project
 # Copy of project dependencies
 COPY nexus_app/pom.xml /project/
 
-# Error
-#RUN mvn clean verify -e -X
+# Execute command in compilation container to download project dependencies
+RUN mvn clean verify --fail-never
 
 # Source code copy to /src
 COPY nexus_app/src /project/src
+COPY --from=angular /code/dist/project-front-end /project/src/main/resources/static/new
 
-# Compile project
-RUN mvn package -DskipTests=true
+# Compile project using already downloaded libraries
+RUN mvn package -DskipTests
 
-# Application container
+#########################
+# APPLICATION CONTAINER #
+#########################
 FROM openjdk:17
 
 WORKDIR /usr/src/app/
