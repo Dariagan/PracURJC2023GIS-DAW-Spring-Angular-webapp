@@ -11,16 +11,17 @@ import { Router } from '@angular/router';
   styleUrls:['./nav-button.component.css']
 })
 export class NavButtonComponent {
-  @Input() url!: string;
+  @Input() url?: string;
   @Input() buttonText!: string;
   
   constructor(private router: Router){
   }
 
   redirect(){
-    this.router.navigate([this.url]).catch(error => {
-      console.error('Navigation error:', error);
-    });;
+    if(this.url != undefined)
+      this.router.navigate([this.url]).catch(error => {
+        console.error('Navigation error:', error);
+      });;
   }
 }
 

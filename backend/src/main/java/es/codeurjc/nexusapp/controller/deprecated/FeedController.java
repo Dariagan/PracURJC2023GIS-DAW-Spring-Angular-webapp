@@ -68,7 +68,7 @@ public class FeedController {
         Optional<User> loggedUser = userService.getUserBy(req);
         if (loggedUser.isPresent() && loggedUser.get().isAdmin())
         {
-            updateFeedModel(model, loggedUser, tweetService.queryTweetsToModerate());
+            updateFeedModel(model, loggedUser, tweetService.getMostReportedTweets(PageRequest.of(0, 10)));
             return "feed";
         } 
         else return "error";

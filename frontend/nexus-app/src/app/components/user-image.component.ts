@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { User } from 'app/models/user';
 import { UploadImagePromptComponent } from './upload-image-prompt.component';
 import { UserService } from 'app/services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-image',
@@ -87,7 +88,6 @@ export class UserImageComponent implements OnInit, OnChanges {
 
   emitError() {
     this.imageError.emit();
-    console.log("imageerror")
   }
 
   ngOnInit(): void {
@@ -102,13 +102,16 @@ export class UserImageComponent implements OnInit, OnChanges {
     }
   }
 
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   handleClick() {
     if (this.ownProfile) {
       this.showUploadPrompt = true;
+    } else {
+      this.router.navigate(['/u/', this.user?.username]);
     }
   }
+  
 
   uploadImage(file: File) {
     if (this.user) {

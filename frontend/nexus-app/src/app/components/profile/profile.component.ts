@@ -40,6 +40,10 @@ export class ProfileComponent {
     })
   }
 
+  onBan(ban:boolean){
+    this.threadComponent.refreshTweetsBanned(ban)
+  }
+
   loadInLastTweet(){
     this.threadComponent.loadInLastTweet()
   }
@@ -55,6 +59,10 @@ export class ProfileComponent {
 
   refreshTweetsViewingUser(){
     this.threadComponent.refreshUsers()
+  }
+
+  moderateButtonClicked(){
+    
   }
 
   constructor(private loginService: LoginService, private userService: UserService, private tweetService: TweetService,private activatedRoute: ActivatedRoute){

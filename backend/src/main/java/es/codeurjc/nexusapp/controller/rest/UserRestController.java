@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -209,6 +210,28 @@ public class UserRestController {
             else return ResponseEntity.notFound().build();
         } 
         else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @Operation(summary = "PATCH user's ban")
+    @PatchMapping("/{username}")
+    public ResponseEntity<User> toggleBanOnUser(
+        HttpServletRequest request, 
+        @PathVariable String username,
+        @RequestParam(name = "banned", required = true) boolean banned
+        ) 
+    {
+        var reqUserOpt = userService.getUserBy(request);
+        if (UserService.isAdmin(reqUserOpt)){
+            var targetUserOpt = userService.getUserBy(username);
+            if (targetUserOpt.isPresent()){
+                if (banned)
+                    targetUserOpt.get().ban();
+                else
+                    targetUserOpt.get().unban();
+                userService.save(targetUserOpt.get());
+                return ResponseEntity.ok().build();
+            }else return ResponseEntity.notFound().build();
+        } else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @Operation(summary = "Delete user from followlist")

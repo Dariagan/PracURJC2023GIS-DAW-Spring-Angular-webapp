@@ -63,7 +63,7 @@ public final class TweetService implements EntityService<Tweet>
 
     public Page<Tweet> getTweetsByTags(Set<String> tags, Pageable pageable)
     {
-        return tweetRepository.findTweetsByTags(tags, pageable);
+        return tweetRepository.findTweetsByTags(tags, tags.size(), pageable);
     }
 
     public Page<Tweet> getAll(Pageable pageable)
@@ -95,9 +95,9 @@ public final class TweetService implements EntityService<Tweet>
         return tweetRepository.findFollowedUsersTweets(userOpt.get(), pageable);
     }
 
-    public List<Tweet> queryTweetsToModerate()
+    public List<Tweet> getMostReportedTweets(Pageable pageable)
     {
-        return tweetRepository.findMostReportedTweets(Pageable.ofSize(10));
+        return tweetRepository.findMostReportedTweets(pageable);
     }
 
     public List<User> getLikingUsers(Optional<Tweet> tweetOpt, Pageable pageable)

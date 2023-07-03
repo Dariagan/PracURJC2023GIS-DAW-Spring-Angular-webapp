@@ -28,6 +28,8 @@ public class SecurityConfig {
         "/api/tweets/likes**",
         "/api/users/*",
         "/api/tweets/*",
+        "/api/tweets**",
+        "/api/tweets/tags",
         "/h2-console/**",//FIXME
         "/login",
         "/signup",
@@ -64,6 +66,9 @@ public class SecurityConfig {
     };
     private final String[] ADMIN_POST_ENDPOINTS = {
     };
+    private final String[] ADMIN_PATCH_ENDPOINTS = {
+        "/api/users/*"
+    };
     private final String[] ADMIN_DELETE_ENDPOINTS = {
     };
     
@@ -89,6 +94,8 @@ public class SecurityConfig {
             .antMatchers(HttpMethod.GET, ADMIN_GET_ENDPOINTS)
             .hasAuthority(Role.ADMIN.toString())
             .antMatchers(HttpMethod.POST, ADMIN_POST_ENDPOINTS)
+            .hasAuthority(Role.ADMIN.toString())
+            .antMatchers(HttpMethod.PATCH, ADMIN_PATCH_ENDPOINTS)
             .hasAuthority(Role.ADMIN.toString())
             .antMatchers(HttpMethod.DELETE, ADMIN_DELETE_ENDPOINTS)
             .hasAuthority(Role.ADMIN.toString())

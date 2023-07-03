@@ -23,6 +23,8 @@ import { RedactableTextComponent } from './components/redactable-text.component'
 import { UploadImagePromptComponent } from './components/upload-image-prompt.component';
 import { WriteTweetComponent } from './components/write-tweet.component';
 import { FollowButtonComponent } from './components/follow-button.component';
+import { ChartComponent } from './components/chart/chart.component';
+import { SearchbarComponent } from './components/searchbar.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +46,8 @@ import { FollowButtonComponent } from './components/follow-button.component';
     UploadImagePromptComponent,
     WriteTweetComponent,
     FollowButtonComponent,
+    ChartComponent,
+    SearchbarComponent
   ],
   imports: [
     BrowserModule,

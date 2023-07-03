@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
 
 import es.codeurjc.nexusapp.model.Tweet;
@@ -59,9 +60,10 @@ public interface TweetRepository extends JpaRepository<Tweet, Long>{
     "WHERE t.author.role != 'BANNED' GROUP BY t.id ORDER BY COUNT(l) DESC")
     Page<Tweet> findMostLikedTweets(Pageable pageable);
     
-    // 13-A
-    @Query("SELECT t FROM Tweet t " +
-    "WHERE EXISTS (SELECT tag FROM t.tags tag WHERE tag IN :tags) " +
-    "AND t.author.role != 'BANNED'")
-    Page<Tweet> findTweetsByTags(Set<String> tags, Pageable pageable);
+ 
+
+    @Query("SELECT t FROM Tweet t WHERE SIZE(t.tags) >= :tagCount AND (:tagCount = 0 OR :tagsSubset MEMBER OF t.tags)")
+    Page<Tweet> findTweetsByTags(@Param("tagsSubset") Set<String> tagsSubset, @Param("tagCount") int tagCount, Pageable pageable);
 }
+
+

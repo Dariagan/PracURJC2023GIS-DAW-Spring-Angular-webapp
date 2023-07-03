@@ -3,6 +3,7 @@ package es.codeurjc.nexusapp.model;
 import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,6 +98,10 @@ public class Tweet implements Comparable<Tweet>
         }
         public Builder setMedia(Blob media){
             this.media = media;
+            return this;
+        }
+        public Builder setTags(String[] tags){
+            this.tags = new HashSet<>(Arrays.asList(tags));
             return this;
         }
         public Builder setTags(HashSet<String> tags){

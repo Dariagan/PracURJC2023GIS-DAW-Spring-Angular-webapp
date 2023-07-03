@@ -23,8 +23,23 @@ export class ThreadComponent {
   constructor(){
   }
 
+
   ngOnInit(): void {
     this.showMoreTweets()
+  }
+
+  public restart(){
+    this.resetPage()
+    this.showMoreTweets()
+  }
+  public resetPage(){
+    this.page = 0;
+    this.displayedTweets = []
+  }
+  showMoreTweets(){
+    this.tweetRetrievalMethod(this.page, this.size).subscribe(
+      newTweets => {this.displayedTweets = this.displayedTweets.concat(newTweets); this.page++;}
+    )
   }
 
   public loadInLastTweet(){
@@ -33,13 +48,30 @@ export class ThreadComponent {
     )
   }
 
-  refreshTweetsBlocked(blocked: boolean){//se puede mejorar y hacer q solo refresque al especificado
+  refreshTweetsBlocked(blocked: boolean){
     this.tweetComponents.forEach(tweetComponent => {
       tweetComponent.blocked = blocked;
     });
   }
+  refreshTweetsBanned(banned: boolean){
+    this.tweetComponents.forEach(tweetComponent => {
+      tweetComponent.authorBanned = banned;
+      if (tweetComponent.tweet)
+        tweetComponent.tweet.author.role = "BANNED";
+    });
+  }
 
-  refreshTweets(){//se puede mejorar y hacer q solo refresque al especificado
+  sortByMostReported(){
+    
+  }
+
+  
+  
+  removeTweetFromList(id: number){
+    this.displayedTweets = this.displayedTweets.filter(tweet => tweet.id !== id);
+  }
+
+  refreshTweets(){
     this.tweetComponents.forEach(tweetComponent => {
       tweetComponent.refreshTweet();
     });
@@ -48,14 +80,5 @@ export class ThreadComponent {
     this.tweetComponents.forEach(tweetComponent => {
       tweetComponent.refreshViewingUser();
     });
-  }
-  showMoreTweets(){
-    this.tweetRetrievalMethod(this.page, this.size).subscribe(
-      newTweets => this.displayedTweets = this.displayedTweets.concat(newTweets)
-    )
-    this.page++;
-  }
-  removeTweetFromList(id: number){
-    this.displayedTweets = this.displayedTweets.filter(tweet => tweet.id !== id);
   }
 }

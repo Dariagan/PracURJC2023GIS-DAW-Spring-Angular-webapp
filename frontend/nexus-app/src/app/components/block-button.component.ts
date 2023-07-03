@@ -39,7 +39,6 @@ export class BlockButtonComponent {
 
 
   buttonPressed() {
-    console.log(this.isBlocked)
     if (this.isBlocked) {
       this.unblockUser();
     } else {

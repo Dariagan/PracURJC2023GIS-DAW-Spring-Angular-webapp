@@ -1497,44 +1497,7 @@
     margin-bottom: 0;
     text-decoration: none;
   }
-  .feedanon-searchbarinput {
-    width: 357px;
-    height: 44px;
-    display: flex;
-    padding: 6px 17px;
-    overflow: hidden;
-    position: relative;
-    align-items: center;
-    flex-shrink: 0;
-    border-color: rgba(83, 76, 134, 1);
-    border-style: solid;
-    border-width: 0 0 2px 0;
-    border-radius: 100px;
-    margin-bottom: 46px;
-    justify-content: center;
-    background-image: linear-gradient(270deg, rgba(83, 76, 134, 1) 0%, rgba(83, 76, 134, 0) 100%);
-  }
-  .feedanon-iconsax-linearboxsearch {
-    width: 16px;
-    height: 16px;
-    position: relative;
-    margin-right: 8px;
-  }
-  .feedanon-text088 {
-    color: rgba(224, 211, 222, 1);
-    height: auto;
-    font-size: 14px;
-    align-self: auto;
-    font-style: Bold;
-    text-align: center;
-    font-family: Ubuntu;
-    font-weight: 700;
-    line-height: normal;
-    font-stretch: normal;
-    margin-right: 0;
-    margin-bottom: 0;
-    text-decoration: none;
-  }
+
   .feedanon-related {
     width: 357px;
     height: 437px;

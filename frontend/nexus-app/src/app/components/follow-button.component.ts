@@ -8,7 +8,7 @@ import { UserService } from 'app/services/user.service';
   template: `
     <div class="followbutton" *ngIf="viewingUser && targetUser && targetUser.username != viewingUser.username">
       <span class="followtext" (click)="buttonPressed()">
-        {{ followed ? 'Follow' : 'Unfollow' }}
+        {{ followed ? 'Unfollow' : 'Follow' }}
       </span>
     </div>
   `,
@@ -56,14 +56,13 @@ export class FollowButtonComponent {
 
   followed?: boolean;
 
+ 
   ngOnInit(): void {
-    this.followed = this.viewingUser && this.targetUser != undefined && this.viewingUser?.following.includes(this.targetUser.username);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['viewingUser'] && changes['viewingUser'].currentValue)  {
-      this.followed = this.viewingUser && this.targetUser != undefined && this.viewingUser?.following.includes(this.targetUser.username);
-      
+      this.followed = this.viewingUser && this.targetUser && this.viewingUser?.following.includes(this.targetUser.username);
     }
   }
 

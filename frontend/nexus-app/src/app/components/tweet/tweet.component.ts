@@ -34,9 +34,9 @@ export class TweetComponent {
   constructor(private loginService:LoginService, private tweetService:TweetService, private userService:UserService, private router: Router){}
 
   ngOnInit(): void {
-    this.authorBanned = this.tweet?.author.role == 'BANNED'
+    this.authorBanned = UserService.isBanned(this.tweet?.author)
     this.blocked = this.tweet?.author && this.viewingUser?.blocked.includes(this.tweet?.author.username);
-    this.viewerIsAdmin = this.viewingUser?.role === 'ADMIN';
+    this.viewerIsAdmin = UserService.isAdmin(this.viewingUser)
     this.displayTweetMedia = this.tweet?.hasMedia;
     this.displayUserImage = this.tweet?.author.hasImage;
     this.ownTweet = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;

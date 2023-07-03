@@ -14,6 +14,13 @@ public class PageableUtil {
     {
         return PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction));
     }
+    public static Sort.Direction getDirection(String direction){
+        if (direction.equalsIgnoreCase("asc")) 
+            return Sort.Direction.ASC;
+        if (direction.equalsIgnoreCase("desc")) 
+            return Sort.Direction.DESC;
+        else throw new RuntimeException("input direction isn't 'asc' or 'desc'");
+    }
     
     public static Sort getSort (String sortBy, String direction)
     {

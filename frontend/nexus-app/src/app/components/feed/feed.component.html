@@ -2,7 +2,6 @@
 <!-- Made by group 13-A. Designed by: Oskar Denis Siodmok using Figma. broken html & css export fix, mustache templating, by: Stefano Tomasini-->
 <html lang="english">
 <head>
-    <title>exported project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta charset="utf-8" />
     <meta property="twitter:card" content="summary_large_image" />
@@ -41,7 +40,9 @@
   <body>
       <app-nav>
         <app-nav-button [url]="'/u/'+viewingUser?.username" [buttonText]="'Profile'"></app-nav-button>
+        <app-nav-button [url]="'/chart'" [buttonText]="'Chart'"></app-nav-button>
         <app-nav-button [url]="'/logout'" [buttonText]="'Log out'"></app-nav-button>
+        <app-nav-button (click)="moderateButtonClicked()" [buttonText]="'Moderate'" *ngIf="isAdmin"></app-nav-button>
       </app-nav>
       <div class="feedanon-container">
         <div class="feedanon-feedanon">
@@ -51,54 +52,23 @@
             <span class="feedanon-text050"><span>Trending</span></span>
             <div class="feedanon-content4">
               <div class="feedanon-singletrending">
-                <span class="feedanon-text052"><span>#Lorem</span></span>
-                <span class="feedanon-text054"><span class="tag">31 posts</span></span>
+                <span class="feedanon-text052"><span>cars</span></span>
+                <span class="feedanon-text054"><span class="tag">TODO ºn posts</span></span>
               </div>
               <div class="feedanon-singletrending1">
-                <span class="feedanon-text056"><span>ipsum</span></span>
-                <span class="feedanon-text058"><span class="tag">16 posts</span></span>
+                <span class="feedanon-text056"><span>pets</span></span>
+                <span class="feedanon-text058"><span class="tag">TODO ºn posts</span></span>
               </div>
               <div class="feedanon-singletrending2">
-                <span class="feedanon-text060"><span>#consectetur</span></span>
-                <span class="feedanon-text062"><span class="tag">31 posts</span></span>
+                <span class="feedanon-text060"><span>sports</span></span>
+                <span class="feedanon-text062"><span class="tag">TODO ºn posts</span></span>
               </div>
-              <div class="feedanon-singletrending3">
-                <span class="feedanon-text064"><span>#Lorem</span></span>
-                <span class="feedanon-text066"><span class="tag">31 posts</span></span>
-              </div>
-              <div class="feedanon-singletrending4">
-                <span class="feedanon-text068"><span>ipsum</span></span>
-                <span class="feedanon-text070"><span class="tag">16 posts</span></span>
-              </div>
-              <div class="feedanon-singletrending5">
-                <span class="feedanon-text072"><span>#consectetur</span></span>
-                <span class="feedanon-text074"><span class="tag">31 posts</span></span>
-              </div>
-              <div class="feedanon-singletrending6">
-                <span class="feedanon-text076"><span>#Lorem</span></span>
-                <span class="feedanon-text078"><span class="tag">31 posts</span></span>
-              </div>
-              <div class="feedanon-singletrending7">
-                <span class="feedanon-text080"><span>ipsum</span></span>
-                <span class="feedanon-text082"><span class="tag">16 posts</span></span>
-              </div>
-              <div class="feedanon-singletrending8">
-                <span class="feedanon-text084"><span>#consectetur</span></span>
-                <span class="feedanon-text086"><span class="tag">31 posts</span></span>
-              </div>
+
             </div>
           </div>
           <div class="feedanon-frame30">
-            <div class="feedanon-searchbarinput">
-              <img
-                src="assets/feed/iconsaxlinearboxsearchi133-oodp.svg"
-                alt="IconsaxLinearboxsearchI133"
-                class="feedanon-iconsax-linearboxsearch"
-              />
-              <form class="feedanon-text088" method="get" action="/feed/search">
-                <input type="text" placeholder="Search over nexus..." name="tags"/>
-              </form>
-            </div>
+            <app-searchbar (search)="onSearch($event)"></app-searchbar>
+
             <div class="feedanon-related">
               <div class="feedanon-stack">
                 <span class="feedanon-text090">

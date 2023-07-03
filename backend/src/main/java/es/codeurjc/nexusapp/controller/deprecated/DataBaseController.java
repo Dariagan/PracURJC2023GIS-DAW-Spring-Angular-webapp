@@ -1,5 +1,7 @@
 package es.codeurjc.nexusapp.controller.deprecated;
 
+import java.util.HashSet;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class DataBaseController {
         // Building tweets
         tweetBuilder
             .setAuthor(userA)
-            .setText("I like fat cats")
+            .setText("I like cats")
             .addTag("chonkers").addTag("cats").addTag("pets");
         
         Tweet tweet1 = tweetBuilder.build();
@@ -82,17 +84,42 @@ public class DataBaseController {
 
         tweetBuilder.setAuthor(userB);
 
-        for (int i = 0; i < 50; i++)
+        HashSet<String> tags = new HashSet<>();
+
+        String format = "about %s tweet nº%d";
+        String text = "nothing";
+        
+        for (int i = 4; i < 50; i++)
         {
-            tweetService.save(tweetBuilder.setText("tweet " + (i + 4)).build());
-            if (i == 6)
-                tweetBuilder.clearTags().addTag("sports").setAuthor(userC);
-            if (i == 10)
-                tweetBuilder.clearTags().addTag("pets").setAuthor(userA);
-            if (i == 12)
-                tweetBuilder.clearTags().addTag("cars").addTag("pets").setAuthor(userB);
-            if (i == 16)
-                tweetBuilder.clearTags().addTag("cars").addTag("sports").setAuthor(userB);
+            if (i == 14){
+                text = "cars";
+                tags.add("cars");
+            }if (i == 17){     
+                text = "cars and sports";
+                tags.add("sports");
+            }if (i == 21){
+                text = "sports cars and pets";
+                tags.add("pets");
+            }if (i == 25){
+                tags.clear();
+                text = "sports";
+                tags.add("sports");
+            }
+            if (i == 29){
+                tags.clear();
+                text = "pets";
+                tags.add("pets");
+            }
+            if (i == 34){
+                text = "sports and pets";
+                tags.add("sports");
+            }
+            tweetBuilder.setText(String.format(format, text, i));
+            tweetBuilder.setTags(tags);
+
+            tweetService.save(tweetBuilder.build());
+
+
         }
 
     }

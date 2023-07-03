@@ -3,14 +3,17 @@ package es.codeurjc.nexusapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.hibernate.engine.jdbc.BlobProxy;
+import org.springdoc.core.converters.models.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -27,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -183,20 +187,72 @@ public class TweetRestController {
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
-        @RequestParam(value = "direction", defaultValue = "desc") String direction) 
+        @RequestParam(value = "direction", defaultValue = "desc") String direction,
+        @RequestParam(value = "tags") Optional<Set<String>> tags,
+        HttpServletRequest request
+        )
     {   
+        if (sortBy.equalsIgnoreCase("reports"))
+            if (UserService.isAdmin(userService.getUserBy(request)))
+                return getMostReportedTweets(page, size);
+            else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        if (sortBy.equalsIgnoreCase("likes"))
+            return getMostLikedTweets(page, size);
+        else if (tags.isPresent()){
+            return getTweetsByTags(page, size, sortBy, tags.get());
+        }
+        else {
+            List<Tweet> foundTweets = tweetService
+                .getAll(PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
+                .getContent();
+
+            ArrayList<TweetDto> dtos = new ArrayList<>();
+            for (Tweet tweet: foundTweets)    
+                dtos.add(new TweetDto(tweet));
+
+            return new ResponseEntity<List<TweetDto>>(dtos, HttpStatus.OK);
+        }
+    }
+    private ResponseEntity<List<TweetDto>> getMostReportedTweets(
+        int page,
+        int size)
+    {       
         List<Tweet> foundTweets = tweetService
-            .getAll(PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
-            .getContent();
+            .getMostReportedTweets(PageRequest.of(page, size));
 
         ArrayList<TweetDto> dtos = new ArrayList<>();
         for (Tweet tweet: foundTweets)    
             dtos.add(new TweetDto(tweet));
 
-        return new ResponseEntity<>(
-            dtos, 
-            HttpStatus.OK
-            );
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+    private ResponseEntity<List<TweetDto>> getMostLikedTweets(
+        int page,
+        int size)
+    {       
+        List<Tweet> foundTweets = tweetService
+            .getMostLikedTweets(PageRequest.of(page, size))
+            .getContent();
+        ArrayList<TweetDto> dtos = new ArrayList<>();
+        for (Tweet tweet: foundTweets)    
+            dtos.add(new TweetDto(tweet));
+
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
+    }
+    private ResponseEntity<List<TweetDto>> getTweetsByTags(
+        int page,
+        int size,
+        String sortBy,
+        Set<String> tags
+    ){       
+        List<Tweet> foundTweets = tweetService
+            .getTweetsByTags(tags, PageRequest.of(page, size))
+            .getContent();
+        ArrayList<TweetDto> dtos = new ArrayList<>();
+        for (Tweet tweet: foundTweets)    
+            dtos.add(new TweetDto(tweet));
+
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @Operation(summary = "Get likers of a tweet by tweet id")

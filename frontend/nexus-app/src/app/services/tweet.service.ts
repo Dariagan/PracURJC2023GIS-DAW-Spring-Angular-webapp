@@ -18,6 +18,22 @@ export class TweetService {
     );
   }
 
+  getMostLikedTweets(page: number, size: number): Observable<Tweet[]> {
+    const url = `/api/tweets?page=${page}&size=${size}&sort-by=likes`;
+    return this.httpClient.get<Tweet[]>(url).pipe(
+      catchError(error => this.handleError<Tweet[]>(error))
+    );
+  }
+
+  getTweetsByTags(tags: string[], page: number, size: number): Observable<Tweet[]> {
+    let url = `/api/tweets/?page=${page}&size=${size}&tags=${tags.join(',')}`;
+    return this.httpClient.get<Tweet[]>(url).pipe(
+      catchError(error => this.handleError<Tweet[]>(error))
+    );
+  }
+  
+
+
   getUserTweets(user: string, page: number, size: number): Observable<Tweet[]> {
     let url = "/api/users/" + user + "/tweets?page=" + page + "&size=" + size;
     return this.httpClient.get<Tweet[]>(url).pipe(
@@ -41,16 +57,24 @@ export class TweetService {
     );
   }
 
-
-  getRecommendedTweetsForUser(user: string, page: number, size: number): Observable<Tweet[]> {
-    
-    let url = "/api/users/" + user + "/following/tweets?page=" + page + "&size=" + size;
+  getFollowedUsersTweets(user: string, page: number, size: number): Observable<Tweet[]> {
+    const url = `/api/users/${user}/following/tweets?page=${page}&size=${size}`;
     return this.httpClient.get<Tweet[]>(url).pipe(
       catchError(error => this.handleError<Tweet[]>(error))
     );
   }
 
-  getTweetsForAnon(page: number, size: number): Observable<Tweet[]> {
+  getMostReportedTweets(page: number, size: number): Observable<Tweet[]> {
+    
+    const url = `/api/tweets?page=${page}&size=${size}&sort-by=reports`;
+    return this.httpClient.get<Tweet[]>(url).pipe(
+      catchError(error => this.handleError<Tweet[]>(error))
+    );
+  }
+
+
+
+  getNewestTweets(page: number, size: number): Observable<Tweet[]> {
     
     let url = "/api/tweets?page=" + page + "&size=" + size;
     return this.httpClient.get<Tweet[]>(url).pipe(
@@ -90,7 +114,6 @@ export class TweetService {
   } 
 
   deleteTweet(tweetId: number): Observable<any> {
-    console.log("asd")
     const url = `/api/tweets/${tweetId}`;
     const httpOptions = {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { User } from 'app/models/user';
+import { UserService } from 'app/services/user.service';
 
 @Component({
   selector: 'app-username-hyperlink',
@@ -51,6 +52,6 @@ export class UsernameHyperlinkComponent {
   @Input()
   blocked!:boolean;
 
-  banned:boolean = this.user?.role == 'BANNED';
+  banned:boolean = UserService.isBanned(this.user)
 
 }

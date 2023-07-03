@@ -39,7 +39,7 @@
   <body>
     <app-nav>
       <app-nav-button [url]="'/feed'" [buttonText]="'Feed'"></app-nav-button>
-      <app-nav-button [url]="'/chart'" [buttonText]="'Chart'"></app-nav-button>
+      <app-nav-button (click)="moderateButtonClicked()" [buttonText]="'Moderate'" *ngIf="isAdmin"></app-nav-button>
     </app-nav>
       <div class="profileanon-container">
         <div class="profileanon-profileanon">
@@ -96,15 +96,15 @@
           
           
           <div class="profileanon-leftcomponents">
-            <div class="profileanon-searchbar">
+            <div class="profileanon-searchbar">        
+              <span class="profileanon-text076">
+                <app-ban-button [viewingUser]="viewingUser" [targetUser]="user" (banned)="onBan($event)"></app-ban-button>
+              </span>
               <img
                 src="/assets/profile/iconsaxlinearboxsearchi135-6ep.svg"
                 alt="IconsaxLinearboxsearchI135"
                 class="profileanon-iconsax-linearboxsearch"
               />
-              <span class="profileanon-text076">
-                <app-ban-button (stateChanged)="refreshTweets()"></app-ban-button>
-              </span>
               <span class="profileanon-text076">
                 <app-block-button (blocked)="refreshOnBlock($event)" [viewingUser]="viewingUser" [targetUser]="user?.username" ></app-block-button>
               </span>
