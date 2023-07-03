@@ -43,8 +43,7 @@
     </app-nav>
       <div class="profileanon-container">
         <div class="profileanon-profileanon">
-          <app-write-tweet *ngIf="!banned && ownProfile">
-
+          <app-write-tweet *ngIf="!banned && ownProfile" (postedTweet)="loadInLastTweet()">
           </app-write-tweet>
           <app-thread [tweetRetrievalMethod]="getTweetsMethod">
           </app-thread>
@@ -107,7 +106,7 @@
                 <app-ban-button (stateChanged)="refreshTweets()"></app-ban-button>
               </span>
               <span class="profileanon-text076">
-                <app-block-button (blocked)="refreshTweetsBlock($event)" [viewingUser]="viewingUser" [targetUser]="user?.username" ></app-block-button>
+                <app-block-button (blocked)="refreshOnBlock($event)" [viewingUser]="viewingUser" [targetUser]="user?.username" ></app-block-button>
               </span>
             </div>
             <div class="profileanon-profile-variant3">

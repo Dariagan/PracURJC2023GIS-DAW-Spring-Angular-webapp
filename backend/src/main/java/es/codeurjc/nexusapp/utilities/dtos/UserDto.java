@@ -2,13 +2,11 @@ package es.codeurjc.nexusapp.utilities.dtos;
 
 import java.util.ArrayList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.codeurjc.nexusapp.model.Tweet;
 import es.codeurjc.nexusapp.model.User;
-import es.codeurjc.nexusapp.service.UserService;
 import lombok.Getter;
 
 @Getter

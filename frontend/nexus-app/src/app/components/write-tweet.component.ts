@@ -65,11 +65,15 @@ export class WriteTweetComponent {
   tweetText: string = '';
   selectedMedia: File | undefined;
   hide: boolean = true;
+  @Output()
+  postedTweet = new EventEmitter();
 
   constructor(private tweetService: TweetService) {}
 
   postTweet(text: string, media?: File) {
-    this.tweetService.postTweet(text, media).subscribe();
+    this.tweetService.postTweet(text, media).subscribe(
+      () => this.postedTweet.emit()
+    );
     this.resetForm();
   }
 

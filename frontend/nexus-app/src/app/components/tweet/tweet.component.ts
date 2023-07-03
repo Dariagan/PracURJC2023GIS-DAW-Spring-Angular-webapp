@@ -43,7 +43,7 @@ export class TweetComponent {
   }
   
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['viewingUser'] && changes['viewingUser.blocked'].currentValue)  {
+    if (changes['viewingUser.blocked'] && changes['viewingUser.blocked'].currentValue)  {
       this.blocked = this.viewingUser && this.tweet?.author  && this.viewingUser?.blocked.includes(this.tweet?.author.username);
       
     }

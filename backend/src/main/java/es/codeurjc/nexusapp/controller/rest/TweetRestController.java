@@ -3,11 +3,9 @@ package es.codeurjc.nexusapp.controller.rest;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -101,6 +99,7 @@ public class TweetRestController {
             )}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
     @PostMapping("")
+    @JsonView(Tweet.TweetIdentifyingView.class)
     public ResponseEntity<Tweet> postTweet(String tweetText, MultipartFile image, String[] tags, HttpServletRequest request) {
         var userOpt = userService.getUserBy(request);
 

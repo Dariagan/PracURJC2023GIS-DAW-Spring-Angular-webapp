@@ -40,7 +40,12 @@ export class ProfileComponent {
     })
   }
 
-  refreshTweetsBlock(block: boolean){
+  loadInLastTweet(){
+    this.threadComponent.loadInLastTweet()
+  }
+
+  refreshOnBlock(block: boolean){
+    this.blockedByViewer = block;
     this.threadComponent.refreshTweetsBlocked(block)
   }
 
@@ -49,7 +54,6 @@ export class ProfileComponent {
   }
 
   refreshTweetsViewingUser(){
-    console.log("jfidfjidijfjid")
     this.threadComponent.refreshUsers()
   }
 

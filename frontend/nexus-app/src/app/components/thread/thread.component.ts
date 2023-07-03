@@ -27,6 +27,12 @@ export class ThreadComponent {
     this.showMoreTweets()
   }
 
+  public loadInLastTweet(){
+    this.tweetRetrievalMethod(0, 1).subscribe(
+      newTweet => this.displayedTweets = newTweet.concat(this.displayedTweets)
+    )
+  }
+
   refreshTweetsBlocked(blocked: boolean){//se puede mejorar y hacer q solo refresque al especificado
     this.tweetComponents.forEach(tweetComponent => {
       tweetComponent.blocked = blocked;
@@ -38,21 +44,17 @@ export class ThreadComponent {
       tweetComponent.refreshTweet();
     });
   }
-
   refreshUsers(){
-    console.log("asdasjdj")
     this.tweetComponents.forEach(tweetComponent => {
       tweetComponent.refreshViewingUser();
     });
   }
-  
   showMoreTweets(){
     this.tweetRetrievalMethod(this.page, this.size).subscribe(
       newTweets => this.displayedTweets = this.displayedTweets.concat(newTweets)
     )
     this.page++;
   }
-
   removeTweetFromList(id: number){
     this.displayedTweets = this.displayedTweets.filter(tweet => tweet.id !== id);
   }

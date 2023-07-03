@@ -1,24 +1,19 @@
 package es.codeurjc.nexusapp.controller.rest;
 
-import java.io.IOException;
 import java.net.URI;
 import java.sql.Blob;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.hibernate.engine.jdbc.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
+
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +36,6 @@ import es.codeurjc.nexusapp.service.UserService;
 import es.codeurjc.nexusapp.utilities.PageableUtil;
 import es.codeurjc.nexusapp.utilities.dtos.TweetDto;
 import es.codeurjc.nexusapp.utilities.dtos.UserDto;
-import es.codeurjc.nexusapp.utilities.queriers.AuthorTweetsQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.BlockQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.FollowedUsersTweetsQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.FollowingQuerier;
@@ -54,7 +48,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.vavr.control.Try;
 
 import static org.springframework.web.servlet.support.ServletUriComponentsBuilder.fromCurrentRequest;
 

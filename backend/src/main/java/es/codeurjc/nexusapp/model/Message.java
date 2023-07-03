@@ -1,6 +1,5 @@
 package es.codeurjc.nexusapp.model;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
