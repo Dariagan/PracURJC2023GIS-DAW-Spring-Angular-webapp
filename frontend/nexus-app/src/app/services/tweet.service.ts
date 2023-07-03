@@ -25,7 +25,16 @@ export class TweetService {
     );
   }
 
-  postTweet(tweetText: string, image?: File, tags?: Set<string>): Observable<Tweet> {
+  postUserToBlocklist(blocker: string, blocked: string): Observable<any> {
+    const url = `/api/users/${blocker}/blocks`;
+    const blockedUser = { blocked: blocked };
+
+    return this.httpClient.post(url, blockedUser).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
+
+  postTweet(tweetText: string, image?: File, tags?: string[]): Observable<Tweet> {
     const formData = new FormData();
     formData.append('tweetText', tweetText);
 
@@ -36,7 +45,7 @@ export class TweetService {
       formData.append('tags', JSON.stringify(Array.from(tags)));
     }
 
-    return this.httpClient.post<Tweet>('/api/tweets/', formData).pipe(
+    return this.httpClient.post<Tweet>('/api/tweets', formData).pipe(
       catchError(error => this.handleError<Tweet>(error))
     );
   }

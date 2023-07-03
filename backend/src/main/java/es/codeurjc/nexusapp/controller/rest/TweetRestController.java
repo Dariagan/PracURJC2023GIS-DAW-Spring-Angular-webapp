@@ -100,36 +100,36 @@ public class TweetRestController {
                 schema = @Schema(implementation = Tweet.class)
             )}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
-    @PostMapping("/")
-    public ResponseEntity<Tweet> postTweet(String tweetText, Optional<MultipartFile> image, Optional<Set<String>> tags, HttpServletRequest request) 
-    {
+    @PostMapping("")
+    public ResponseEntity<Tweet> postTweet(String tweetText, MultipartFile image, String[] tags, HttpServletRequest request) {
         var userOpt = userService.getUserBy(request);
 
-        if (userOpt.isPresent()){
+        if (userOpt.isPresent()) {
             try {
                 Tweet.Builder tweetBuilder = new Tweet.Builder();
 
                 tweetBuilder.setAuthor(userOpt.get())
-                .setText(tweetText);
+                    .setText(tweetText);
 
-                if (tags.isPresent())
-                    tweetBuilder.setTags(new HashSet<>(tags.get()));
-                
-                if (image.isPresent())
-                    tweetBuilder.setMedia(BlobProxy.generateProxy(image.get().getInputStream(), image.get().getSize()));
+                if (tags != null)
+                    tweetBuilder.setTags(new HashSet<>(List.of(tags)));
+
+                if (image != null)
+                    tweetBuilder.setMedia(BlobProxy.generateProxy(image.getInputStream(), image.getSize()));
 
                 Tweet tweet = tweetBuilder.build();
                 tweetService.save(tweet);
                 URI location = fromCurrentRequest().path("/{id}")
                     .buildAndExpand(tweet.getId()).toUri();
                 return ResponseEntity.created(location).body(tweet);
-            }
-            catch (Exception e) 
-            {
+            } catch (Exception e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
     }
+
 
     @Operation(summary = "Delete tweet")
     @ApiResponses(value = {

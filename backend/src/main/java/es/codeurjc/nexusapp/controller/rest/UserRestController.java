@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,7 @@ import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.service.TweetService;
 import es.codeurjc.nexusapp.service.UserService;
 import es.codeurjc.nexusapp.utilities.PageableUtil;
+import es.codeurjc.nexusapp.utilities.dtos.TweetDto;
 import es.codeurjc.nexusapp.utilities.dtos.UserDto;
 import es.codeurjc.nexusapp.utilities.queriers.AuthorTweetsQuerier;
 import es.codeurjc.nexusapp.utilities.queriers.BlockQuerier;
@@ -130,19 +133,31 @@ public class UserRestController {
             description = "Forbidden",
             content = @Content
         )})
-    @JsonView(Tweet.FullView.class)
     @GetMapping("/{username}/tweets")
-    public ResponseEntity<Object> getTweetsByUsername(
+    public ResponseEntity<ArrayList<TweetDto>> getTweetsByUsername(
         @PathVariable String username,
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
-        @RequestParam(value = "sort-by", defaultValue = "date") Optional<String> sortBy,
+        @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
         @RequestParam(value = "direction", defaultValue = "desc") String direction,
-        @RequestParam Optional<String> tweet) 
+        @RequestParam Optional<Long> tweet) //for searching for a specific tweet, doesn't do anything for now
     {
-        var reg = new GetResponseEntityGenerator<User, Tweet>(new UserQuerier(userService), new TweetQuerier(tweetService));
+        var userOpt = userService.getUserBy(username);
+        if(userOpt.isPresent()){
 
-        return reg.generateGetResponseEntity(username, page, size, sortBy, direction, tweet, new AuthorTweetsQuerier(tweetService));
+            List<Tweet> foundTweets = tweetService
+                    .getTweetsByUser(userOpt.get(), PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
+                    .getContent();
+
+            ArrayList<TweetDto> dtos = new ArrayList<>();
+            for (Tweet foundTweet: foundTweets)
+                dtos.add(new TweetDto(foundTweet));
+            
+            return new ResponseEntity<>(
+                dtos, 
+                HttpStatus.OK
+                );
+        } else return ResponseEntity.notFound().build();
     }
 
     @Operation(summary = "GET users followed by pathvariable username")
@@ -235,7 +250,7 @@ public class UserRestController {
                 schema = @Schema(implementation = User.class)
                 )}),
         @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
-    @JsonView(User.FullView.class)
+    @JsonView(User.UsernameView.class)
     @GetMapping("/{username}/blocks")
     public ResponseEntity<Object> getUserBlocks(
         @PathVariable String username,
@@ -266,22 +281,26 @@ public class UserRestController {
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
     @PostMapping("/{username}/blocks")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> blockUser(
+    public ResponseEntity<String> blockUser(
         HttpServletRequest request, 
         @PathVariable String username,
-        @RequestBody User blocked) 
+        @RequestBody String blocked) 
     {
-        Optional<User> loggedUser = userService.getUserBy(request);
+        Optional<User> loggedUserOpt = userService.getUserBy(request);
 
-        if (UserService.isOwnResource(username, loggedUser)) 
+        if (UserService.isOwnResource(username, loggedUserOpt)) 
         {
-            userService.save(loggedUser.get()).save(blocked);
-            URI location = fromCurrentRequest().path("/{blockeduser}")
-                .buildAndExpand(blocked.getUsername()).toUri();
-            return ResponseEntity.created(location).body(blocked);
-        } else {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+            var blockedUserOpt = userService.getUserBy(blocked);
+            if(blockedUserOpt.isPresent()){
+                loggedUserOpt.get().block(blockedUserOpt.get());
+                userService.save(loggedUserOpt.get());
+                URI location = fromCurrentRequest().path("/{blocked}")
+                    .buildAndExpand(blocked).toUri();
+                return ResponseEntity.created(location).body(blocked);
+            }
+            else return ResponseEntity.notFound().build();
+
+        } else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @Operation(summary = "DELETE user from blocklist")

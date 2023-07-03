@@ -16,6 +16,8 @@ export class UserService {
       catchError(error => this.handleError<User>(error))
     );
   }
+
+  // post user to blocklist (/api/users/{username}/blocks)
   
   postImage(username: string, imageFile: File): Observable<any> {
     const url = `/api/users/${username}/image`;

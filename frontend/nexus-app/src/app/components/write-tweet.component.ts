@@ -69,7 +69,7 @@ export class WriteTweetComponent {
   constructor(private tweetService: TweetService) {}
 
   postTweet(text: string, media?: File) {
-    this.tweetService.postTweet(text, media);
+    this.tweetService.postTweet(text, media).subscribe();
     this.resetForm();
   }
 

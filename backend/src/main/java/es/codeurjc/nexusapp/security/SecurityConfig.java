@@ -48,7 +48,8 @@ public class SecurityConfig {
         "/api/users**",
         "/api/users/*/image",
         "/api/tweets/*/image",
-        "/api/tweets**"
+        "/api/tweets**",
+        "/api/tweets"
     };
     private final String[] USER_DELETE_ENDPOINTS = {
         "/api/users/*",//needed for deleting own account, backend restcontroller checks if allowed

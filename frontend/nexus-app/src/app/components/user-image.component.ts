@@ -68,12 +68,11 @@ export class UserImageComponent implements OnInit, OnChanges {
   user?: User;
 
   url = '';
+  
+  banned: boolean = false;
 
   @Input()
-  banned?: boolean;
-
-  @Input()
-  blocked?: boolean;
+  blocked?: boolean = false;
 
   @Input()
   ownProfile?: boolean;
@@ -88,6 +87,7 @@ export class UserImageComponent implements OnInit, OnChanges {
 
   emitError() {
     this.imageError.emit();
+    console.log("imageerror")
   }
 
   ngOnInit(): void {
@@ -96,8 +96,10 @@ export class UserImageComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['user'] && changes['user'].currentValue) {
+    if (changes['user'] && changes['user'].currentValue)  {
+      console.log("ngonchanges1"+this.user?.hasImage+this.banned+this.blocked)
       this.updateImageUrl();
+      this.banned = this.user?.role== "BANNED";
     }
   }
 

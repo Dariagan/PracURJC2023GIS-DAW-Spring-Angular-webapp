@@ -22,16 +22,25 @@ export class TweetComponent {
 
   viewingUser?:User = this.loginService.getUser();
 
-  authorBanned:boolean = this.tweet?.author.role == 'BANNED';
-  blocked?:boolean = this.tweet?.author && this.viewingUser?.blocked.includes(this.tweet?.author.username);
-  viewerIsAdmin:boolean = this.viewingUser?.role === 'ADMIN';
+  authorBanned:boolean = false;
+  blocked?:boolean;
+  viewerIsAdmin?:boolean;
 
-  displayTweetMedia?:boolean = this.tweet?.hasMedia;
-  displayUserImage?:boolean = this.tweet?.author.hasImage;
+  displayTweetMedia?:boolean;
+  displayUserImage?:boolean;
 
-  ownTweet:boolean = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;
+  ownTweet?:boolean;
 
   constructor(private loginService:LoginService, private tweetService:TweetService, private userService:UserService, private router: Router){}
+
+  ngOnInit(): void {
+    this.authorBanned = this.tweet?.author.role == 'BANNED'
+    this.blocked = this.tweet?.author && this.viewingUser?.blocked.includes(this.tweet?.author.username);
+    this.viewerIsAdmin = this.viewingUser?.role === 'ADMIN';
+    this.displayTweetMedia = this.tweet?.hasMedia;
+    this.displayUserImage = this.tweet?.author.hasImage;
+    this.ownTweet = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;
+  }
 
   getTweetMediaURL(): string {
     if (this.tweet) {
@@ -48,7 +57,7 @@ export class TweetComponent {
   }
 
   like() {
-    if(this.viewingUser && !this.ownTweet && this.tweet){
+    if(this.viewingUser && this.tweet){
       const i: number = this.tweet.likes.indexOf(this.viewingUser.username);
       if (i !== -1){
         this.tweet.likes.splice(i, 1);
@@ -58,7 +67,7 @@ export class TweetComponent {
         this.tweetService.likeTweet(this.tweet.id, this.viewingUser.username).subscribe();
       }
     }else{
-      this.router.navigateByUrl(`login`);
+      this.router.navigateByUrl(``);
     }
   }
 

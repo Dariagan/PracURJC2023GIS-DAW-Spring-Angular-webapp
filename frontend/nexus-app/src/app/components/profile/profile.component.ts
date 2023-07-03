@@ -30,7 +30,7 @@ export class ProfileComponent {
           this.user = foundUser
           this.banned = this.user?.role == "BANNED";
           this.viewingUser = this.loginService.getUser();
-          this.ownProfile = this.viewingUser?.username == this.user?.username;
+          this.ownProfile = this.viewingUser && this.viewingUser.username == this.user?.username;
           this.blockedByViewer = !this.ownProfile && this.viewingUser && this.user && this.viewingUser.blocked.includes(this.user?.username);
         },
         error => error//TODO redirigir a 404 page si hay error

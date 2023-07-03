@@ -2,9 +2,20 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-block-button',
-  template: ``,
+  template: `
+    
+
+
+  `,
   styles: []
 })
 export class BlockButtonComponent {
 
+
+
+  blocked?:boolean
+
+  buttonPressed(){
+    
+  }
 }
