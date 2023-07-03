@@ -2,18 +2,6 @@ package es.codeurjc.nexusapp.model;
 
 import java.sql.Blob;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.ArrayList;
-
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import java.util.*;
 
 import javax.persistence.*;
@@ -22,7 +10,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.nexusapp.service.EmailService;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,9 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-// Class initially defined by group 13 B in a basic manner, 
-// refactored, reprogrammed, given all functionality by group 13 A
-@EqualsAndHashCode
+// 13-A
 @NoArgsConstructor
 @Entity(name = "UserTable")
 public class User implements UserDetails
@@ -42,11 +27,10 @@ public class User implements UserDetails
     public interface UsernameView {}
     public interface BasicView extends UsernameView{}
     public interface TweetsView {}
-    public interface FollowingView extends UsernameView{}
+    public interface FollowView extends UsernameView{}
     public interface FullView extends User.BasicView, User.TweetsView, Tweet.BasicView {}
     
-    @JsonView(UsernameView.class)
-    @Id
+    @JsonView(UsernameView.class) @Id
     @Getter private String username;
 
     @JsonView(BasicView.class)
@@ -64,39 +48,29 @@ public class User implements UserDetails
     @JsonIgnore
     @Setter private String encodedPassword;
 
-    @JsonView(BasicView.class)
-    @Enumerated(EnumType.STRING)
+    @JsonView(BasicView.class) @Enumerated(EnumType.STRING)
     @Getter private Role role;
 
-    @Nullable
-    @Lob
-    @JsonIgnore
-    private Blob image;
-    
-    
-
-    public Blob getImage() {
-        return image;
-    }
-    public void setImage(Blob image) {
-        this.image = image;
-    }
+    @Nullable @Lob @JsonIgnore
+    @Getter @Setter private Blob image;
 
     @JsonView(TweetsView.class)
     @OneToMany(mappedBy = "author")
     @Getter private List<Tweet> tweets = new ArrayList<>();
 
-    @JsonView(FollowingView.class)
-    @Nullable
-    @ManyToMany
-    @Getter private Set<User> following = new HashSet<>();
+    @JoinTable(
+        name = "user_followers",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    @JsonView(FollowView.class) @Nullable @ManyToMany @Getter
+    private Set<User> following = new HashSet<>();
 
-    //PREGUNTAR CHATGPT COMO PONER LOS FOLLOWERS SIN Q HAYA DUPLICACIONES EN LA BD
+    @JsonView(FollowView.class) @Nullable @ManyToMany(mappedBy = "following") @Getter
+    private Set<User> followers = new HashSet<>();
 
-    @JsonIgnore
-    @Nullable
-    @ManyToMany
-    @Getter private Set<User> blocked = new HashSet<>();
+    @JsonIgnore @Nullable @ManyToMany @Getter 
+    private Set<User> blocked = new HashSet<>();
 
     public static class Builder {
         private String username, email, encodedPassword, name = "", description = "";
@@ -182,24 +156,27 @@ public class User implements UserDetails
     public void setAdmin() { role = Role.ADMIN; }
     public void removeAdmin() { role = Role.USER; }
 
-    // FIXME the next few codeblocks can produce null pointer exceptions.
-    public void switchFollow(User user)
+    public void toggleFollow(User user)
     {
         assert user != null && !user.equals(this);
-        if (!following.contains(user))
+        if (!following.contains(user)){
             following.add(user);
-        else following.remove(user);
+            user.followers.add(this);
+        } else {
+            following.remove(user);
+            user.followers.remove(this);
+        }
     }
 
     public void block(User user)
     {
-        assert user != this;
+        assert !user.equals(this);
         blocked.add(user);
     };
 
     public void unblock(User user)
     {
-        assert user != this;
+        assert !user.equals(this);
         blocked.remove(user);
     };
 
@@ -216,4 +193,18 @@ public class User implements UserDetails
     @Override public boolean isCredentialsNonExpired() { return true;}
     @Override public boolean isEnabled() {return !isBanned();}
     @Override public String getPassword() {return encodedPassword;}
+
+    @Override
+    public int hashCode() {return Objects.hash(username);}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        User other = (User) obj;
+        return Objects.equals(username, other.username);
+    }
 }

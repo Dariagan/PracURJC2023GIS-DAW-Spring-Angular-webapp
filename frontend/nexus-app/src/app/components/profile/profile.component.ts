@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
@@ -6,6 +6,7 @@ import { LoginService } from 'app/services/login.service';
 import { TweetService } from 'app/services/tweet.service';
 import { UserService } from 'app/services/user.service';
 import { Observable } from 'rxjs';
+import { ThreadComponent } from '../thread/thread.component';
 
 @Component({
   selector: 'app-profile',
@@ -20,6 +21,7 @@ export class ProfileComponent {
   blockedByViewer?: boolean;
   banned: boolean = false;
   getTweetsMethod!: (page: number, size: number) => Observable<Tweet[]>;
+  @ViewChild(ThreadComponent) threadComponent!: ThreadComponent;
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
@@ -38,6 +40,18 @@ export class ProfileComponent {
     })
   }
 
+  refreshTweetsBlock(block: boolean){
+    this.threadComponent.refreshTweetsBlocked(block)
+  }
+
+  refreshTweets(){
+    this.threadComponent.refreshTweets()
+  }
+
+  refreshTweetsViewingUser(){
+    console.log("jfidfjidijfjid")
+    this.threadComponent.refreshUsers()
+  }
 
   constructor(private loginService: LoginService, private userService: UserService, private tweetService: TweetService,private activatedRoute: ActivatedRoute){
     

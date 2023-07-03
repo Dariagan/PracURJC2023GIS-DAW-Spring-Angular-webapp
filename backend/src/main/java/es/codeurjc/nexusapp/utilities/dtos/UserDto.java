@@ -2,10 +2,13 @@ package es.codeurjc.nexusapp.utilities.dtos;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.codeurjc.nexusapp.model.Tweet;
 import es.codeurjc.nexusapp.model.User;
+import es.codeurjc.nexusapp.service.UserService;
 import lombok.Getter;
 
 @Getter
@@ -19,6 +22,8 @@ public class UserDto {
         blocked = new ArrayList<>();
     private final ArrayList<Long> tweets = new ArrayList<>();
 
+    
+
     @JsonIgnore
     public UserDto(User user){
         username = user.getUsername();
@@ -30,7 +35,10 @@ public class UserDto {
             tweets.add(tweet.getId());
         for (User followed: user.getFollowing())
             following.add(followed.getUsername());
+        for (User follower: user.getFollowers())
+            followers.add(follower.getUsername());
         for (User blocked: user.getBlocked())
             this.blocked.add(blocked.getUsername());
     }
+
 }

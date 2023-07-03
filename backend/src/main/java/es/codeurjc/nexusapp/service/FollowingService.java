@@ -22,7 +22,7 @@ public class FollowingService {
 
         if (users.isFull() && !UserService.isSelfAction(users))
         {
-            users.getRight().switchFollow(users.getLeft());
+            users.getRight().toggleFollow(users.getLeft());
             userService.save(users);
             return ResponseEntity.ok().build();
         } else

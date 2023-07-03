@@ -97,7 +97,6 @@ export class UserImageComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] && changes['user'].currentValue)  {
-      console.log("ngonchanges1"+this.user?.hasImage+this.banned+this.blocked)
       this.updateImageUrl();
       this.banned = this.user?.role== "BANNED";
     }
@@ -122,8 +121,8 @@ export class UserImageComponent implements OnInit, OnChanges {
 
   private updateImageUrl() {
     if (this.user) {
-      const timestamp = new Date().getTime(); // Generate a timestamp
-      this.url = `/api/users/${this.user.username}/image?timestamp=${timestamp}`; // Append timestamp as a query parameter
+      const timestamp = new Date().getTime();
+      this.url = `/api/users/${this.user.username}/image?timestamp=${timestamp}`;
     }
   }
 }

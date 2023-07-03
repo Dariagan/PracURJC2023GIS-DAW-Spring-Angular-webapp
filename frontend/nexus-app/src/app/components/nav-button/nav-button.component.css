@@ -17,6 +17,7 @@
     font-weight: bold;
     margin-right: 10px;
     float: right;
+    cursor: pointer;
   }
   .buttontext {
     color: rgba(224, 211, 222, 1);
