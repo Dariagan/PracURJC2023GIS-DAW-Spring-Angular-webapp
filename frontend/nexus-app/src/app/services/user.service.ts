@@ -17,7 +17,35 @@ export class UserService {
     );
   }
 
-  // post user to blocklist (/api/users/{username}/blocks)
+  blockUser(blocker: string, blocked: string): Observable<any> {
+    const url = `/api/users/${blocker}/blocks`;
+
+    return this.httpClient.post(url, blocked).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
+
+  unblockUser(blocker: string, unblocked: string): Observable<any> {
+    const url = `/api/users/${blocker}/blocks/${unblocked}`;
+    return this.httpClient.delete(url).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
+
+  followUser(follower: string, followed: string): Observable<any> {
+    const url = `/api/users/${follower}/following`;
+
+    return this.httpClient.post(url, followed).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
+
+  unfollowUser(unfollower: string, unfollowed: string): Observable<any> {
+    const url = `/api/users/${unfollower}/following/${unfollowed}`;
+    return this.httpClient.delete(url).pipe(
+      catchError(error => this.handleError<any>(error))
+    );
+  }
   
   postImage(username: string, imageFile: File): Observable<any> {
     const url = `/api/users/${username}/image`;

@@ -32,7 +32,7 @@ public class UserInteractionController {
             
             if (UserService.urlUserExists(users) && !UserService.isSelfAction(users)){
             
-                users.getRight().switchFollow(users.getLeft());
+                users.getRight().toggleFollow(users.getLeft());
 
                 userService.save(users.getLeft()).save(users.getRight());
 

@@ -104,8 +104,10 @@
                 class="profileanon-iconsax-linearboxsearch"
               />
               <span class="profileanon-text076">
-                <app-ban-button></app-ban-button>
-                <app-block-button></app-block-button>
+                <app-ban-button (stateChanged)="refreshTweets()"></app-ban-button>
+              </span>
+              <span class="profileanon-text076">
+                <app-block-button (blocked)="refreshTweetsBlock($event)" [viewingUser]="viewingUser" [targetUser]="user?.username" ></app-block-button>
               </span>
             </div>
             <div class="profileanon-profile-variant3">
@@ -131,10 +133,12 @@
               </div>
               <span class="profileanon-text080">{{user?.signUpDate}}</span>
               
-              <app-redactable-text [cssClass]="'description'" [blocked]="blockedByViewer" [banned]="banned">
+              <app-redactable-text [class]="'description'" [blocked]="blockedByViewer" [banned]="banned">
                 {{user?.description}}
               </app-redactable-text>
-        
+              <app-follow-button [viewingUser]="viewingUser" [targetUser]="user">
+
+              </app-follow-button>
 
              
               <span class="profileanon-text086">

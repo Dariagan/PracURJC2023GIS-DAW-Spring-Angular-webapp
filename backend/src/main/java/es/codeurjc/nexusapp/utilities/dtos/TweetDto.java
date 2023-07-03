@@ -16,7 +16,7 @@ import lombok.Getter;
 public class TweetDto {
     
     private final long id;
-    private final TweetDtoUser author;
+    private final UserDto author;
     private final String text;
     private final LocalDateTime date;
     private final boolean hasMedia;
@@ -28,7 +28,7 @@ public class TweetDto {
         id = tweet.getId();
         date = tweet.getDate();
         hasMedia = tweet.hasMedia();
-        author = new TweetDtoUser(tweet.getAuthor());
+        author = new UserDto(tweet.getAuthor());
         text = tweet.getText();
         for (User user: tweet.getReporters())
             reporters.add(user.getUsername());
@@ -39,17 +39,4 @@ public class TweetDto {
         tags = tweet.getTags();
     }
 
-    @Getter
-    private class TweetDtoUser{
-        private final String username, description, role;
-        private final boolean banned, hasImage;
-
-        public TweetDtoUser(User user){
-            username = user.getUsername();
-            description = user.getDescription();
-            role = user.getRole().toString();
-            banned = user.isBanned();
-            hasImage = user.hasImage();
-        }
-    }
 }

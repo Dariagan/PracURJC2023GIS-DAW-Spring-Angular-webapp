@@ -6,7 +6,7 @@
       <span class="profileanon-text012">
             {{tweet?.date}}
       </span>
-      <app-username-hyperlink [user]="tweet?.author" [blocked]="false" [cssClass]="'tweet'">
+      <app-username-hyperlink [user]="tweet?.author" [blocked]="false" [class]="'tweet'">
 
       </app-username-hyperlink>
     </div>
@@ -76,14 +76,9 @@
   </div>
   <div class="profileanon-post1">
     <div class="profileanon-content1">
-      <span class="profileanon-text022">
-        <ng-container *ngIf="!authorBanned">
-          {{tweet?.text}}
-        </ng-container>
-        <ng-container *ngIf="authorBanned">
-          This user has been banned.
-        </ng-container>
-      </span>
+      <app-redactable-text [banned]="authorBanned" [blocked]="blocked" [class]="'tweet'">
+        {{tweet?.text}}
+      </app-redactable-text>
     </div>
   </div>
 

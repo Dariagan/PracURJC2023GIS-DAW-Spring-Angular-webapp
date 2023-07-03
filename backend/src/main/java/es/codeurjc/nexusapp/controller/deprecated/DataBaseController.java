@@ -45,7 +45,7 @@ public class DataBaseController {
 
         // /Building users
 
-        userA.switchFollow(userB);
+        userA.toggleFollow(userB);
         userService.save(userA);
         
         // Building tweets

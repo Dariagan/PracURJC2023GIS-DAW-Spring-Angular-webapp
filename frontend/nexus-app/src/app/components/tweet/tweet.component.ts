@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
 import { Router } from '@angular/router';
@@ -41,6 +41,13 @@ export class TweetComponent {
     this.displayUserImage = this.tweet?.author.hasImage;
     this.ownTweet = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;
   }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['viewingUser'] && changes['viewingUser.blocked'].currentValue)  {
+      this.blocked = this.viewingUser && this.tweet?.author  && this.viewingUser?.blocked.includes(this.tweet?.author.username);
+      
+    }
+  }
 
   getTweetMediaURL(): string {
     if (this.tweet) {
@@ -54,6 +61,22 @@ export class TweetComponent {
    }
   handleUserImageError(){
     this.displayUserImage = false;
+  }
+
+  public refreshViewingUser(){
+    if(this.viewingUser)
+      this.userService.getUser(this.viewingUser.username).subscribe(
+        refreshedUser => this.viewingUser = refreshedUser,
+        () => console.error("couldn't refresh tweet ${this.tweet?.id}'s viewing user")
+      )
+  }
+
+  public refreshTweet(){
+    if(this.tweet)
+      this.tweetService.getTweet(this.tweet.id).subscribe(
+        tweet => this.tweet = tweet,
+        () => console.error("couldn't refresh tweet " + this.tweet?.id)
+      )
   }
 
   like() {
@@ -82,13 +105,10 @@ export class TweetComponent {
     }
   }
 
-
   share() {
   }
   reply(){
   }
-
-  
 
   delete() {
     if(this.tweet && this.viewingUser && this.viewerIsAdmin){

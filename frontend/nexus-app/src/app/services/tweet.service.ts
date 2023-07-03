@@ -25,15 +25,6 @@ export class TweetService {
     );
   }
 
-  postUserToBlocklist(blocker: string, blocked: string): Observable<any> {
-    const url = `/api/users/${blocker}/blocks`;
-    const blockedUser = { blocked: blocked };
-
-    return this.httpClient.post(url, blockedUser).pipe(
-      catchError(error => this.handleError<any>(error))
-    );
-  }
-
   postTweet(tweetText: string, image?: File, tags?: string[]): Observable<Tweet> {
     const formData = new FormData();
     formData.append('tweetText', tweetText);

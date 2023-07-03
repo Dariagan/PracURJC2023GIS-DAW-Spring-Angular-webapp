@@ -173,7 +173,7 @@ public class UserRestController {
             responseCode = "404",
             description = "User not found",
             content = @Content)})
-    @JsonView(User.FullView.class)
+    @JsonView(User.UsernameView.class)
     @GetMapping("/{username}/following")
     public ResponseEntity<Object> getUserFollowing(
         @PathVariable String username,
@@ -194,21 +194,26 @@ public class UserRestController {
             content = {@Content(
                 mediaType = "application/json", schema = @Schema(implementation = User.class))}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
-    @PostMapping("/{username}/following")
-    @ResponseStatus(HttpStatus.CREATED)
+    @JsonView(User.UsernameView.class)
+    @PostMapping("/{follower}/following")
     public ResponseEntity<User> followUser(
         HttpServletRequest request, 
-        @PathVariable String username,
-        @RequestBody User followed) 
+        @PathVariable String follower,
+        @RequestBody String followed) 
     {
-        Optional<User> loggedUser = userService.getUserBy(request);
+        Optional<User> loggedUserOpt = userService.getUserBy(request);
 
-        if (UserService.isOwnResource(username, loggedUser)) 
-        {
-            userService.save(loggedUser.get()).save(followed);
-            URI location = fromCurrentRequest().path("/{followeduser}")
-                .buildAndExpand(followed.getUsername()).toUri();
-            return ResponseEntity.created(location).body(followed);
+        if (UserService.isOwnResource(follower, loggedUserOpt) && !follower.equals(followed)) 
+        {   
+            var followedUserOpt = userService.getUserBy(followed);
+            if (followedUserOpt.isPresent()){
+                loggedUserOpt.get().toggleFollow(followedUserOpt.get());
+                userService.save(loggedUserOpt.get());
+                URI location = fromCurrentRequest().path("/{followed}")
+                    .buildAndExpand(followed).toUri();
+                return ResponseEntity.created(location).body(followedUserOpt.get());    
+            }
+            else return ResponseEntity.notFound().build();
         } 
         else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
@@ -222,23 +227,26 @@ public class UserRestController {
                     schema = @Schema(implementation = User.class))}),
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
         @ApiResponse(responseCode = "404", description = "Not found", content = @Content)})
-    @DeleteMapping("/{username}/following/{unfollowed}")
+    @DeleteMapping("/{unfollower}/following/{unfollowed}")
     public ResponseEntity<User> unfollowUser(
-        HttpServletRequest request, 
+        HttpServletRequest request,
+        @PathVariable String unfollower, 
         @PathVariable String unfollowed) 
     {
         Optional<User> loggedUserOpt = userService.getUserBy(request);
         Optional<User> unfollowedUserOpt = userService.getUserBy(unfollowed);
 
-        if (loggedUserOpt.isPresent())
+        if (UserService.isOwnResource(unfollower, loggedUserOpt) && !unfollower.equals(unfollowed)) 
+        {   
             if (unfollowedUserOpt.isPresent() && 
             loggedUserOpt.get().getFollowing().remove(unfollowedUserOpt.get())) 
             {
                 userService.save(loggedUserOpt.get());
-                return new ResponseEntity<>(null, HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
             } 
             else return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @Operation(summary = "GET block list of pathvariable username")
@@ -288,7 +296,7 @@ public class UserRestController {
     {
         Optional<User> loggedUserOpt = userService.getUserBy(request);
 
-        if (UserService.isOwnResource(username, loggedUserOpt)) 
+        if (UserService.isOwnResource(username, loggedUserOpt) && !username.equals(blocked)) 
         {
             var blockedUserOpt = userService.getUserBy(blocked);
             if(blockedUserOpt.isPresent()){
@@ -299,8 +307,8 @@ public class UserRestController {
                 return ResponseEntity.created(location).body(blocked);
             }
             else return ResponseEntity.notFound().build();
-
-        } else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } 
+        else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @Operation(summary = "DELETE user from blocklist")

@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, QueryList, ViewChildren } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
 import { Observable } from 'rxjs';
+import { TweetComponent } from '../tweet/tweet.component';
 
 @Component({
   selector: 'app-thread',
@@ -10,6 +11,8 @@ import { Observable } from 'rxjs';
 export class ThreadComponent {
 
   displayedTweets: Tweet[] = [];
+
+  @ViewChildren(TweetComponent) tweetComponents!: QueryList<TweetComponent>;
 
   @Input()
   tweetRetrievalMethod!: (page: number, size: number) => Observable<Tweet[]>;
@@ -22,6 +25,25 @@ export class ThreadComponent {
 
   ngOnInit(): void {
     this.showMoreTweets()
+  }
+
+  refreshTweetsBlocked(blocked: boolean){//se puede mejorar y hacer q solo refresque al especificado
+    this.tweetComponents.forEach(tweetComponent => {
+      tweetComponent.blocked = blocked;
+    });
+  }
+
+  refreshTweets(){//se puede mejorar y hacer q solo refresque al especificado
+    this.tweetComponents.forEach(tweetComponent => {
+      tweetComponent.refreshTweet();
+    });
+  }
+
+  refreshUsers(){
+    console.log("asdasjdj")
+    this.tweetComponents.forEach(tweetComponent => {
+      tweetComponent.refreshViewingUser();
+    });
   }
   
   showMoreTweets(){
