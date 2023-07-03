@@ -5,7 +5,7 @@ services:
       context: ..
       dockerfile: docker/dockerfile
     restart: on-failure
-    image: Gabriel1510/nexus
+    image: gabriel1510/nexus
     ports:
       - "8443:8443"
     environment:
