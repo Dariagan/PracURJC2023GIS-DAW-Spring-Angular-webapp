@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.security.JwtCookieManager;
 import es.codeurjc.nexusapp.service.AuthService;
+import es.codeurjc.nexusapp.utilities.LoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RequiredArgsConstructor
 public class AuthRestController {
 
-    public record LoginRequest(String username, String password, String email) {}
+    
     
     private final AuthService authService;
     
@@ -67,8 +68,6 @@ public class AuthRestController {
         @CookieValue(name = "accessToken", required = false) String accessToken,
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,
         @RequestBody LoginRequest loginRequest,
-        @RequestParam Optional<String> username,
-        @RequestParam Optional<String> password,
         HttpServletRequest req,
         HttpServletResponse res
     ) {
@@ -76,9 +75,6 @@ public class AuthRestController {
             req.logout();
             req.getSession(false).invalidate();     
         } catch (Exception ignored) {}
-
-        if (username.isPresent() && password.isPresent())
-            loginRequest = new LoginRequest(username.get(), password.get(), null);
 
         return authService.login(loginRequest, accessToken, refreshToken);
     }

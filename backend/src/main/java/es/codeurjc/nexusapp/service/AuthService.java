@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import es.codeurjc.nexusapp.controller.rest.AuthRestController.LoginRequest;
+import es.codeurjc.nexusapp.utilities.LoginRequest;
 import es.codeurjc.nexusapp.model.User;
 import es.codeurjc.nexusapp.security.JwtCookieManager;
 import es.codeurjc.nexusapp.security.JwtTokenProvider;
