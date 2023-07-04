@@ -13,21 +13,19 @@ import lombok.Getter;
 public class UserDto {
     
     private final String username, description, role;
-    private final boolean banned, hasImage;
+    private final boolean hasImage;
     private final ArrayList<String> 
         following = new ArrayList<>(), 
         followers  = new ArrayList<>(), 
         blocked = new ArrayList<>();
     private final ArrayList<Long> tweets = new ArrayList<>();
 
-    
 
     @JsonIgnore
     public UserDto(User user){
         username = user.getUsername();
         description = user.getDescription();
         role = user.getRole().toString();
-        banned = user.isBanned();
         hasImage = user.hasImage();
         for (Tweet tweet: user.getTweets())
             tweets.add(tweet.getId());

@@ -39,7 +39,6 @@
   <body>
     <app-nav>
       <app-nav-button [url]="'/feed'" [buttonText]="'Feed'"></app-nav-button>
-      <app-nav-button (click)="moderateButtonClicked()" [buttonText]="'Moderate'" *ngIf="isAdmin"></app-nav-button>
     </app-nav>
       <div class="profileanon-container">
         <div class="profileanon-profileanon">

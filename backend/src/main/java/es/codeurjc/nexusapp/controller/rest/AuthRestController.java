@@ -2,6 +2,8 @@ package es.codeurjc.nexusapp.controller.rest;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -62,8 +64,13 @@ public class AuthRestController {
     public ResponseEntity<?> logIn(
         @CookieValue(name = "accessToken", required = false) String accessToken,
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,
-        @RequestBody LoginRequest loginRequest
+        @RequestBody LoginRequest loginRequest,
+        @RequestParam Optional<String> username,
+        @RequestParam Optional<String> password
     ) {
+        if (username.isPresent() && password.isPresent())
+            loginRequest = new LoginRequest(username.get(), password.get());
+
         return authService.login(loginRequest, accessToken, refreshToken);
     }
 

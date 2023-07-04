@@ -90,6 +90,6 @@ export class UserService {
 
     console.error('An error occurred:', error);
 
-    return of([] as T);
+    throw error
   }
 }

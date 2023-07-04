@@ -59,16 +59,17 @@
         </div>
         <ng-template #removeable>
           <ng-container *ngIf="!viewerIsAdmin; else adminRemoveable">
-            <span style="margin-left: 15px" class="profileanon-text020">delete</span>  
+            <span class="profileanon-text020">delete</span>  
           </ng-container>
           <ng-template #adminRemoveable>
-            <span style="margin-left: 15px" class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
+            <span class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
           </ng-template>
           <img
                 (click)="delete()"
                 src="/assets/tweet/delete.png"
                 alt="delete"
-                class="profileanon-iconsax-linearmessage1"
+                class="interaction-icon"
+                
             />
         </ng-template>
     </div>

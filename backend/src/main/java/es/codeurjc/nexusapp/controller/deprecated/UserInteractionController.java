@@ -92,7 +92,6 @@ public class UserInteractionController {
         return "error";
     }
 
-    //TODO before getting here, add prompt asking whether you want to delete your account
     @RequestMapping("/u/{username}/delete")
     public String deleteUser(
         @PathVariable String username, HttpServletRequest req

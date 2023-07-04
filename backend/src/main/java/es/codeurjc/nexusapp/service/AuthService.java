@@ -95,8 +95,8 @@ public class AuthService {
 	public ResponseEntity<?> register(
     String email, String username, String password
     ) {
-        if (!emailService.emailIsValid(email))
-            return ResponseBuilder.badReq("Wrong email provided");
+        //if (!emailService.emailIsValid(email))
+            //return ResponseBuilder.badReq("Wrong email provided");
         
         if (userService.isUsernameTaken(username))
             return ResponseBuilder.badReq("Username already in use");

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
 import { LoginService } from 'app/services/login.service';
@@ -35,7 +35,9 @@ export class ProfileComponent {
           this.ownProfile = this.viewingUser && this.viewingUser.username == this.user?.username;
           this.blockedByViewer = !this.ownProfile && this.viewingUser && this.user && this.viewingUser.blocked.includes(this.user?.username);
         },
-        error => error//TODO redirigir a 404 page si hay error
+        () => {
+          this.router.navigateByUrl('error', { skipLocationChange: true })
+        }
       )
     })
   }
@@ -61,11 +63,8 @@ export class ProfileComponent {
     this.threadComponent.refreshUsers()
   }
 
-  moderateButtonClicked(){
-    
-  }
-
-  constructor(private loginService: LoginService, private userService: UserService, private tweetService: TweetService,private activatedRoute: ActivatedRoute){
+  constructor(private loginService: LoginService, private userService: UserService, 
+    private tweetService: TweetService, private activatedRoute: ActivatedRoute, private router: Router){
     
   }
 }

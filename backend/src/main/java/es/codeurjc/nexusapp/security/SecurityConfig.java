@@ -18,44 +18,60 @@ import es.codeurjc.nexusapp.model.Role;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    // TODO define all endpoints
-    private final String[] PUBLIC_GET_ENDPOINTS = {
-        
-        "**",
+    // would be better to be read from a file
+    private final String[] PUBLIC_GET_ENDPOINTS = 
+    {
+        "**", 
+        "*",
+        "/feed",
+        "/login",
+        "/error",
         "/assets/css/**",
         "/api/auth/**",
         "/api/ex/public-str",
-        "/api/tweets/likes**",
+        
         "/api/users/*",
+        "/api/users/*/blocks",
+        "/api/users/*/following",
+        "/api/users/*/followers",
+
+        "/api/users/*/image",
         "/api/tweets/*",
+        "/api/tweets/*/image",
+        "/api/tweets/*/likes**",
         "/api/tweets**",
         "/api/tweets/tags",
-        "/h2-console/**",//FIXME
+        "/h2-console/**",//FIXME NOT FOR PRODUCTION
         "/login",
         "/signup",
         "/feed/**",
-        "/u/**"
+        "/u/**",
+        "/v3/api-docs"
     };
-    private final String[] PUBLIC_POST_ENDPOINTS = {
-        
+    private final String[] PUBLIC_POST_ENDPOINTS = 
+    {
         "/api/auth/**",
-
     };
-    private final String[] USER_GET_ENDPOINTS = {
+    private final String[] USER_GET_ENDPOINTS = 
+    {
         "/api/ex/user-str",
         "/api/ex/name"
-
     };
-    private final String[] USER_POST_ENDPOINTS = {
+    private final String[] USER_POST_ENDPOINTS = 
+    {
         "/api/users**",
+        "/api/users/*/blocks",
+        "/api/users/*/following",
+        "/api/users/*/followers",
+        "/api/tweets/*/likes",
         "/api/users/*/image",
         "/api/tweets/*/image",
         "/api/tweets**",
         "/api/tweets"
     };
-    private final String[] USER_DELETE_ENDPOINTS = {
-        "/api/users/*",//needed for deleting own account, backend restcontroller checks if allowed
-        
+    private final String[] USER_DELETE_ENDPOINTS = 
+    {
+        "/api/users/*",//needed for deleting own account, backend restcontroller checks if allowed 
         "/api/users/*/blocks",
         "/api/users/*/following",
         "/api/users/*/followers",
@@ -87,7 +103,6 @@ public class SecurityConfig {
             .antMatchers(HttpMethod.GET, USER_GET_ENDPOINTS)
             .hasAnyAuthority(Role.USER.toString(), Role.ADMIN.toString())
             .antMatchers(HttpMethod.POST, USER_POST_ENDPOINTS)
-    
             .hasAnyAuthority(Role.USER.toString(), Role.ADMIN.toString())
             .antMatchers(HttpMethod.DELETE, USER_DELETE_ENDPOINTS)
             .hasAnyAuthority(Role.USER.toString(), Role.ADMIN.toString())

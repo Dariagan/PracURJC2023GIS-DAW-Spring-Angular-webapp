@@ -45,6 +45,7 @@ import es.codeurjc.nexusapp.utilities.queriers.UserQuerier;
 import es.codeurjc.nexusapp.utilities.responseentity.GetResponseEntityGenerator;
 import es.codeurjc.nexusapp.utilities.responseentity.ResourcesBuilder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -133,12 +134,11 @@ public class UserRestController {
         @RequestParam(value = "page", defaultValue = "0") int page ,
         @RequestParam(value = "size", defaultValue = "10") int size,
         @RequestParam(value = "sort-by", defaultValue = "date") String sortBy,
-        @RequestParam(value = "direction", defaultValue = "desc") String direction,
-        @RequestParam Optional<Long> tweet) //for searching for a specific tweet, doesn't do anything for now
-    {
+        @RequestParam(value = "direction", defaultValue = "desc") String direction
+    ){
         var userOpt = userService.getUserBy(username);
-        if(userOpt.isPresent()){
-
+        if(userOpt.isPresent())
+        {
             List<Tweet> foundTweets = tweetService
                     .getTweetsByUser(userOpt.get(), PageRequest.of(page, size, PageableUtil.getSort(sortBy, direction)))
                     .getContent();
@@ -147,10 +147,10 @@ public class UserRestController {
             for (Tweet foundTweet: foundTweets)
                 dtos.add(new TweetDto(foundTweet));
             
-            return new ResponseEntity<>(
-                dtos, 
-                HttpStatus.OK
-                );
+                return new ResponseEntity<>(
+                    dtos, 
+                    HttpStatus.OK
+                    );      
         } else return ResponseEntity.notFound().build();
     }
 
@@ -212,7 +212,10 @@ public class UserRestController {
         else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    @Operation(summary = "PATCH user's ban")
+    @Operation(summary = "Toggle user's ban status")
+    @ApiResponse(responseCode = "200", description = "User ban status toggled successfully")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @ApiResponse(responseCode = "403", description = "Forbidden - Not admin")
     @PatchMapping("/{username}")
     public ResponseEntity<User> toggleBanOnUser(
         HttpServletRequest request, 
@@ -432,31 +435,25 @@ public class UserRestController {
             return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{username}/image")
-	public ResponseEntity<Resource> downloadImage(@PathVariable String username) 
-    {
-		Optional<User> user = userService.getUserBy(username);
-        if (user.isEmpty()) return ResponseEntity.notFound().build();
-
-        Optional<Blob> image = Optional.ofNullable(user.get().getImage());
-        if (image.isEmpty()) return ResponseEntity.notFound().build();
-
-        return ResourcesBuilder
-            .tryBuildImgResponse(image)
-            .getOrElse(ResponseEntity.internalServerError().build());
-	}
-
     @PostMapping("/{username}/image")
-	public ResponseEntity<Object> uploadImage(@PathVariable String username, @RequestBody MultipartFile imageFile, HttpServletRequest request)
+    @Operation(summary = "Upload an image for a user")
+    @ApiResponse(responseCode = "201", description = "Image uploaded successfully")
+    @ApiResponse(responseCode = "204", description = "No image provided")
+    @ApiResponse(responseCode = "403", description = "Can't change another user's image")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    public ResponseEntity<Object> uploadImage(
+            @Parameter(description = "Username of the user") @PathVariable String username,
+            @Parameter(description = "Image file to upload") @RequestBody MultipartFile imageFile,
+            HttpServletRequest request)
     {
-		Optional<User> user = userService.getUserBy(username);
-        if (user.isEmpty()) return ResponseEntity.notFound().build();
+        Optional<User> user = userService.getUserBy(username);
+        if (user.isEmpty()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         if(UserService.isOwnResource(username, user))
         {
             URI location = fromCurrentRequest().build().toUri();
 
-            if (!imageFile.isEmpty()) 
+            if (!imageFile.isEmpty())
             {
                 try {
                     user.get().setImage(BlobProxy.generateProxy(imageFile.getInputStream(), imageFile.getSize()));
@@ -467,8 +464,29 @@ public class UserRestController {
                     e.printStackTrace();
                     return new ResponseEntity<Object>(location, null, HttpStatus.INTERNAL_SERVER_ERROR);
                 }
-            }	return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
+            }
+            else return new ResponseEntity<Object>(HttpStatus.NO_CONTENT);
         } else return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
-	}
+    }
+
+
+    @GetMapping("/{username}/image")
+    @Operation(summary = "Download the user's image")
+    @ApiResponse(responseCode = "200", description = "Image retrieved successfully", content = @Content(mediaType = "image/*"))
+    @ApiResponse(responseCode = "204", description = "User has no image")
+    @ApiResponse(responseCode = "404", description = "User not found")
+    public ResponseEntity<Resource> downloadImage(
+            @Parameter(description = "Username of the user") @PathVariable String username)
+    {
+        Optional<User> user = userService.getUserBy(username);
+        if (user.isEmpty()) return ResponseEntity.notFound().build();
+
+        Optional<Blob> image = Optional.ofNullable(user.get().getImage());
+        if (image.isEmpty()) return ResponseEntity.noContent().build();
+
+        return ResourcesBuilder
+                .tryBuildImgResponse(image)
+                .getOrElse(ResponseEntity.internalServerError().build());
+    }
 
 }

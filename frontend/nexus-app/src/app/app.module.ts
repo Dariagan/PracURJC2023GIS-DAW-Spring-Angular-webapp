@@ -25,6 +25,7 @@ import { WriteTweetComponent } from './components/write-tweet.component';
 import { FollowButtonComponent } from './components/follow-button.component';
 import { ChartComponent } from './components/chart/chart.component';
 import { SearchbarComponent } from './components/searchbar.component';
+import { ErrorComponent } from './components/error.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { SearchbarComponent } from './components/searchbar.component';
     WriteTweetComponent,
     FollowButtonComponent,
     ChartComponent,
-    SearchbarComponent
+    SearchbarComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
