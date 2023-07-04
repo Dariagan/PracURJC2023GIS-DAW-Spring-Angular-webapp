@@ -8,13 +8,13 @@ FROM node:16 AS angular
 WORKDIR /code
 
 # Copy project dependencies from local project to compilation container directory
-COPY nexus-app/package*.json nexus-app/angular.json nexus-app/tsconfig*.json  /code/
+COPY frontend/nexus-app/package*.json frontend/nexus-app/angular.json frontend/nexus-app/tsconfig*.json  /code/
 
 # Execute command in compilation container to download project dependencies
 RUN npm install --legacy-peer-deps
 
 # Copy project source from local project to compilation container directory
-COPY nexus-app/src /code/src
+COPY frontend/nexus-app/src /code/src
 
 # Compile project using already downloaded libraries configurating the base href
 RUN npm run build -- --configuration production --base-href=/new/
@@ -34,8 +34,8 @@ COPY backend/pom.xml /project/
 RUN mvn clean verify --fail-never
 
 # Source code copy to /src
-COPY nexus_app/src /project/src
-COPY --from=angular /code/dist/project-front-end /project/src/main/resources/static/new
+COPY backend/src /project/src
+COPY --from=angular /code/dist/nexus-app /project/src/main/resources/static/new
 
 # Compile project using already downloaded libraries
 RUN mvn package -DskipTests
