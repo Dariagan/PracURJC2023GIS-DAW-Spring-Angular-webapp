@@ -24,7 +24,7 @@ export class ThreadComponent {
   size: number = 10;
 
   public async restart(){
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 150));
     this.resetPage()
     this.showMoreTweets()
   }

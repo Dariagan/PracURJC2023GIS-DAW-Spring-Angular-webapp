@@ -18,7 +18,7 @@ export class FeedComponent {
 
   viewingUser?:User 
 
-  getTweetsMethod?: (page: number, size: number) => Observable<Tweet[]>;
+
 
   @ViewChild(ThreadComponent) threadComponent!: ThreadComponent;
 
@@ -30,14 +30,19 @@ export class FeedComponent {
         this.viewingUser = 
         user; this.isAdmin = UserService.isAdmin(this.viewingUser);
         this.threadComponent.refreshViewingUsers(this.viewingUser)
-        this.getTweetsMethod = 
-        (page: number, size: number) => this.tweetService.getFollowedUsersTweets(this.viewingUser!.username, page, size)
-        this.threadComponent.tweetRetrievalMethod = this.getTweetsMethod
+        
+        if(this.viewingUser.following.length > 0)
+          this.threadComponent.tweetRetrievalMethod = 
+          (page: number, size: number) => this.tweetService.getFollowedUsersTweets(this.viewingUser!.username, page, size)
+        else
+        this.threadComponent.tweetRetrievalMethod = 
+        (page: number, size: number) => this.tweetService.getMostLikedTweets(page, size)
+
         this.threadComponent.showMoreTweets();
       },
       () => {
-        this.getTweetsMethod = (page: number, size: number) => this.tweetService.getNewestTweets(page, size)
-        this.threadComponent.tweetRetrievalMethod = this.getTweetsMethod
+        this.threadComponent.tweetRetrievalMethod = 
+        (page: number, size: number) => this.tweetService.getNewestTweets(page, size)
         this.threadComponent.showMoreTweets();
       }
     );
@@ -57,12 +62,12 @@ export class FeedComponent {
 
   onSearch(input:string){
     let tags: string[] = input.split(/[\s]+/);
-    this.getTweetsMethod = (page: number, size: number) => this.tweetService.getTweetsByTags(tags, page, size);
+    this.threadComponent.tweetRetrievalMethod = (page: number, size: number) => this.tweetService.getTweetsByTags(tags, page, size);
     this.threadComponent.restart()
   }
 
   moderateButtonClicked(){
-    this.getTweetsMethod = (page: number, size: number) => this.tweetService.getMostReportedTweets(page, size);
+    this.threadComponent.tweetRetrievalMethod = (page: number, size: number) => this.tweetService.getMostReportedTweets(page, size);
     this.threadComponent.restart()
   }
   
