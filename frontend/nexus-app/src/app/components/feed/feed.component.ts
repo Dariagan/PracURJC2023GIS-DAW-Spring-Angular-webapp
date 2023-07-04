@@ -1,7 +1,7 @@
 import { Component, SimpleChanges, ViewChild } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
-import { LoginService } from 'app/services/login.service';
+import { AuthService } from 'app/services/login.service';
 import { TweetService } from 'app/services/tweet.service';
 import { Observable } from 'rxjs';
 import { ThreadComponent } from '../thread/thread.component';
@@ -27,7 +27,7 @@ export class FeedComponent {
   ngOnInit(): void {
     this.userService.getCurrentUser().subscribe(
       user => {this.viewingUser = user; this.isAdmin = UserService.isAdmin(this.viewingUser)}
-      
+
     );
     
   }

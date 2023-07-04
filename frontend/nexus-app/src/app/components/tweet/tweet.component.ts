@@ -4,7 +4,7 @@ import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
 import { Router } from '@angular/router';
 import { TweetService } from 'app/services/tweet.service';
-import { LoginService } from 'app/services/login.service';
+import { AuthService } from 'app/services/login.service';
 import { UserService } from 'app/services/user.service';
 
 @Component({
@@ -32,7 +32,7 @@ export class TweetComponent {
 
   ownTweet?:boolean;
 
-  constructor(private loginService:LoginService, private tweetService:TweetService, private userService:UserService, private router: Router){}
+  constructor(private loginService:AuthService, private tweetService:TweetService, private userService:UserService, private router: Router){}
 
   ngOnInit(): void {
     this.authorBanned = UserService.isBanned(this.tweet?.author)

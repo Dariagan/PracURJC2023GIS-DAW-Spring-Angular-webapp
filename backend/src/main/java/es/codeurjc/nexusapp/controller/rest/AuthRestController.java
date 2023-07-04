@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RequiredArgsConstructor
 public class AuthRestController {
 
-    public record LoginRequest(String username, String password) {}
+    public record LoginRequest(String username, String password, String email) {}
     
     private final AuthService authService;
     
@@ -47,11 +47,9 @@ public class AuthRestController {
             responseCode = "400", description = "Bad request")})
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(
-        @RequestParam String email,
-        @RequestParam String username,
-        @RequestParam String password
+        @RequestBody LoginRequest loginRequest
     ) {
-        return authService.register(email, username, password);
+        return authService.register(loginRequest);
     }
 
     @Operation(summary = "Authenticate current session with username and password")
@@ -80,7 +78,7 @@ public class AuthRestController {
         } catch (Exception ignored) {}
 
         if (username.isPresent() && password.isPresent())
-            loginRequest = new LoginRequest(username.get(), password.get());
+            loginRequest = new LoginRequest(username.get(), password.get(), null);
 
         return authService.login(loginRequest, accessToken, refreshToken);
     }

@@ -1,0 +1,469 @@
+.loginpage-container {
+    min-height: 100vh;
+    background-image: linear-gradient(149deg, rgba(30, 26, 59, 1) 0%, rgba(51, 46, 89, 1) 100%);
+  }
+  .loginpage-loginpage {
+    width: 100%;
+    height: 1117px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }
+  .loginpage-logo {
+    top: 16px;
+    left: 16px;
+    width: 23.143390655517578px;
+    height: 26px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    margin-right: 0;
+    border-radius: 0px 0px 0px 0px;
+    margin-bottom: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-group {
+    top: 0px;
+    left: 0px;
+    width: 23.143390655517578px;
+    height: 26px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    border-radius: 0px 0px 0px 0px;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-vector {
+    top: 0px;
+    left: 0px;
+    width: 23px;
+    height: 26px;
+    position: absolute;
+  }
+  .loginpage-btn {
+    top: 11px;
+    left: 1551px;
+    width: 164px;
+    height: 33px;
+    display: flex;
+    padding: 10px;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: rgba(83, 76, 134, 1);
+    border-style: solid;
+    border-width: 1 px;
+    border-radius: 100px;
+    justify-content: center;
+    background-color: rgba(51, 46, 89, 1);
+  }
+  .loginpage-text {
+    color: rgba(224, 211, 222, 1);
+    width: 121px;
+    height: auto;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Bold;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 700;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .loginpage-content {
+    top: calc(50% - 300px);
+    left: calc(50% - 211px);
+    width: 423px;
+    height: 469px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }
+  .loginpage-login {
+    top: 144px;
+    left: 1px;
+    width: 423px;
+    display: flex;
+    padding: 19px 0;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    border-color: transparent;
+    flex-direction: column;
+  }
+  
+  .loginpage-keplr {
+    bottom: -40px;
+    left: 1px;
+    width: 423px;
+    display: flex;
+    padding: 19px 0;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    border-color: transparent;
+    flex-direction: column;
+  }
+  .loginpage-input {
+    color: rgba(83, 76, 134, 1);
+    width: 268px;
+    height: 41px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    font-size: 16px;
+    text-align: center;
+    align-items: flex-start;
+    flex-shrink: 0;
+    font-family: Ubuntu;
+    font-weight: 400;
+    border-color: rgba(83, 76, 134, 1);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    background-color: rgba(30, 26, 59, 1);
+  }
+  .loginpage-mainbutton {
+    width: 164px;
+    height: 41px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: rgba(83, 76, 134, 1);
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 60px;
+    margin-bottom: 25px;
+    background-color: rgba(224, 211, 222, 1);
+  }
+  .loginpage-mainbutton[value="Log in"] {
+    color: rgba(30, 26, 59, 1);
+    font-size: 16px;
+    align-self: auto;
+    font-style: Medium;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+    justify-content: center;
+  }
+  
+  .loginpage-divisor {
+    width: 423px;
+    height: 43px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+    margin-bottom: 25px;
+  }
+  .loginpage-text04 {
+    top: 13px;
+    left: 201px;
+    color: rgba(83, 76, 134, 1);
+    height: auto;
+    position: absolute;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Medium;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .loginpage-line1 {
+    top: 23px;
+    left: 3px;
+    width: 169px;
+    height: 0px;
+    position: absolute;
+    border-color: #534c86;
+    border-width: 1px;
+  }
+  .loginpage-line2 {
+    top: 24px;
+    left: 250px;
+    width: 173px;
+    height: 0px;
+    position: absolute;
+    border-color: #534c86;
+    border-width: 1px;
+  }
+  .loginpage-text06 {
+    top: 11px;
+    left: 29px;
+    color: rgba(30, 26, 59, 1);
+    width: 107px;
+    height: auto;
+    position: absolute;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Medium;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+  .loginpage-select {
+    top: 77px;
+    left: 0px;
+    width: 425px;
+    display: flex;
+    padding: 10px 90px;
+    overflow: hidden;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    border-width: 0 0 2px 0;
+    border-style: solid;
+    border-color: #534C86;
+  }
+  .loginpage-text08 {
+    color: rgba(224, 211, 222, 1);
+    height: auto;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Medium;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 120px;
+    margin-bottom: 0;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .loginpage-text10 {
+    color: rgba(116, 179, 206, 1);
+    height: auto;
+    font-size: 16px;
+    align-self: auto;
+    font-style: Medium;
+    text-align: center;
+    font-family: Ubuntu;
+    font-weight: 500;
+    line-height: normal;
+    font-stretch: normal;
+    margin-right: 0;
+    margin-bottom: 0;
+    text-decoration: none;
+  }
+
+  .loginpage-logo1 {
+    top: 0px;
+    left: 90px;
+    width: 243px;
+    height: 48px;
+    display: flex;
+    overflow: hidden;
+    position: absolute;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }
+  .loginpage-chi {
+    top: 0px;
+    left: 104.88163757324219px;
+    width: 40.85154342651367px;
+    height: 48px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    margin-right: 0;
+    border-radius: 0px 0px 0px 0px;
+    margin-bottom: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-chi2 {
+    top: 0px;
+    left: 0px;
+    width: 41px;
+    height: 48px;
+    position: absolute;
+  }
+  .loginpage-chi1 {
+    top: 0.10007081925868988px;
+    left: 0.04601544514298439px;
+    width: 41px;
+    height: 48px;
+    position: absolute;
+  }
+  .loginpage-nexus {
+    top: 0.001220703125px;
+    left: 0px;
+    width: 243px;
+    height: 47.998779296875px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    margin-right: 0;
+    border-radius: 0px 0px 0px 0px;
+    margin-bottom: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-nexuspath {
+    top: 0px;
+    left: 0px;
+    width: 243px;
+    height: 48px;
+    position: absolute;
+  }
+  :root {
+    --dl-color-gray-500: #595959;
+    --dl-color-gray-700: #999999;
+    --dl-color-gray-900: #D9D9D9;
+    --dl-size-size-large: 144px;
+    --dl-size-size-small: 48px;
+    --dl-color-danger-300: #A22020;
+    --dl-color-danger-500: #BF2626;
+    --dl-color-danger-700: #E14747;
+    --dl-color-gray-black: #000000;
+    --dl-color-gray-white: #FFFFFF;
+    --dl-size-size-medium: 96px;
+    --dl-size-size-xlarge: 192px;
+    --dl-size-size-xsmall: 16px;
+    --dl-space-space-unit: 16px;
+    --dl-color-primary-100: #003EB3;
+    --dl-color-primary-300: #0074F0;
+    --dl-color-primary-500: #14A9FF;
+    --dl-color-primary-700: #85DCFF;
+    --dl-color-success-300: #199033;
+    --dl-color-success-500: #32A94C;
+    --dl-color-success-700: #4CC366;
+    --dl-size-size-xxlarge: 288px;
+    --dl-size-size-maxwidth: 1400px;
+    --dl-radius-radius-round: 50%;
+    --dl-space-space-halfunit: 8px;
+    --dl-space-space-sixunits: 96px;
+    --dl-space-space-twounits: 32px;
+    --dl-radius-radius-radius2: 2px;
+    --dl-radius-radius-radius4: 4px;
+    --dl-radius-radius-radius8: 8px;
+    --dl-space-space-fiveunits: 80px;
+    --dl-space-space-fourunits: 64px;
+    --dl-space-space-threeunits: 48px;
+    --dl-space-space-oneandhalfunits: 24px;
+  }
+  .button {
+    color: var(--dl-color-gray-black);
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-color: var(--dl-color-gray-black);
+    border-width: 1px;
+    border-radius: 4px;
+    background-color: var(--dl-color-gray-white);
+  }
+  .input {
+    color: var(--dl-color-gray-black);
+    cursor: auto;
+    padding: 0.5rem 1rem;
+    border-color: var(--dl-color-gray-black);
+    border-width: 1px;
+    border-radius: 4px;
+    background-color: var(--dl-color-gray-white);
+  }
+  .textarea {
+    color: var(--dl-color-gray-black);
+    cursor: auto;
+    padding: 0.5rem;
+    border-color: var(--dl-color-gray-black);
+    border-width: 1px;
+    border-radius: 4px;
+    background-color: var(--dl-color-gray-white);
+  }
+  .list {
+    width: 100%;
+    margin: 1em 0px 1em 0px;
+    display: block;
+    padding: 0px 0px 0px 1.5rem;
+    list-style-type: none;
+    list-style-position: outside;
+  }
+  .list-item {
+    display: list-item;
+  }
+  .teleport-show {
+    display: flex !important;
+    transform: none !important;
+  }
+  .Content {
+    font-size: 16px;
+    font-family: Inter;
+    font-weight: 400;
+    line-height: 1.15;
+    text-transform: none;
+    text-decoration: none;
+  }
+  .Heading {
+    font-size: 32px;
+    font-family: Inter;
+    font-weight: 700;
+    line-height: 1.15;
+    text-transform: none;
+    text-decoration: none;
+  }
+  

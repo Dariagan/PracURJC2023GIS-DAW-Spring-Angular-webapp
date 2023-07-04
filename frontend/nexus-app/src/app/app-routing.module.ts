@@ -6,10 +6,12 @@ import { ProfileComponent } from './components/profile/profile.component';
 import { ChartComponent } from './components/chart/chart.component';
 import { ErrorComponent } from './components/error.component';
 import { LogoutComponent } from './components/logout.component';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
 
 const routes: Routes = [
 
   { path: '', component: LoginComponent },
+  { path: 'signup', component: SignUpComponent },
   { path: 'feed', component: FeedComponent},
   { path: 'chart', component: ChartComponent},
   { path: 'logout', component: LogoutComponent },

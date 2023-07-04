@@ -1,5 +1,7 @@
 package es.codeurjc.nexusapp.service;
 
+import java.net.URI;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,22 +95,26 @@ public class AuthService {
 	}
 
 	public ResponseEntity<?> register(
-    String email, String username, String password
+		LoginRequest loginRequest
     ) {
         //if (!emailService.emailIsValid(email))
             //return ResponseBuilder.badReq("Wrong email provided");
         
-        if (userService.isUsernameTaken(username))
+        if (userService.isUsernameTaken(loginRequest.username()))
             return ResponseBuilder.badReq("Username already in use");
         
         // NOTE not production ready code
-        if (password.length() < 1)
+        if (loginRequest.password().length() < 1)
             return ResponseBuilder.badReq("Password too short");
         
-        User newUser = userService.buildHelper(username, email, passwordEncoder.encode(password));
-        userService.save(newUser);
+        var builder = new User.Builder();
+		builder.setUsername(loginRequest.username())
+			.setEncodedPassword(passwordEncoder.encode(loginRequest.password()))
+			.setEmail(loginRequest.email()).build();
+
+        userService.save(builder.build());
         
-        return login(new LoginRequest(username, password), null, null);
+        return ResponseEntity.ok().build();
     }
 
 	public ResponseEntity<AuthResponse> refresh(String encryptedRefreshToken) {

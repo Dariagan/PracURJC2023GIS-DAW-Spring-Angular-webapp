@@ -9,7 +9,7 @@ const BASE_URL = '/api/auth';
 @Injectable({
   providedIn: 'root'
 })
-export class LoginService {
+export class AuthService {
 
     logged: boolean = false;
 
@@ -28,13 +28,15 @@ export class LoginService {
         );
     }
 
-    register(userData: any): Observable<any> {
-        return this.httpClient.post("/api/users/", userData)
+    signUp(username: string, password: string): Observable<any> {
+        const loginRequest = { username: username, password: password };
+
+        return this.httpClient.post(BASE_URL + "/signup", loginRequest)
           .pipe(
             map((response: any) => {
               return response;
             }),
-            catchError((error: any) => {
+            catchError(() => {
               return throwError('Register Error');
             })
           );

@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Tweet } from 'app/models/tweet.model';
 import { User } from 'app/models/user';
-import { LoginService } from 'app/services/login.service';
+import { AuthService } from 'app/services/login.service';
 import { TweetService } from 'app/services/tweet.service';
 import { UserService } from 'app/services/user.service';
 import { Observable } from 'rxjs';
@@ -68,7 +68,7 @@ export class ProfileComponent {
     this.threadComponent.refreshUsers()
   }
 
-  constructor(private loginService: LoginService, private userService: UserService, 
+  constructor(private loginService: AuthService, private userService: UserService, 
     private tweetService: TweetService, private activatedRoute: ActivatedRoute, private router: Router){
     
   }

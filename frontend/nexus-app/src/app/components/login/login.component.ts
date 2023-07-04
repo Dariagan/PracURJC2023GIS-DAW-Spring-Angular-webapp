@@ -1,5 +1,5 @@
 import { Component, ElementRef, Injectable } from '@angular/core';
-import { LoginService } from 'app/services/login.service';
+import { AuthService } from 'app/services/login.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 @Injectable({providedIn: 'root'})
 export class LoginComponent {
 
-  constructor(private loginService: LoginService, private router: Router){}
+  constructor(private loginService: AuthService, private router: Router){}
 
   logIn(event: any, username: string, password: string) {
 
@@ -26,7 +26,4 @@ export class LoginComponent {
     );
   }
 
-  logOut() {
-    this.loginService.logOut();
-  }
 }

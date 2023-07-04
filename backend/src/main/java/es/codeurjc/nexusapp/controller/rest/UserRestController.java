@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import es.codeurjc.nexusapp.model.Tweet;
 import es.codeurjc.nexusapp.model.User;
+import es.codeurjc.nexusapp.model.User.UsernameView;
 import es.codeurjc.nexusapp.service.TweetService;
 import es.codeurjc.nexusapp.service.UserService;
 import es.codeurjc.nexusapp.utilities.PageableUtil;
@@ -308,7 +309,8 @@ public class UserRestController {
         @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)})
     @PostMapping("/{username}/blocks")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<String> blockUser(
+    @JsonView(User.UsernameView.class)
+    public ResponseEntity<User> blockUser(
         HttpServletRequest request, 
         @PathVariable String username,
         @RequestBody String blocked) 
@@ -323,7 +325,7 @@ public class UserRestController {
                 userService.save(loggedUserOpt.get());
                 URI location = fromCurrentRequest().path("/{blocked}")
                     .buildAndExpand(blocked).toUri();
-                return ResponseEntity.created(location).body(blocked);
+                return ResponseEntity.created(location).body(blockedUserOpt.get());
             }
             else return ResponseEntity.notFound().build();
         } 
@@ -361,7 +363,7 @@ public class UserRestController {
             {
                 loggedUserOpt.get().getBlocked().remove(unblockedUserOpt.get());
                 userService.save(loggedUserOpt.get());
-                return new ResponseEntity<>(null, HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
             } 
             else return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 

@@ -165,17 +165,6 @@ public final class UserService implements EntityService<User>
         return "redirect:" + req.getHeader("Referer");
     }
 
-    public User buildHelper(String username, String email, String encodedPassword)
-    {
-        User.Builder builder = new User.Builder();
-
-        builder
-            .setUsername(username)
-            .setEmail(email)
-            .setEncodedPassword(encodedPassword);
-
-        return builder.build();
-    }
 
 
 }
