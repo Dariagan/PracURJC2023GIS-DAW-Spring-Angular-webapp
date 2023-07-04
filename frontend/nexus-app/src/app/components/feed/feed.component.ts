@@ -18,7 +18,7 @@ export class FeedComponent {
 
   viewingUser?:User 
 
-  getTweetsMethod: (page: number, size: number) => Observable<Tweet[]>;
+  getTweetsMethod?: (page: number, size: number) => Observable<Tweet[]>;
 
   @ViewChild(ThreadComponent) threadComponent!: ThreadComponent;
 
@@ -26,8 +26,20 @@ export class FeedComponent {
 
   ngOnInit(): void {
     this.userService.getCurrentUser().subscribe(
-      user => {this.viewingUser = user; this.isAdmin = UserService.isAdmin(this.viewingUser)}
-
+      user => {
+        this.viewingUser = 
+        user; this.isAdmin = UserService.isAdmin(this.viewingUser);
+        this.threadComponent.refreshViewingUsers(this.viewingUser)
+        this.getTweetsMethod = 
+        (page: number, size: number) => this.tweetService.getFollowedUsersTweets(this.viewingUser!.username, page, size)
+        this.threadComponent.tweetRetrievalMethod = this.getTweetsMethod
+        this.threadComponent.showMoreTweets();
+      },
+      () => {
+        this.getTweetsMethod = (page: number, size: number) => this.tweetService.getNewestTweets(page, size)
+        this.threadComponent.tweetRetrievalMethod = this.getTweetsMethod
+        this.threadComponent.showMoreTweets();
+      }
     );
     
   }
@@ -40,9 +52,7 @@ export class FeedComponent {
   }
 
   constructor(private userService: UserService, private tweetService: TweetService){ 
-    this.getTweetsMethod = this.viewingUser
-      ? (page: number, size: number) => this.tweetService.getFollowedUsersTweets(this.viewingUser!.username, page, size)
-      : (page: number, size: number) => this.tweetService.getNewestTweets(page, size);
+    
   }
 
   onSearch(input:string){

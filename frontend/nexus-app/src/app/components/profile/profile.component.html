@@ -44,7 +44,7 @@
         <div class="profileanon-profileanon">
           <app-write-tweet *ngIf="!banned && ownProfile" (postedTweet)="loadInLastTweet()">
           </app-write-tweet>
-          <app-thread [tweetRetrievalMethod]="getTweetsMethod" [viewingUser]="viewingUser">
+          <app-thread [viewingUser]="viewingUser">
           </app-thread>
           <div class="profileanon-trending">
             <span class="profileanon-text036"><span>Trending</span></span>

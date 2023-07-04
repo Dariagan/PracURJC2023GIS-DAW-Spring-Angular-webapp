@@ -17,7 +17,7 @@ export class SignUpComponent {
 
     this.loginService.signUp(username, password).subscribe(
       () => {
-        this.router.navigate([''])
+        this.router.navigate(['feed'])
       },
       () => {
         alert("Error on signup");

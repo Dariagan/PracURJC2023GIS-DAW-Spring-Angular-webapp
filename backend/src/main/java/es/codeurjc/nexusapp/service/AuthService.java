@@ -114,7 +114,7 @@ public class AuthService {
 
         userService.save(builder.build());
         
-        return ResponseEntity.ok().build();
+        return login(loginRequest, null, null);
     }
 
 	public ResponseEntity<AuthResponse> refresh(String encryptedRefreshToken) {

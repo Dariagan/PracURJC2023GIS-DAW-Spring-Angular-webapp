@@ -20,15 +20,17 @@ export class ProfileComponent {
   ownProfile?: boolean = false;
   blockedByViewer?: boolean = false;
   banned: boolean = false;
-  getTweetsMethod!: (page: number, size: number) => Observable<Tweet[]>;
+  
   @ViewChild(ThreadComponent) threadComponent!: ThreadComponent;
 
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
       const username = params['username'];
-      this.getTweetsMethod = (page: number) => this.tweetService.getUserTweets(username, page, 10);
+      
       this.userService.getUser(username).subscribe(
         foundUser => {
+          this.threadComponent.tweetRetrievalMethod = (page: number) => this.tweetService.getUserTweets(username, page, 10);
+          this.threadComponent.showMoreTweets()
           this.user = foundUser
           this.banned = this.user?.role == "BANNED";
           this.userService.getCurrentUser().subscribe(
@@ -36,6 +38,7 @@ export class ProfileComponent {
                 this.viewingUser = user
                 this.ownProfile = this.viewingUser && this.viewingUser.username == this.user?.username;
                 this.blockedByViewer = !this.ownProfile && this.viewingUser && this.user && this.viewingUser.blocked.includes(this.user?.username);  
+                
               }
             );
           
@@ -65,7 +68,8 @@ export class ProfileComponent {
   }
 
   refreshTweetsViewingUser(){
-    this.threadComponent.refreshUsers()
+    if(this.viewingUser)
+      this.threadComponent.refreshViewingUsers(this.viewingUser)
   }
 
   constructor(private loginService: AuthService, private userService: UserService, 

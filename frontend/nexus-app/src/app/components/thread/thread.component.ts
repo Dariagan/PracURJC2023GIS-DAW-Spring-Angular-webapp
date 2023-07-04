@@ -15,22 +15,13 @@ export class ThreadComponent {
 
   @ViewChildren(TweetComponent) tweetComponents!: QueryList<TweetComponent>;
 
-  @Input()
-  tweetRetrievalMethod!: (page: number, size: number) => Observable<Tweet[]>;
+  tweetRetrievalMethod?: (page: number, size: number) => Observable<Tweet[]>;
 
   @Input()
   viewingUser?: User;
 
   page: number = 0;
   size: number = 10;
-
-  constructor(){
-  }
-
-
-  ngOnInit(): void {
-    this.showMoreTweets()
-  }
 
   public async restart(){
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -42,15 +33,21 @@ export class ThreadComponent {
     this.displayedTweets = []
   }
   showMoreTweets(){
-    this.tweetRetrievalMethod(this.page, this.size).subscribe(
-      newTweets => {this.displayedTweets = this.displayedTweets.concat(newTweets); this.page++;}
-    )
+    if(this.tweetRetrievalMethod){
+      this.tweetRetrievalMethod(this.page, this.size).subscribe(
+        newTweets => {
+          this.displayedTweets = this.displayedTweets.concat(newTweets); 
+          this.page++;
+        }
+      )
+    }
   }
 
   public loadInLastTweet(){
-    this.tweetRetrievalMethod(0, 1).subscribe(
-      newTweet => this.displayedTweets = newTweet.concat(this.displayedTweets)
-    )
+    if(this.tweetRetrievalMethod)
+      this.tweetRetrievalMethod(0, 1).subscribe(
+        newTweet => this.displayedTweets = newTweet.concat(this.displayedTweets)
+      )
   }
 
   refreshTweetsBlocked(blocked: boolean){
@@ -69,8 +66,6 @@ export class ThreadComponent {
   sortByMostReported(){
     
   }
-
-  
   
   removeTweetFromList(id: number){
     this.displayedTweets = this.displayedTweets.filter(tweet => tweet.id !== id);
@@ -81,9 +76,10 @@ export class ThreadComponent {
       tweetComponent.refreshTweet();
     });
   }
-  refreshUsers(){
+  refreshViewingUsers(viewingUser: User){
+    this.viewingUser = viewingUser
     this.tweetComponents.forEach(tweetComponent => {
-      tweetComponent.refreshViewingUser();
+      tweetComponent.viewingUser = viewingUser
     });
   }
 }
