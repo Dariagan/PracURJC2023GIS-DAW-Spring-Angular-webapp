@@ -5,13 +5,17 @@ import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import es.codeurjc.nexusapp.model.User;
+import es.codeurjc.nexusapp.security.JwtCookieManager;
 import es.codeurjc.nexusapp.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -82,15 +86,20 @@ public class AuthRestController {
         @ApiResponse(
             responseCode = "500", description = "Couldn't log out")
         })
-    @GetMapping("/logout")
-    public ResponseEntity<?> logOut(HttpServletRequest req){
+    @PostMapping("/logout")
+    public ResponseEntity<?> logOut(HttpServletRequest req, HttpServletResponse res){
         
         try {
             req.logout();
+
+            JwtCookieManager jwtCookieManager = new JwtCookieManager();
+            res.addHeader(HttpHeaders.SET_COOKIE, jwtCookieManager.deleteAccessTokenCookie().toString());
+            res.addHeader(HttpHeaders.SET_COOKIE, jwtCookieManager.deleteRefreshTokenCookie().toString());
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (ServletException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
 }
