@@ -1,0 +1,1221 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: https://localhost:8443
+  description: Generated server url
+paths:
+  /api/users:
+    get:
+      tags:
+      - user-rest-controller
+      summary: GET paged users from Pageable parameters
+      operationId: getUsers
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: username
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      responses:
+        "200":
+          description: Found users
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_FullView'
+    post:
+      tags:
+      - user-rest-controller
+      summary: POST new user
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/users/{username}/image:
+    get:
+      tags:
+      - user-rest-controller
+      operationId: downloadImage
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+    post:
+      tags:
+      - user-rest-controller
+      operationId: uploadImage
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageFile:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/users/{username}/blocks:
+    get:
+      tags:
+      - user-rest-controller
+      summary: GET block list of pathvariable username
+      operationId: getUserBlocks
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: "Optional[username]"
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      - name: user
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "404":
+          description: User not found
+        "200":
+          description: Found users blocked by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_UsernameView'
+    post:
+      tags:
+      - user-rest-controller
+      summary: POST user in block list
+      operationId: blockUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/users/{follower}/following:
+    post:
+      tags:
+      - user-rest-controller
+      summary: POST user in followlist
+      operationId: followUser
+      parameters:
+      - name: follower
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_UsernameView'
+  /api/tweets:
+    get:
+      tags:
+      - tweet-rest-controller
+      summary: Get tweets from pageable params
+      operationId: getAll
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: date
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      - name: tags
+        in: query
+        required: false
+        schema:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        "404":
+          description: Not found
+    post:
+      tags:
+      - tweet-rest-controller
+      summary: Post new tweet
+      operationId: postTweet
+      parameters:
+      - name: tweetText
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: image
+        in: query
+        required: true
+        schema:
+          type: string
+          format: binary
+      - name: tags
+        in: query
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet_TweetIdentifyingView'
+        "403":
+          description: Forbidden
+  /api/tweets/{id}/reports:
+    get:
+      tags:
+      - tweet-rest-controller
+      summary: Get reporters of a tweet by tweet id
+      operationId: getReportersByTweetId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: user
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Found the tweet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_UsernameView'
+        "400":
+          description: Tweet id is not integer
+        "404":
+          description: not found
+    post:
+      tags:
+      - tweet-rest-controller
+      summary: POST reporting user to tweet's reportlist
+      operationId: reportTweet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "403":
+          description: Forbidden
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Tweet id is not integer
+  /api/tweets/{id}/likes:
+    get:
+      tags:
+      - tweet-rest-controller
+      summary: Get likers of a tweet by tweet id
+      operationId: getLikesByTweetId
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: user
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Found the tweet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_UsernameView'
+        "400":
+          description: Tweet id is not integer
+        "404":
+          description: not found
+    post:
+      tags:
+      - tweet-rest-controller
+      summary: POST liking user to tweet's likelist
+      operationId: likeTweet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonString'
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "400":
+          description: Tweet id is not integer
+  /api/tweets/{id}/image:
+    get:
+      tags:
+      - tweet-rest-controller
+      operationId: downloadImage_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+      - tweet-rest-controller
+      operationId: uploadImage_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/auth/signup:
+    post:
+      tags:
+      - auth-rest-controller
+      summary: Sign up with user details
+      operationId: signUp
+      parameters:
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: password
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "400":
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: object
+        "200":
+          description: Sign up successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/auth/login:
+    post:
+      tags:
+      - auth-rest-controller
+      summary: Authenticate current session with username and password
+      operationId: logIn
+      parameters:
+      - name: accessToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      - name: refreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Wrong password
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Couldn't find user
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/users/{username}:
+    get:
+      tags:
+      - user-rest-controller
+      summary: Get user by username
+      operationId: getUserByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Found the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: Not found
+    patch:
+      tags:
+      - user-rest-controller
+      summary: PATCH user's ban
+      operationId: toggleBanOnUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: banned
+        in: query
+        required: true
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/User'
+  /api/users/{username}/tweets:
+    get:
+      tags:
+      - user-rest-controller
+      summary: Get tweets by username
+      operationId: getTweetsByUsername
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: date
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      - name: tweet
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+  /api/users/{username}/following:
+    get:
+      tags:
+      - user-rest-controller
+      summary: GET users followed by pathvariable username
+      operationId: getUserFollowing
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+          default: "Optional[username]"
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      - name: user
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Found users followed by user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User_UsernameView'
+        "404":
+          description: User not found
+  /api/users/{username}/following/tweets:
+    get:
+      tags:
+      - user-rest-controller
+      summary: GET followed users' tweets
+      operationId: getFollowedUserTweets
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: sort-by
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: direction
+        in: query
+        required: false
+        schema:
+          type: string
+          default: desc
+      - name: tweet
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet_FullView'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+  /api/users/me:
+    get:
+      tags:
+      - user-rest-controller
+      summary: GET authenticated user
+      operationId: getLoggedUser
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "404":
+          description: User not found
+  /api/tweets/{id}:
+    get:
+      tags:
+      - tweet-rest-controller
+      summary: Get tweet by id
+      operationId: getTweetById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Id is not an integer
+        "200":
+          description: Found the tweet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        "404":
+          description: Not found
+    delete:
+      tags:
+      - tweet-rest-controller
+      summary: Delete tweet
+      operationId: deleteTweet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "400":
+          description: Invalid id given
+        "403":
+          description: Forbidden
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tweet'
+        "404":
+          description: Not found
+  /api/ex/user-str:
+    get:
+      tags:
+      - example-routes
+      operationId: getUserStr
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/ex/public-str:
+    get:
+      tags:
+      - example-routes
+      operationId: getPublicStr
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/ex/name:
+    get:
+      tags:
+      - example-routes
+      operationId: getName
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/ex/admin-str:
+    get:
+      tags:
+      - example-routes
+      operationId: getAdminStr
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /api/auth/logout:
+    get:
+      tags:
+      - auth-rest-controller
+      summary: Log out of current session
+      operationId: logOut
+      responses:
+        "200":
+          description: Logout successful
+          content:
+            '*/*':
+              schema:
+                type: object
+        "500":
+          description: Couldn't log out
+          content:
+            '*/*':
+              schema:
+                type: object
+  /api/users/{username}/blocks/{unblocked}:
+    delete:
+      tags:
+      - user-rest-controller
+      summary: DELETE user from blocklist
+      operationId: unblockUser
+      parameters:
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: unblocked
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+  /api/users/{unfollower}/following/{unfollowed}:
+    delete:
+      tags:
+      - user-rest-controller
+      summary: Delete user from followlist
+      operationId: unfollowUser
+      parameters:
+      - name: unfollower
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: unfollowed
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+  /api/tweets/{id}/likes/{username}:
+    delete:
+      tags:
+      - tweet-rest-controller
+      summary: DELETE self user from tweet's likelist
+      operationId: unlikeTweet
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        "403":
+          description: Forbidden
+        "400":
+          description: Tweet id is not integer
+components:
+  schemas:
+    GrantedAuthority:
+      type: object
+      properties:
+        authority:
+          type: string
+    Tweet:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        author:
+          $ref: '#/components/schemas/User'
+        date:
+          type: string
+          format: date-time
+        reporters:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        text:
+          type: string
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        likes:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet'
+        shares:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet'
+        userName:
+          type: string
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        signUpDate:
+          type: string
+          format: date-time
+        role:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - BANNED
+        tweets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet'
+        following:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        followers:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        enabled:
+          type: boolean
+        admin:
+          type: boolean
+        banned:
+          type: boolean
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantedAuthority'
+        accountNonLocked:
+          type: boolean
+        password:
+          type: string
+        accountNonExpired:
+          type: boolean
+        credentialsNonExpired:
+          type: boolean
+    GrantedAuthority_UsernameView:
+      type: object
+      properties:
+        authority:
+          type: string
+    User_UsernameView:
+      type: object
+      properties:
+        username:
+          type: string
+        enabled:
+          type: boolean
+        admin:
+          type: boolean
+        banned:
+          type: boolean
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantedAuthority_UsernameView'
+        accountNonLocked:
+          type: boolean
+        password:
+          type: string
+        accountNonExpired:
+          type: boolean
+        credentialsNonExpired:
+          type: boolean
+    Tweet_TweetIdentifyingView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet_TweetIdentifyingView'
+        shares:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet_TweetIdentifyingView'
+        userName:
+          type: string
+    JsonString:
+      type: object
+      properties:
+        text:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    GrantedAuthority_FullView:
+      type: object
+      properties:
+        authority:
+          type: string
+    Tweet_FullView:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        author:
+          $ref: '#/components/schemas/User_FullView'
+        date:
+          type: string
+          format: date-time
+        reporters:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User_FullView'
+        text:
+          type: string
+        tags:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        likes:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/User_FullView'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet_FullView'
+        shares:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Tweet_FullView'
+        userName:
+          type: string
+    User_FullView:
+      type: object
+      properties:
+        username:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        description:
+          type: string
+        signUpDate:
+          type: string
+          format: date-time
+        role:
+          type: string
+          enum:
+          - USER
+          - ADMIN
+          - BANNED
+        enabled:
+          type: boolean
+        admin:
+          type: boolean
+        banned:
+          type: boolean
+        authorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrantedAuthority_FullView'
+        accountNonLocked:
+          type: boolean
+        password:
+          type: string
+        accountNonExpired:
+          type: boolean
+        credentialsNonExpired:
+          type: boolean

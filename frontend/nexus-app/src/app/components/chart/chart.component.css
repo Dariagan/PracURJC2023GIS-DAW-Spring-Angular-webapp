@@ -1,0 +1,80 @@
+.loginpage-container {
+    min-height: 100vh;
+    background-image: linear-gradient(149deg, rgba(30, 26, 59, 1) 0%, rgba(51, 46, 89, 1) 100%);
+  }
+  .loginpage-loginpage {
+    width: 100%;
+    height: 1117px;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    align-items: flex-start;
+    flex-shrink: 0;
+    border-color: transparent;
+  }
+  .loginpage-logo {
+    top: 16px;
+    left: 16px;
+    width: 23.143390655517578px;
+    height: 26px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    margin-right: 0;
+    border-radius: 0px 0px 0px 0px;
+    margin-bottom: 0;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-group {
+    top: 0px;
+    left: 0px;
+    width: 23.143390655517578px;
+    height: 26px;
+    display: flex;
+    padding: 0;
+    position: absolute;
+    align-self: auto;
+    box-sizing: border-box;
+    align-items: flex-start;
+    flex-shrink: 1;
+    border-color: transparent;
+    border-style: none;
+    border-width: 0;
+    border-radius: 0px 0px 0px 0px;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: transparent;
+  }
+  .loginpage-vector {
+    top: 0px;
+    left: 0px;
+    width: 23px;
+    height: 26px;
+    position: absolute;
+  }
+
+  .chart {
+    top: calc(50% - 400px);
+    width: 100%;
+    height: 50%;
+    display: flex;
+    position: absolute;
+    align-items: center;
+    flex-shrink: 0;
+    border-color: transparent;
+    justify-content: center;
+  }
+
+  html, body {
+      margin: 0; height: 100%; overflow: hidden;
+  }
+  

@@ -41,11 +41,9 @@ export class TweetComponent {
     this.displayTweetMedia = this.tweet?.hasMedia;
     this.displayUserImage = this.tweet?.author.hasImage;
     this.ownTweet = this.viewingUser != undefined && this.tweet?.author.username == this.viewingUser.username;
-    console.log("sdfsds!",this.viewingUser)
   }
   
   ngOnChanges(changes: SimpleChanges): void {
-    console.log("sdfsds!",this.viewingUser)
     if (changes['viewingUser.blocked'] && changes['viewingUser.blocked'].currentValue)  {
       this.blocked = this.viewingUser && this.tweet?.author  && this.viewingUser?.blocked.includes(this.tweet?.author.username);
       

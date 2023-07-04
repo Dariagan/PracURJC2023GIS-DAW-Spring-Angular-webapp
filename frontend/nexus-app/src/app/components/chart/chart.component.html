@@ -43,10 +43,13 @@
     />
   </head>
   <body>
-
+    <app-nav>
+      <app-nav-button [url]="'/feed'" [buttonText]="'Feed'"></app-nav-button>
+      <app-nav-button [url]="'/'" [buttonText]="'Login'"></app-nav-button>
+    </app-nav> 
       <div class="loginpage-container">
         <div class="loginpage-loginpage">
-          <app-nav></app-nav> 
+          
           
           <div class="chart">
             <canvas id="myChart" style="width:100%;max-width:1000px"></canvas>

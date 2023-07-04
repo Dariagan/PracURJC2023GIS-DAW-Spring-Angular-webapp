@@ -1,8 +1,9 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
 import { TweetService } from 'app/services/tweet.service';
-import { ChartOptions, ChartType, ChartDataset, elements, Chart } from 'chart.js';
+import { Chart, registerables} from 'chart.js';
 
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-bar-chart',
@@ -10,36 +11,7 @@ import { ChartOptions, ChartType, ChartDataset, elements, Chart } from 'chart.js
   styleUrls: ['./chart.component.css']
 })
 export class ChartComponent {
-  public barChartOptions: ChartOptions = {
-    responsive: true, 
-    maintainAspectRatio: false,
-    scales: {
-      x: {
-        grid: {
-          display: false
-        },
-        beginAtZero: true
-      },
-      y: {
-        grid: {
-          display: true
-        },
-          beginAtZero: true 
-
-      }
-    },
-    plugins: {
-      legend: {
-        display: false 
-      }
-    },
-    elements: {
-      bar: {
-        backgroundColor: ["red", "green", "blue", "orange", "brown"],
-        
-      }
-    }
-  };
+ 
   
   
   public barChartLegend = false;
@@ -51,43 +23,59 @@ export class ChartComponent {
     
   }
   ngOnInit(): void{
+    var myChart: any;
     this.tweetService.getMostLikedTweets(0, 6).subscribe(
-      receivedTweets => {this.tweets = receivedTweets; this.defineChart()}
+      receivedTweets => {this.tweets = receivedTweets; this.defineChart(myChart)}
     )
   }
 
-  defineChart(){
+  defineChart(chart: any){
 
     const xValues: string[] = []
     const yValues: number[] = []
 
     this.tweets?.forEach(tweet => {
-      xValues.push(`'${tweet.text}'\nby: ${tweet.author}`)
+      xValues.push(`'${tweet.text}'\nby user: ${tweet.author.username}`)
       yValues.push(tweet.likes.length)
     });
 
 
-    var myChart =
+    chart =
         new Chart("myChart", {
           type: "bar",
           data: {
             labels: xValues,
             datasets: [{
+              label: "Top 5 most liked tweets",
+              backgroundColor: ["red", "green","blue","orange","brown"],
               data: yValues
             }]
           },
           options: {
             scales: {
               y:{
-
+                beginAtZero: true,
+                ticks: {
+                  precision: 0
+                },
+              },
+              
+            },
+            plugins: {
+              legend: {
+                  labels: {
+                    
+                      font: {
+                          size: 20
+                      }
+                  }
               }
-            }
+          }
           }
         });
   }
 
 
-  public barChartData: ChartDataset[] = [];
 
   chartClicked(e: any): void {
     // Handle chart click event
