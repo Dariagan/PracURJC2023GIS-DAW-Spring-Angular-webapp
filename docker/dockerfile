@@ -28,7 +28,7 @@ FROM maven:3.8.5-openjdk-17 as builder
 WORKDIR /project
 
 # Copy of project dependencies
-COPY nexus_app/pom.xml /project/
+COPY backend/pom.xml /project/
 
 # Execute command in compilation container to download project dependencies
 RUN mvn clean verify --fail-never
