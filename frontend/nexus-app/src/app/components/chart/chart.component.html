@@ -48,17 +48,8 @@
         <div class="loginpage-loginpage">
           <app-nav></app-nav> 
           
-          <div class = "chart">
-            <app-bar-chart 
-            [data]="barChartData"
-            [labels]="barChartLabels"
-            [options]="barChartOptions"
-            [plugins]="barChartPlugins"
-            [legend]="barChartLegend"
-            [chartType]="'bar'"
-            (chartHover)="chartHovered($event)"
-            (chartClick)="chartClicked($event)">
-            </app-bar-chart>
+          <div class="chart">
+            <canvas id="myChart" style="width:100%;max-width:1000px"></canvas>
           </div>
 
         </div>

@@ -39,6 +39,7 @@
   <body>
     <app-nav>
       <app-nav-button [url]="'/feed'" [buttonText]="'Feed'"></app-nav-button>
+      <app-nav-button [url]="'/logout'" [buttonText]="'Log out'" *ngIf="viewingUser != undefined"></app-nav-button>
     </app-nav>
       <div class="profileanon-container">
         <div class="profileanon-profileanon">

@@ -1,11 +1,12 @@
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { Tweet } from 'app/models/tweet.model';
 import { TweetService } from 'app/services/tweet.service';
-import { ChartOptions, ChartType, ChartDataset, elements } from 'chart.js';
+import { ChartOptions, ChartType, ChartDataset, elements, Chart } from 'chart.js';
+
 
 @Component({
   selector: 'app-bar-chart',
-  template: './chart.component.html',
+  templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.css']
 })
 export class ChartComponent {
@@ -46,25 +47,45 @@ export class ChartComponent {
   data?: number[]
   tweets?: Tweet[]
 
-  constructor(tweetService: TweetService){
-    tweetService.getMostLikedTweets(0, 6).subscribe(
-      receivedTweets => this.tweets = receivedTweets
+  constructor(private tweetService: TweetService){
+    
+  }
+  ngOnInit(): void{
+    this.tweetService.getMostLikedTweets(0, 6).subscribe(
+      receivedTweets => {this.tweets = receivedTweets; this.defineChart()}
     )
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['tweets'] && changes['tweets'].currentValue && this.tweets)  {
-      //TODO preparar gráfico
-      
-      this.barChartData = [
-        {
-          data: [0],
-          barThickness: 'flex',
-        }
-      ]
-    }
+  defineChart(){
+
+    const xValues: string[] = []
+    const yValues: number[] = []
+
+    this.tweets?.forEach(tweet => {
+      xValues.push(`'${tweet.text}'\nby: ${tweet.author}`)
+      yValues.push(tweet.likes.length)
+    });
+
+
+    var myChart =
+        new Chart("myChart", {
+          type: "bar",
+          data: {
+            labels: xValues,
+            datasets: [{
+              data: yValues
+            }]
+          },
+          options: {
+            scales: {
+              y:{
+
+              }
+            }
+          }
+        });
   }
-  
+
 
   public barChartData: ChartDataset[] = [];
 
