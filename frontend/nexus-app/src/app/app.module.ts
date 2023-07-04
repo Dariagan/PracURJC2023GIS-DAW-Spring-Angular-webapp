@@ -26,6 +26,7 @@ import { FollowButtonComponent } from './components/follow-button.component';
 import { ChartComponent } from './components/chart/chart.component';
 import { SearchbarComponent } from './components/searchbar.component';
 import { ErrorComponent } from './components/error.component';
+import { LogoutComponent } from './components/logout.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { ErrorComponent } from './components/error.component';
     FollowButtonComponent,
     ChartComponent,
     SearchbarComponent,
-    ErrorComponent
+    ErrorComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserModule,

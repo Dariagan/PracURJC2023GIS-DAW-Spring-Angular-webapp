@@ -24,4 +24,7 @@ public class JwtCookieManager {
 		return ResponseCookie.from(ACCESS_TOKEN_COOKIE_NAME, "").maxAge(0).httpOnly(true).path("/").build();
 	}
 
+	public HttpCookie deleteRefreshTokenCookie() {
+		return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "").maxAge(0).httpOnly(true).path("/").build();
+	}
 }

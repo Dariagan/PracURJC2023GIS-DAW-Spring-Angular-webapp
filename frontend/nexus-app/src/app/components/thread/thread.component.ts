@@ -28,7 +28,8 @@ export class ThreadComponent {
     this.showMoreTweets()
   }
 
-  public restart(){
+  public async restart(){
+    await new Promise((resolve) => setTimeout(resolve, 400));
     this.resetPage()
     this.showMoreTweets()
   }

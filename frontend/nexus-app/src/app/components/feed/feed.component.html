@@ -39,9 +39,9 @@
 
   <body>
       <app-nav>
-        <app-nav-button [url]="'/u/'+viewingUser?.username" [buttonText]="'Profile'"></app-nav-button>
+        <app-nav-button [url]="'/u/'+viewingUser.username" [buttonText]="'Profile'" *ngIf="viewingUser != undefined"></app-nav-button>
         <app-nav-button [url]="'/chart'" [buttonText]="'Chart'"></app-nav-button>
-        <app-nav-button [url]="'/logout'" [buttonText]="'Log out'"></app-nav-button>
+        <app-nav-button [url]="'/logout'" [buttonText]="'Log out'" *ngIf="viewingUser != undefined"></app-nav-button>
         <app-nav-button (click)="moderateButtonClicked()" [buttonText]="'Moderate'" *ngIf="isAdmin"></app-nav-button>
       </app-nav>
       <div class="feedanon-container">

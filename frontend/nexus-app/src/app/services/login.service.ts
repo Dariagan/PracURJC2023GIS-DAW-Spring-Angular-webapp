@@ -69,7 +69,7 @@ export class LoginService {
     logOut() {
 
         return this.httpClient.post(BASE_URL + '/logout', { withCredentials: true })
-            .subscribe((resp: any) => {
+            .subscribe(() => {
                 console.log("LOGOUT: Successful");
                 this.logged = false;
                 this.user = undefined;
