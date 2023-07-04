@@ -20,7 +20,8 @@ export class TweetComponent {
   @Output()
   deleted = new EventEmitter<number>();
 
-  viewingUser?:User = this.loginService.getUser();
+  @Input()
+  viewingUser?:User;
 
   authorBanned:boolean = false;
   blocked?:boolean;

@@ -70,8 +70,15 @@ public class AuthRestController {
 		@CookieValue(name = "refreshToken", required = false) String refreshToken,
         @RequestBody LoginRequest loginRequest,
         @RequestParam Optional<String> username,
-        @RequestParam Optional<String> password
+        @RequestParam Optional<String> password,
+        HttpServletRequest req,
+        HttpServletResponse res
     ) {
+        try {
+            req.logout();
+            req.getSession(false).invalidate();     
+        } catch (Exception ignored) {}
+
         if (username.isPresent() && password.isPresent())
             loginRequest = new LoginRequest(username.get(), password.get());
 
@@ -91,6 +98,9 @@ public class AuthRestController {
         
         try {
             req.logout();
+            try {  
+                req.getSession(false).invalidate();     
+            } catch (Exception ignored) {}
 
             JwtCookieManager jwtCookieManager = new JwtCookieManager();
             res.addHeader(HttpHeaders.SET_COOKIE, jwtCookieManager.deleteAccessTokenCookie().toString());

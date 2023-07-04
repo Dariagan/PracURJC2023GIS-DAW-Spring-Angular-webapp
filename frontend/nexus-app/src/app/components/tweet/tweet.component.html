@@ -40,38 +40,41 @@
         />
         
 
-        <div *ngIf="!viewerIsAdmin && !ownTweet; else removeable" (click)="report()">
-          <ng-container *ngIf="viewingUser && !tweet?.reporters?.includes(viewingUser.username); else alreadyReported">
-            <span style="margin-left: 15px; margin-bottom: 5px; cursor: pointer;" class="profileanon-text020">
-              report
-            </span>
-            <img
-              src="/assets/tweet/report.png"
-              alt="report"
-              class="interaction-icon"
-          />
-          </ng-container>
-          <ng-template #alreadyReported>
-            <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">
-              reported.
-            </span>
-          </ng-template>  
-        </div>
-        <ng-template #removeable>
-          <ng-container *ngIf="!viewerIsAdmin; else adminRemoveable">
-            <span class="profileanon-text020">delete</span>  
-          </ng-container>
-          <ng-template #adminRemoveable>
-            <span class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
-          </ng-template>
-          <img
-                (click)="delete()"
-                src="/assets/tweet/delete.png"
-                alt="delete"
+        <ng-container *ngIf="viewingUser != undefined">
+          <div *ngIf="!viewerIsAdmin && !ownTweet; else removeable" (click)="report()">
+            <ng-container *ngIf="viewingUser && !tweet?.reporters?.includes(viewingUser.username); else alreadyReported">
+              <span style="margin-left: 15px; margin-bottom: 5px; cursor: pointer;" class="profileanon-text020">
+                report
+              </span>
+              <img
+                src="/assets/tweet/report.png"
+                alt="report"
                 class="interaction-icon"
-                
             />
-        </ng-template>
+            </ng-container>
+            <ng-template #alreadyReported>
+              <span style="margin-left: 15px; margin-bottom: 5px;" class="profileanon-text020">
+                reported.
+              </span>
+            </ng-template>  
+          </div>
+
+          <ng-template #removeable>
+            <ng-container *ngIf="!viewerIsAdmin; else adminRemoveable">
+              <span class="profileanon-text020">delete</span>  
+            </ng-container>
+            <ng-template #adminRemoveable>
+              <span class="profileanon-text020">{{tweet?.reporters?.length}} reports</span>  
+            </ng-template>
+            <img
+                  (click)="delete()"
+                  src="/assets/tweet/delete.png"
+                  alt="delete"
+                  class="interaction-icon"
+                  
+              />
+          </ng-template>
+        </ng-container>
     </div>
 
   </div>

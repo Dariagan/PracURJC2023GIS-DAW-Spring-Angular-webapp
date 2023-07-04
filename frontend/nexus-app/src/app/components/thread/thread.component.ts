@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, QueryList, ViewChildren } from 
 import { Tweet } from 'app/models/tweet.model';
 import { Observable } from 'rxjs';
 import { TweetComponent } from '../tweet/tweet.component';
+import { User } from 'app/models/user';
 
 @Component({
   selector: 'app-thread',
@@ -17,6 +18,9 @@ export class ThreadComponent {
   @Input()
   tweetRetrievalMethod!: (page: number, size: number) => Observable<Tweet[]>;
 
+  @Input()
+  viewingUser?: User;
+
   page: number = 0;
   size: number = 10;
 
@@ -29,7 +33,7 @@ export class ThreadComponent {
   }
 
   public async restart(){
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 200));
     this.resetPage()
     this.showMoreTweets()
   }

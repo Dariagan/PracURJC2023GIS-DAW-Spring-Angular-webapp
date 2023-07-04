@@ -10,6 +10,13 @@ export class UserService {
 
   constructor(private httpClient: HttpClient) { }
 
+  public getCurrentUser(): Observable<User> {
+    const url = "/api/users/me";
+    return this.httpClient.get<User>(url).pipe(
+      catchError(error => this.handleError<User>(error))
+    );
+  }
+
   public getUser(username: string): Observable<User> {
     const url = "/api/users/" + username;
     return this.httpClient.get<User>(url).pipe(

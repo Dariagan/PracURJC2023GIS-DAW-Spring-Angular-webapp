@@ -16,7 +16,7 @@ export class FeedComponent {
 
   retrievedTweets:Tweet[] = [];
 
-  viewingUser?:User = this.loginService.getUser();
+  viewingUser?:User 
 
   getTweetsMethod: (page: number, size: number) => Observable<Tweet[]>;
 
@@ -25,7 +25,11 @@ export class FeedComponent {
   isAdmin?: boolean;
 
   ngOnInit(): void {
-    this.isAdmin = UserService.isAdmin(this.viewingUser)
+    this.userService.getCurrentUser().subscribe(
+      user => {this.viewingUser = user; this.isAdmin = UserService.isAdmin(this.viewingUser)}
+      
+    );
+    
   }
 
 
@@ -35,7 +39,7 @@ export class FeedComponent {
     }
   }
 
-  constructor(private loginService: LoginService, private tweetService: TweetService){ 
+  constructor(private userService: UserService, private tweetService: TweetService){ 
     this.getTweetsMethod = this.viewingUser
       ? (page: number, size: number) => this.tweetService.getFollowedUsersTweets(this.viewingUser!.username, page, size)
       : (page: number, size: number) => this.tweetService.getNewestTweets(page, size);

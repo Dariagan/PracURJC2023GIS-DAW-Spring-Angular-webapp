@@ -20,7 +20,7 @@ export class LoginComponent {
       () => {
         this.router.navigate(['feed'])
       },
-      (error) => {
+      () => {
         alert("Wrong credentials");
       }
     );
