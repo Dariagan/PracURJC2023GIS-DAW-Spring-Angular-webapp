@@ -207,7 +207,7 @@ Now you can make a custom query via parameters in the url of the specific REST A
 
 #### Gabriel: 
 
-I've mainly worked on the creation of the docker image, its operation.
+I've mainly worked on the creation of the docker image, its operation, and setting up the website in the URJC machine
 |  Description |
 | ------ | 
 | Created docker-compse.yml |
